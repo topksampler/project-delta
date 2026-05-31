@@ -1,18 +1,17 @@
-# lalith-ai-lab
+Personal AI lab.
 
-Personal AI systems lab for fine-tuning, post-training, evals, and distributed training.
+Fine-tuning, evals, post-training, distributed training.
 
-## Mental model
+```text
+Mac = cockpit | GitHub = code | B2 = data | Lambda/Modal = workers
+```
 
-- GitHub stores code, scripts, configs, and documentation.
-- Backblaze B2 stores durable data, checkpoints, logs, and artifacts.
-- Lambda and Modal are disposable compute workers.
-- Secrets live in local `.env` files or platform secret managers, never in Git.
+Workers are disposable. Code and data are not.
 
-## Local setup
+Phase 1 — clone, `.env`, B2, run job, push artifacts, kill machine. Details in [phases](./docs/phases.md), [the split](./docs/the-split.md), [b2 tree](./docs/b2-tree.md).
 
 ```bash
-cp .env.example .env
-# fill in .env
-bash scripts/check_storage.sh
-bash scripts/test_storage_roundtrip.sh
+bash scripts/check_storage.sh && bash scripts/test_storage_roundtrip.sh
+```
+
+Fix storage before Lambda.
