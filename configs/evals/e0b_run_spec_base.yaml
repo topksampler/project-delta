@@ -1,0 +1,12 @@
+run_id: e0b-qwen-0_5b-run-spec-base
+
+model:
+  name: Qwen/Qwen2.5-0.5B-Instruct
+  trust_remote_code: true
+
+eval:
+  path: data/run_spec_v0/eval.jsonl
+  output_dir: runs/e0b-qwen-0_5b-run-spec-base
+  max_new_tokens: 256
+  temperature: 0.0
+  top_p: 1.0
