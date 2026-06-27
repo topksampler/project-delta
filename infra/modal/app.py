@@ -15,14 +15,26 @@ Run from Mac cockpit (no SSH):
 from __future__ import annotations
 
 import os
+import json
+import platform
 import subprocess
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 import modal
+import torch
 import yaml
 
 APP_NAME = "lalith-ai-lab"
 REPO_ROOT = Path("/root/lalith-ai-lab")
+
+
+def _timed(label: str, fn):
+    t0 = time.perf_counter()
+    result = fn()
+    print(f"[timing] {label}: {time.perf_counter() - t0:.1f}s")
+    return result
 
 app = modal.App(APP_NAME)
 
@@ -35,17 +47,18 @@ image = (
         "mv s5cmd /usr/local/bin/s5cmd",
         "rm s5cmd_2.2.2_Linux-64bit.tar.gz",
     )
-    .pip_install_from_requirements("requirements.txt")
+    .pip_install_from_requirements("requirements/torch-cu128.txt")
+    .pip_install_from_requirements("requirements/runtime.txt")
     .env({"PYTHONPATH": "/root/lalith-ai-lab/src"})
+    .add_local_dir("src", remote_path="/root/lalith-ai-lab/src")
+    .add_local_dir("configs", remote_path="/root/lalith-ai-lab/configs")
 )
 
-src_mount = modal.Mount.from_local_dir("src", remote_path="/root/lalith-ai-lab/src")
-cfg_mount = modal.Mount.from_local_dir("configs", remote_path="/root/lalith-ai-lab/configs")
 secrets = [modal.Secret.from_name("lalith-lab")]
 
 
 def _s5cmd(args: list[str]) -> None:
-    endpoint = os.environ["S3_ENDPOINT_URL"]
+    endpoint = os.environ["S3_ENDPOINT_URL"].strip()
     cmd = ["s5cmd", "--endpoint-url", endpoint, *args]
     print("+", " ".join(cmd))
     subprocess.run(cmd, check=True)
@@ -93,7 +106,39 @@ def _sync_outputs(run_id: str, cfg: dict) -> None:
         run_dir = Path(cfg["output"]["dir"])
     else:
         run_dir = Path(cfg["eval"]["output_dir"])
+    if not run_dir.is_absolute():
+        run_dir = REPO_ROOT / run_dir
     _s5cmd(["cp", f"{run_dir}/*", _s3(f"runs/{run_id}/")])
+
+
+def _write_receipts(run_id: str) -> None:
+    run_dir = REPO_ROOT / "runs" / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+    cuda_available = torch.cuda.is_available()
+    device_count = torch.cuda.device_count() if cuda_available else 0
+    hardware = {
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "target": "modal",
+        "hostname": platform.node(),
+        "platform": platform.platform(),
+        "cuda_available": cuda_available,
+        "device_count": device_count,
+        "gpu_names": [torch.cuda.get_device_name(i) for i in range(device_count)] if cuda_available else [],
+    }
+    env = {
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "target": "modal",
+        "python": platform.python_version(),
+        "torch": torch.__version__,
+        "torch_cuda": torch.version.cuda,
+        "cuda_available": cuda_available,
+        "device_count": device_count,
+        "profile": "modal-cu128",
+    }
+    (run_dir / "hardware.json").write_text(json.dumps(hardware, indent=2) + "\n", encoding="utf-8")
+    (run_dir / "env.json").write_text(json.dumps(env, indent=2) + "\n", encoding="utf-8")
+    _s5cmd(["cp", str(run_dir / "hardware.json"), _s3(f"runs/{run_id}/hardware.json")])
+    _s5cmd(["cp", str(run_dir / "env.json"), _s3(f"runs/{run_id}/env.json")])
 
 
 def _run_module(module: str, config_path: Path) -> dict:
@@ -101,34 +146,34 @@ def _run_module(module: str, config_path: Path) -> dict:
     env["PYTHONPATH"] = str(REPO_ROOT / "src")
     cmd = ["python", "-m", module, "--config", str(config_path)]
     print("+", " ".join(cmd))
-    subprocess.run(cmd, check=True, env=env)
+    subprocess.run(cmd, check=True, env=env, cwd=str(REPO_ROOT))
     with open(config_path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
 
 @app.function(
     image=image,
-    gpu="A10G",
+    gpu="T4",
     secrets=secrets,
-    mounts=[src_mount, cfg_mount],
     timeout=60 * 60,
 )
 def eval_run(run_id: str, config: str) -> None:
-    config_path = _sync_inputs(run_id, config)
-    cfg = _run_module("lab.eval_run_spec", config_path)
-    _sync_outputs(run_id, cfg)
+    _timed("env_receipts", lambda: _write_receipts(run_id))
+    config_path = _timed("b2_pull_inputs", lambda: _sync_inputs(run_id, config))
+    cfg = _timed("compute", lambda: _run_module("lab.eval_run_spec", config_path))
+    _timed("b2_push_outputs", lambda: _sync_outputs(run_id, cfg))
     print(f"eval_run complete: {run_id}")
 
 
 @app.function(
     image=image,
-    gpu="A10G",
+    gpu="T4",
     secrets=secrets,
-    mounts=[src_mount, cfg_mount],
     timeout=60 * 60 * 4,
 )
 def train(run_id: str, config: str) -> None:
-    config_path = _sync_inputs(run_id, config)
-    cfg = _run_module("lab.train_sft_lora", config_path)
-    _sync_outputs(run_id, cfg)
+    _timed("env_receipts", lambda: _write_receipts(run_id))
+    config_path = _timed("b2_pull_inputs", lambda: _sync_inputs(run_id, config))
+    cfg = _timed("compute", lambda: _run_module("lab.train_sft_lora", config_path))
+    _timed("b2_push_outputs", lambda: _sync_outputs(run_id, cfg))
     print(f"train complete: {run_id}")

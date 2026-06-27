@@ -1,0 +1,11 @@
+transformers
+trl
+peft
+datasets
+accelerate
+pyyaml
+rich
+sentencepiece
+protobuf
+safetensors
+huggingface-hub

@@ -12,7 +12,7 @@ def require_env(*keys: str) -> dict[str, str]:
 
 def s5cmd_base() -> list[str]:
     env = require_env("S3_ENDPOINT_URL")
-    return ["s5cmd", "--endpoint-url", env["S3_ENDPOINT_URL"]]
+    return ["s5cmd", "--endpoint-url", env["S3_ENDPOINT_URL"].strip()]
 
 
 def s3_uri(key: str) -> str:

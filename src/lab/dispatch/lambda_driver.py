@@ -1,12 +1,32 @@
 import os
 import subprocess
 import time
+from contextlib import contextmanager
 from pathlib import Path
 
 import requests
 import yaml
 
+from lab.dispatch.timing import RunTimer
+
 LAMBDA_API = os.environ.get("LAMBDA_API_BASE", "https://cloud.lambdalabs.com/api/v1")
+SSH_OPTS = [
+    "-o",
+    "StrictHostKeyChecking=no",
+    "-o",
+    "UserKnownHostsFile=/dev/null",
+    "-o",
+    "ConnectTimeout=30",
+]
+
+
+@contextmanager
+def _stage(timer: RunTimer | None, name: str):
+    if timer:
+        with timer.stage(name):
+            yield
+    else:
+        yield
 
 
 def _auth() -> tuple[str, str]:
@@ -63,12 +83,14 @@ def terminate_instance(instance_id: str) -> None:
 
 def wait_for_ssh(instance_id: str, *, timeout_sec: int = 900, poll_sec: int = 15) -> dict:
     deadline = time.time() + timeout_sec
+    t0 = time.perf_counter()
     while time.time() < deadline:
         inst = get_instance(instance_id)
         if inst and inst.get("status") == "active" and inst.get("ip"):
             return inst
         status = inst.get("status") if inst else "missing"
-        print(f"waiting for instance {instance_id}: status={status}")
+        elapsed = time.perf_counter() - t0
+        print(f"waiting for instance {instance_id}: status={status} ({elapsed:.0f}s elapsed)")
         time.sleep(poll_sec)
     raise TimeoutError(f"Instance {instance_id} did not become SSH-ready in {timeout_sec}s")
 
@@ -89,17 +111,121 @@ def ssh_env_exports() -> str:
         "AWS_DEFAULT_REGION",
         "HF_TOKEN",
         "HUGGINGFACE_HUB_TOKEN",
+        "LAB_ENV_PROFILE",
+        "LAB_PYTHON_VERSION",
+        "LAB_REQUIRE_GPU",
     ]
     parts = []
     for key in keys:
         val = os.environ.get(key)
         if val:
+            if key == "S3_ENDPOINT_URL":
+                val = val.strip()
             parts.append(f'export {key}={_shell_quote(val)}')
     return "\n".join(parts)
 
 
 def _shell_quote(value: str) -> str:
     return "'" + value.replace("'", "'\"'\"'") + "'"
+
+
+def runtime_ssh_user(repo_root: Path) -> str:
+    return load_runtime_defaults(repo_root).get("ssh_user", "ubuntu")
+
+
+def resolve_host(*, instance_id: str | None, instance_ip: str | None) -> str:
+    if instance_ip:
+        return instance_ip
+    if instance_id:
+        inst = get_instance(instance_id)
+        if not inst:
+            raise RuntimeError(f"Instance not found: {instance_id}")
+        host = inst.get("ip")
+        if not host:
+            raise RuntimeError(f"Instance has no IP yet: {instance_id}")
+        return host
+    raise RuntimeError("Provide --instance-id or --instance-ip")
+
+
+def remote_exec(*, host: str, user: str, body: str) -> None:
+    cmd = ["ssh", *SSH_OPTS, f"{user}@{host}", "bash -s"]
+    print(f"+ {' '.join(cmd)}")
+    subprocess.run(cmd, input=body, text=True, check=True)
+
+
+def rsync_repo(*, host: str, user: str, repo_root: Path, remote_dir: str) -> None:
+    subprocess.run(
+        ["ssh", *SSH_OPTS, f"{user}@{host}", f"mkdir -p {remote_dir}"],
+        check=True,
+    )
+    cmd = [
+        "rsync",
+        "-az",
+        "-e",
+        "ssh " + " ".join(SSH_OPTS),
+        "--exclude",
+        ".git/",
+        "--exclude",
+        ".venv/",
+        "--exclude",
+        "runs/",
+        "--exclude",
+        "tmp/",
+        "--exclude",
+        "data/",
+        f"{repo_root}/",
+        f"{user}@{host}:{remote_dir}/",
+    ]
+    print(f"+ {' '.join(cmd)}")
+    subprocess.run(cmd, check=True)
+
+
+def probe_hardware(*, repo_root: Path, instance_id: str | None, instance_ip: str | None) -> None:
+    user = runtime_ssh_user(repo_root)
+    host = resolve_host(instance_id=instance_id, instance_ip=instance_ip)
+    remote_exec(
+        host=host,
+        user=user,
+        body=r"""
+set -euo pipefail
+echo "=== hardware probe ==="
+hostname
+uname -a
+if command -v nvidia-smi >/dev/null 2>&1; then
+  nvidia-smi
+else
+  echo "nvidia-smi: missing"
+fi
+""",
+    )
+
+
+def build_env(
+    *,
+    repo_root: Path,
+    instance_id: str | None,
+    instance_ip: str | None,
+    run_id: str,
+) -> None:
+    runtime = load_runtime_defaults(repo_root)
+    user = runtime.get("ssh_user", "ubuntu")
+    host = resolve_host(instance_id=instance_id, instance_ip=instance_ip)
+    remote_dir = os.environ.get("LAB_REPO_DIR", "/home/ubuntu/lalith-ai-lab")
+    rsync_repo(host=host, user=user, repo_root=repo_root, remote_dir=remote_dir)
+    preamble = "\n".join(
+        [
+            "set -euo pipefail",
+            ssh_env_exports(),
+            f'export LAB_RUN_ID={_shell_quote(run_id)}',
+            f'export LAB_REPO_DIR={_shell_quote(remote_dir)}',
+            "",
+        ]
+    )
+    remote_exec(
+        host=host,
+        user=user,
+        body=preamble + f"cd {_shell_quote(remote_dir)}\nscripts/remote/bootstrap_env.sh\n",
+    )
 
 
 def run_remote_job(
@@ -119,15 +245,13 @@ def run_remote_job(
             f'export LAB_RUN_ID={_shell_quote(run_id)}',
             f'export LAB_REPO_URL={_shell_quote(repo_url)}',
             f'export LAB_REPO_BRANCH={_shell_quote(repo_branch)}',
+            "export LAB_SKIP_GIT=1",
             "",
         ]
     )
     cmd = [
         "ssh",
-        "-o",
-        "StrictHostKeyChecking=accept-new",
-        "-o",
-        "ConnectTimeout=30",
+        *SSH_OPTS,
         f"{user}@{host}",
         "bash -s",
     ]
@@ -158,6 +282,7 @@ def dispatch(
     terminate: bool,
     instance_id: str | None,
     instance_ip: str | None,
+    timer: RunTimer | None = None,
 ) -> None:
     runtime = load_runtime_defaults(repo_root)
     remote_script = repo_root / "scripts/remote/run_job.sh"
@@ -170,14 +295,16 @@ def dispatch(
 
     try:
         if launch:
-            launched_id = launch_instance(
-                region_name=runtime["region_name"],
-                instance_type_name=runtime["instance_type_name"],
-                ssh_key_names=runtime["ssh_key_names"],
-                name=f"lab-{run_id}"[:60],
-            )
-            print(f"launched instance: {launched_id}")
-            inst = wait_for_ssh(launched_id)
+            with _stage(timer, "lambda_launch"):
+                launched_id = launch_instance(
+                    region_name=runtime["region_name"],
+                    instance_type_name=runtime["instance_type_name"],
+                    ssh_key_names=runtime["ssh_key_names"],
+                    name=f"lab-{run_id}"[:60],
+                )
+                print(f"launched instance: {launched_id}")
+            with _stage(timer, "lambda_boot"):
+                inst = wait_for_ssh(launched_id)
             host = inst["ip"]
         elif instance_id:
             inst = get_instance(instance_id)
@@ -192,15 +319,20 @@ def dispatch(
             raise RuntimeError("No SSH host available for lambda run")
 
         print(f"dispatching to lambda host={host} run_id={run_id}")
-        run_remote_job(
-            host=host,
-            user=ssh_user,
-            run_id=run_id,
-            repo_url=repo_url,
-            repo_branch=repo_branch,
-            remote_script=remote_script,
-        )
+        remote_dir = os.environ.get("LAB_REPO_DIR", "/home/ubuntu/lalith-ai-lab")
+        with _stage(timer, "rsync_code"):
+            rsync_repo(host=host, user=ssh_user, repo_root=repo_root, remote_dir=remote_dir)
+        with _stage(timer, "remote_job"):
+            run_remote_job(
+                host=host,
+                user=ssh_user,
+                run_id=run_id,
+                repo_url=repo_url,
+                repo_branch=repo_branch,
+                remote_script=remote_script,
+            )
     finally:
         if terminate and launched_id and launch:
-            print(f"terminating instance: {launched_id}")
-            terminate_instance(launched_id)
+            with _stage(timer, "lambda_terminate"):
+                print(f"terminating instance: {launched_id}")
+                terminate_instance(launched_id)
