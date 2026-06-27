@@ -1,0 +1,4 @@
+# Modal defaults for `lab run --target modal`.
+
+gpu: A10G
+secret_name: lalith-lab

@@ -1,0 +1,12 @@
+# Lambda Cloud defaults for `lab run --target lambda`.
+# Override per-run with flags or env vars.
+
+region_name: us-west-1
+instance_type_name: gpu_1x_a10
+ssh_key_names:
+  - gh-ssh
+
+ssh_user: ubuntu
+
+repo_url: https://github.com/topksampler/lalith-ai-lab.git
+repo_branch: main

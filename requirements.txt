@@ -10,3 +10,5 @@ sentencepiece
 protobuf
 safetensors
 huggingface-hub
+modal
+requests
