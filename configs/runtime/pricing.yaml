@@ -1,0 +1,26 @@
+# Estimated USD/hour rates for per-run cost accounting.
+# Lambda rates are refreshed from the API when possible.
+# Modal rates are list prices; actual invoice may differ with credits/plan.
+
+modal:
+  default_gpu: T4
+  gpu_usd_per_hour:
+    T4: 0.59
+    L4: 0.80
+    A10G: 1.10
+    A100: 3.40
+    H100: 3.95
+
+lambda:
+  default_instance_type: gpu_1x_a10
+  # Fallback if API lookup fails (USD/hour).
+  instance_usd_per_hour:
+    gpu_1x_a10: 1.29
+    gpu_1x_a100: 1.99
+    gpu_1x_a100_sxm4: 1.99
+
+# Optional manual credit baselines for `lab credits balance`.
+# Set in .env as LAMBDA_CREDITS_USD / MODAL_CREDITS_USD to override.
+credits:
+  lambda_usd: null
+  modal_usd: null

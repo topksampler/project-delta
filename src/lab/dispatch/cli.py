@@ -1,13 +1,12 @@
 import argparse
+import json
 import os
-import subprocess
-import time
 from pathlib import Path
 
 import yaml
 from rich import print
 
-from lab.dispatch import b2, lambda_driver, manifest, modal_driver
+from lab.dispatch import b2, costs, lambda_driver, manifest, modal_driver
 from lab.dispatch.timing import RunTimer
 
 
@@ -99,6 +98,36 @@ def cmd_run(args: argparse.Namespace) -> None:
             b2.upload_file(timings_path, f"runs/{run_id}/timings.json")
         except Exception as exc:
             print(f"[yellow]timings upload skipped: {exc}[/yellow]")
+
+        pricing = costs.load_pricing(root)
+        modal_gpu = args.gpu or pricing.get("modal", {}).get("default_gpu", "T4")
+        lambda_type = pricing.get("lambda", {}).get("default_instance_type", "gpu_1x_a10")
+        if args.target == "lambda":
+            lam_cfg = root / "configs/runtime/lambda.yaml"
+            if lam_cfg.exists():
+                with open(lam_cfg, "r", encoding="utf-8") as f:
+                    lambda_type = yaml.safe_load(f).get("instance_type_name", lambda_type)
+
+        cost = costs.estimate_run_cost(
+            repo_root=root,
+            run_id=run_id,
+            target=args.target,
+            stages=timer.stages,
+            total_sec=timer.total_sec(),
+            launched=bool(args.launch),
+            modal_gpu=modal_gpu if args.target == "modal" else None,
+            lambda_instance_type=lambda_type if args.target == "lambda" else None,
+        )
+        cost_path = root / "runs" / run_id / "cost.json"
+        costs.write_cost(cost_path, cost)
+        try:
+            b2.upload_file(cost_path, f"runs/{run_id}/cost.json")
+        except Exception as exc:
+            print(f"[yellow]cost upload skipped: {exc}[/yellow]")
+        print(
+            f"[green]estimated cost[/green] ${cost['estimated_cost_usd']:.4f} "
+            f"({cost['billable_seconds']:.0f}s @ ${cost['rate_usd_per_hour']:.2f}/hr)"
+        )
         timer.summary()
 
 
@@ -128,6 +157,124 @@ def cmd_lambda_list(_: argparse.Namespace) -> None:
             f"{inst.get('id')}  {inst.get('status'):10}  "
             f"{inst.get('ip') or '-':16}  {inst.get('name') or '-'}"
         )
+
+
+def _collect_costs(root: Path, *, from_b2: bool) -> list[dict]:
+    runs_dir = root / "runs"
+    if from_b2:
+        try:
+            lines = b2.list_prefix("runs/")
+        except Exception as exc:
+            print(f"[yellow]B2 list skipped: {exc}[/yellow]")
+            lines = []
+        run_ids = set()
+        for line in lines:
+            parts = line.strip().split()
+            if not parts:
+                continue
+            key = parts[-1]
+            if key.startswith("runs/") and key.count("/") >= 2:
+                run_ids.add(key.split("/")[1])
+        for rid in sorted(run_ids):
+            local = runs_dir / rid
+            local.mkdir(parents=True, exist_ok=True)
+            for name in ("cost.json", "timings.json"):
+                try:
+                    b2.download_file(f"runs/{rid}/{name}", local / name)
+                except Exception:
+                    pass
+
+    pricing = costs.load_pricing(root)
+    modal_gpu = pricing.get("modal", {}).get("default_gpu", "T4")
+    lambda_type = pricing.get("lambda", {}).get("default_instance_type", "gpu_1x_a10")
+    lam_cfg = root / "configs/runtime/lambda.yaml"
+    if lam_cfg.exists():
+        with open(lam_cfg, "r", encoding="utf-8") as f:
+            lambda_type = yaml.safe_load(f).get("instance_type_name", lambda_type)
+
+    out: list[dict] = []
+    if not runs_dir.exists():
+        return out
+    for run_dir in sorted(runs_dir.iterdir()):
+        if not run_dir.is_dir():
+            continue
+        cost_path = run_dir / "cost.json"
+        if cost_path.exists():
+            try:
+                out.append(json.loads(cost_path.read_text(encoding="utf-8")))
+                continue
+            except Exception:
+                pass
+        timings_path = run_dir / "timings.json"
+        if not timings_path.exists():
+            continue
+        timings = json.loads(timings_path.read_text(encoding="utf-8"))
+        stages = timings.get("stages_sec", {})
+        launched = "lambda_launch" in stages
+        target = timings.get("target", "unknown")
+        estimate = costs.estimate_from_timings(
+            repo_root=root,
+            timings_path=timings_path,
+            launched=launched,
+            modal_gpu=modal_gpu if target == "modal" else None,
+            lambda_instance_type=lambda_type if target == "lambda" else None,
+        )
+        if estimate:
+            costs.write_cost(cost_path, estimate)
+            out.append(estimate)
+    return out
+
+
+def cmd_credits_runs(args: argparse.Namespace) -> None:
+    root = repo_root()
+    load_dotenv(root / ".env")
+    rows = _collect_costs(root, from_b2=args.from_b2)
+    if args.target:
+        rows = [r for r in rows if r.get("target") == args.target]
+    if not rows:
+        print("No cost.json files found. Run jobs first or pass --from-b2.")
+        return
+    for row in rows:
+        print(
+            f"{row.get('run_id'):40}  {row.get('target'):6}  "
+            f"${row.get('estimated_cost_usd', 0):8.4f}  "
+            f"{row.get('billable_seconds', 0):7.0f}s  {row.get('resource', '-')}"
+        )
+
+
+def cmd_credits_summary(args: argparse.Namespace) -> None:
+    root = repo_root()
+    load_dotenv(root / ".env")
+    rows = _collect_costs(root, from_b2=args.from_b2)
+    if args.target:
+        rows = [r for r in rows if r.get("target") == args.target]
+    by_target: dict[str, float] = {}
+    for row in rows:
+        t = row.get("target", "unknown")
+        by_target[t] = by_target.get(t, 0.0) + float(row.get("estimated_cost_usd", 0))
+    total = sum(by_target.values())
+    print(f"[bold]tracked spend[/bold] ${total:.4f} across {len(rows)} runs")
+    for target, amount in sorted(by_target.items()):
+        print(f"  {target:8} ${amount:.4f}")
+
+
+def cmd_credits_balance(args: argparse.Namespace) -> None:
+    root = repo_root()
+    load_dotenv(root / ".env")
+    rows = _collect_costs(root, from_b2=args.from_b2)
+    by_target: dict[str, float] = {}
+    for row in rows:
+        t = row.get("target", "unknown")
+        by_target[t] = by_target.get(t, 0.0) + float(row.get("estimated_cost_usd", 0))
+    baselines = costs.credit_baselines()
+    print("[bold]credit baselines[/bold] (set LAMBDA_CREDITS_USD / MODAL_CREDITS_USD in .env)")
+    for target, baseline in (("lambda", baselines["lambda_usd"]), ("modal", baselines["modal_usd"])):
+        spent = by_target.get(target, 0.0)
+        if baseline is None:
+            print(f"  {target:8} baseline not set  tracked spend ${spent:.4f}")
+        else:
+            remaining = baseline - spent
+            print(f"  {target:8} ${remaining:.2f} remaining of ${baseline:.2f}  (spent ${spent:.4f})")
 
 
 def cmd_hardware_probe(args: argparse.Namespace) -> None:
@@ -208,6 +355,20 @@ def main() -> None:
     build.add_argument("--python-version", default="3.11")
     build.add_argument("--allow-cpu", action="store_true")
     build.set_defaults(func=cmd_env_build)
+
+    credits = sub.add_parser("credits", help="Per-run cost estimates and credit tracking.")
+    credits_sub = credits.add_subparsers(dest="credits_cmd", required=True)
+    cr_runs = credits_sub.add_parser("runs", help="List per-run cost.json entries.")
+    cr_runs.add_argument("--target", choices=["modal", "lambda"])
+    cr_runs.add_argument("--from-b2", action="store_true", help="Pull cost.json from B2 first.")
+    cr_runs.set_defaults(func=cmd_credits_runs)
+    cr_sum = credits_sub.add_parser("summary", help="Aggregate tracked spend by target.")
+    cr_sum.add_argument("--target", choices=["modal", "lambda"])
+    cr_sum.add_argument("--from-b2", action="store_true")
+    cr_sum.set_defaults(func=cmd_credits_summary)
+    cr_bal = credits_sub.add_parser("balance", help="Remaining credits vs tracked spend.")
+    cr_bal.add_argument("--from-b2", action="store_true")
+    cr_bal.set_defaults(func=cmd_credits_balance)
 
     args = parser.parse_args()
     args.func(args)

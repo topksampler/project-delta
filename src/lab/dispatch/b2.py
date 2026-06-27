@@ -21,9 +21,11 @@ def s3_uri(key: str) -> str:
     return f"s3://{bucket}/{key}"
 
 
-def run_s5cmd(args: list[str], *, check: bool = True) -> subprocess.CompletedProcess:
+def run_s5cmd(args: list[str], *, check: bool = True, capture: bool = False) -> subprocess.CompletedProcess:
     cmd = s5cmd_base() + args
     print(f"+ {' '.join(cmd)}")
+    if capture:
+        return subprocess.run(cmd, check=check, capture_output=True, text=True)
     return subprocess.run(cmd, check=check)
 
 
@@ -45,6 +47,12 @@ def download_prefix(remote_prefix: str, local_dir: Path) -> None:
     local_dir.mkdir(parents=True, exist_ok=True)
     remote_prefix = remote_prefix.rstrip("/")
     run_s5cmd(["cp", f"{s3_uri(remote_prefix)}/*", f"{local_dir}/"], check=False)
+
+
+def list_prefix(remote_prefix: str) -> list[str]:
+    remote_prefix = remote_prefix.rstrip("/")
+    proc = run_s5cmd(["ls", f"{s3_uri(remote_prefix)}/"], check=False, capture=True)
+    return (proc.stdout or "").splitlines()
 
 
 def sync_run_outputs(local_run_dir: Path, run_id: str) -> None:
