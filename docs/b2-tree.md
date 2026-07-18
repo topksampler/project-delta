@@ -6,36 +6,30 @@ B2 = durable data
 compute = disposable
 ```
 
-## source of truth
+## invariant
 
 GitHub for code. B2 for data. Everything else is cache or scratch.
 
-## layout
+## what goes where
+
+**Current dispatch reality:** flat `runs/{run_id}/` per job (see `docs/developer-workflow.md`).
 
 ```text
-lalith-ai-lab/
-  datasets/
-    raw/
-    processed/
-    evals/
-  models/
-    base/
-    adapters/
-    merged/
-  checkpoints/
-    sft/
-    dpo/
-    rl/
-  runs/
-    sft/
-    dpo/
-    rl/
-    evals/
-  artifacts/
-    logs/
-    reports/
-    samples/
+datasets/experiments/{experiment_id}/...
+indexes/{experiment_id}/{source_revision}/...
+runs/{run_id}/
+  manifest.yaml
+  config.yaml
+  metrics.json
+  samples.jsonl
+  ledger.yaml
+  adapter/                  # training runs
+artifacts/reports/{experiment_id}/...
 ```
+
+Project DELTA will add `states/{state_id}/` and an active-state pointer only when
+promotion/rollback semantics are implemented. Do not create an aspirational tree
+and call it a registry.
 
 ## lambda scratch
 
@@ -54,3 +48,18 @@ Don't wait until the end of a multi-hour job.
 Acceptable loss: compute time.
 
 Unacceptable: only copy of checkpoint, dataset, or code change.
+
+## what can die
+
+Worker-local datasets, model caches, logs already uploaded, and failed smoke runs.
+
+## what must survive
+
+Frozen datasets, manifests, run configs, metrics, accepted adapters, and—when
+implemented—promotion decisions and active-state lineage.
+
+## command
+
+```bash
+./scripts/lab status --run-id <run_id>
+```

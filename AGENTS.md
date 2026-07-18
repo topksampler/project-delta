@@ -1,5 +1,36 @@
 # lalith-ai-lab — agent notes
 
+## workflow
+
+- **Project DELTA** is the research program: CI/CD for model knowledge. Its
+  invariant and module contracts live only in `docs/project-delta.md`; delivery
+  status lives only in `docs/delta-roadmap.md`.
+- **Platform** (`src/lab/dispatch/`, `scripts/lab`, `infra/modal/`, `infra/lambda/`) is shared across experiments. Do not embed experiment-specific logic there.
+- **Experiments** live in `experiments/{id}/`, configs in `configs/experiments/{id}/`, charters in `docs/experiments/{id}.md`.
+- `e1_vllm` is DELTA's first vertical slice, not an alternate name for the
+  program. Keep its machine ID, run IDs, and B2 paths stable.
+- User writes experiment harness code to learn. Assist with docs, review, small fixes, platform bugs — do not implement whole experiment pipelines unless explicitly asked.
+- See `docs/developer-workflow.md`.
+
+### documentation ownership
+
+- Do not restate the DELTA loop, current phase, model ID, or storage contract in
+  multiple documents.
+- Experiment charters own hypotheses and condition matrices. Data guides own
+  corpus/eval facts. Harness READMEs own commands.
+- Use `implemented`, `partial`, `planned`, or `deferred`. Do not describe a
+  planned module as if a closed loop exists.
+
+### AI doing the work vs user in the loop
+
+**Default:** user in the loop on `experiments/` — writes harness, interprets failures, owns hypotheses.
+
+**Exception (explicit ask or platform):** dispatch, Modal/Lambda wiring, B2 pulls, re-running jobs, fixing platform bugs — fine for agents to execute while user is away.
+
+**Current drift (e1_vllm, Jul 2026):** user stepped out; agent built `eval_vllm_qa.py`, eval configs, dispatched c0/c3 on Modal, fixed eval JSONL + ledger bugs. User was not in the loop for that slice. **Note this** when interpreting results — the harness is real but the learning debt is on experiment code, not on `./scripts/lab run`.
+
+**Invariant:** launching jobs (Modal/Lambda) is platform — exceptional and safe to automate. *What* to run and *what it means* stays with the user unless they explicitly delegate.
+
 ## lessons
 
 ### B2 + s5cmd: export creds before every child process

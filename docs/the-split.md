@@ -4,7 +4,16 @@ Use each thing for exactly one job.
 
 ![the split](./assets/mental_model.png)
 
-## roles
+This is the execution substrate for [Project DELTA](./project-delta.md), not the
+DELTA system architecture.
+
+## invariant
+
+```text
+Workers execute. GitHub and B2 preserve. The Mac coordinates.
+```
+
+## what goes where
 
 | thing | job | keeps state? |
 |---|---|---|
@@ -41,3 +50,18 @@ Edited on Lambda? Push a branch. Don't leave fixes on the worker.
 Parallel evals, batch inference, sweeps, short independent jobs.
 
 Use Modal Secrets, not `.env`.
+
+## what can die
+
+Lambda/Modal workers, local caches, and reproducible intermediate files.
+
+## what must survive
+
+Code and recipes in GitHub; datasets, run evidence, and accepted model state in
+B2.
+
+## command
+
+```bash
+bash scripts/check_storage.sh && bash scripts/test_storage_roundtrip.sh
+```

@@ -1,57 +1,39 @@
-# phases
+# archived lab capability phases
 
-Order matters. No distributed RL before file movement works.
+This was the original learning sequence for the general-purpose lab. It is not the
+Project DELTA delivery roadmap.
 
-![phases](./assets/phases.png)
+The active roadmap is [delta-roadmap.md](./delta-roadmap.md).
 
-## phase 1 — foundations
-
-Make the lab reproducible.
-
-Success:
+## invariant retained from this document
 
 ```text
-Fresh machine can clone repo, configure .env, and read/write B2.
+Reproducible storage and single-node train → reload → eval must work before
+distributed training or post-training is credible.
 ```
 
-No GPU required.
+## status
 
-## phase 2 — single-node fine-tuning
+- reproducible cockpit, B2 storage, and disposable workers: implemented;
+- single-node LoRA train, upload, reload, and eval: implemented;
+- trustworthy DELTA eval and comparison: in progress;
+- post-training and distributed optimization: deferred until the verifier is trusted.
 
-SFT, LoRA, QLoRA on 1B–8B models with checkpointing and basic evals.
+## what goes where
 
-Success:
+The active sequence lives in `docs/delta-roadmap.md`. Platform prerequisites live
+in `docs/developer-workflow.md`. This file remains only as a historical note.
 
-```text
-Train -> checkpoint -> upload -> reload -> eval.
-```
+## what can die
 
-If reload does not work, checkpointing does not work.
+The old numeric phase labels and capability checklist.
 
-## phase 3 — evals + inference
+## what must survive
 
-Eval runner, batch inference, judge-model flow, result JSONL, comparison reports.
+The dependency ordering: storage → reproducible training → trustworthy evaluation
+→ post-training → distributed optimization.
 
-Success:
+## command
 
-```text
-Every checkpoint gets evaluated the same way.
-```
-
-## phase 4 — post-training / RL
-
-Preference data, DPO, ORPO, KTO, reward modeling, small GRPO/PPO experiments.
-
-Needs phases 1–3 or it becomes chaos.
-
-Success:
-
-```text
-generate -> score/rank -> train -> eval -> compare
-```
-
-## phase 5 — distributed systems
-
-DDP, FSDP, DeepSpeed. Order: single GPU → single-node multi-GPU → multi-node.
-
-Success: measured throughput and scaling efficiency, not cross-region latency cosplay.
+See [developer-workflow.md](./developer-workflow.md) for platform commands and
+[delta-roadmap.md](./delta-roadmap.md) for the active DELTA milestone.
