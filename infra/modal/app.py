@@ -1,15 +1,7 @@
 """Modal execution plane for lalith-ai-lab.
 
-Setup once on Mac:
-  pip install modal
-  modal setup
-  modal secret create lalith-lab \\
-    S3_BUCKET=... S3_ENDPOINT_URL=... \\
-    AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=... \\
-    AWS_REGION=... AWS_DEFAULT_REGION=...
-
-Run from Mac cockpit (no SSH):
-  ./scripts/lab run --target modal --config configs/evals/e0b_run_spec_base.yaml
+Setup and ownership: infra/modal/README.md.
+Dispatch through ./scripts/lab; do not call experiment modules from the cockpit.
 """
 
 from __future__ import annotations
@@ -91,14 +83,36 @@ def _sync_inputs(run_id: str, config_rel: str) -> Path:
         if local.exists():
             continue
         local.parent.mkdir(parents=True, exist_ok=True)
-        remote_dataset = _s3(f"datasets/{rel}")
-        remote_flat = _s3(rel)
-        try:
-            _s5cmd(["cp", remote_dataset, str(local)])
-        except subprocess.CalledProcessError:
-            _s5cmd(["cp", remote_flat, str(local)])
+        candidates = [f"datasets/{rel}", rel]
+        if rel.startswith("data/"):
+            candidates.insert(0, f"datasets/{rel[len('data/'):]}")
+        last_err: subprocess.CalledProcessError | None = None
+        for key in candidates:
+            try:
+                _s5cmd(["cp", _s3(key), str(local)])
+                break
+            except subprocess.CalledProcessError as exc:
+                last_err = exc
+        else:
+            assert last_err is not None
+            raise last_err
+
+    adapter_run = cfg.get("model", {}).get("adapter_run_id")
+    if adapter_run:
+        local_adapter = REPO_ROOT / "runs" / adapter_run / "adapter"
+        local_adapter.mkdir(parents=True, exist_ok=True)
+        _s5cmd(["cp", f"{_s3(f'runs/{adapter_run}/adapter')}/*", f"{local_adapter}/"])
 
     return config_path
+
+
+def _eval_module(cfg: dict) -> str:
+    if cfg.get("experiment_id") == "e1_vllm":
+        return "lab.eval_vllm_qa"
+    module = cfg.get("eval", {}).get("module")
+    if module:
+        return module
+    return "lab.eval_run_spec"
 
 
 def _sync_outputs(run_id: str, cfg: dict) -> None:
@@ -160,7 +174,13 @@ def _run_module(module: str, config_path: Path) -> dict:
 def eval_run(run_id: str, config: str) -> None:
     _timed("env_receipts", lambda: _write_receipts(run_id))
     config_path = _timed("b2_pull_inputs", lambda: _sync_inputs(run_id, config))
-    cfg = _timed("compute", lambda: _run_module("lab.eval_run_spec", config_path))
+
+    def _compute() -> dict:
+        with open(config_path, "r", encoding="utf-8") as f:
+            cfg = yaml.safe_load(f)
+        return _run_module(_eval_module(cfg), config_path)
+
+    cfg = _timed("compute", _compute)
     _timed("b2_push_outputs", lambda: _sync_outputs(run_id, cfg))
     print(f"eval_run complete: {run_id}")
 
@@ -169,7 +189,7 @@ def eval_run(run_id: str, config: str) -> None:
     image=image,
     gpu="T4",
     secrets=secrets,
-    timeout=60 * 60 * 4,
+    timeout=60 * 60 * 6,
 )
 def train(run_id: str, config: str) -> None:
     _timed("env_receipts", lambda: _write_receipts(run_id))

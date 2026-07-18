@@ -1,0 +1,10 @@
+{"id": "concept_01", "type": "concept", "question": "What problem does PagedAttention solve in vLLM?", "gold": {"must_contain": ["KV", "cache", "memory"]}, "requires_doc": "0.22.0"}
+{"id": "concept_02", "type": "concept", "question": "What is continuous batching in vLLM?", "gold": {"must_contain": ["batch", "request"]}, "requires_doc": "0.22.0"}
+{"id": "api_01", "type": "api", "question": "What CLI command starts the OpenAI-compatible API server in vLLM?", "gold": {"must_contain": ["vllm", "serve"]}, "requires_doc": "0.22.0"}
+{"id": "api_02", "type": "api", "question": "How do you enable tensor parallelism when serving a model with vLLM?", "gold": {"must_contain": ["tensor-parallel-size"]}, "requires_doc": "0.22.0"}
+{"id": "config_01", "type": "config", "question": "What vLLM argument controls the maximum sequence length for a served model?", "gold": {"must_contain": ["max-model-len"]}, "requires_doc": "0.22.0"}
+{"id": "config_02", "type": "config", "question": "How do you serve a Hugging Face model with vLLM using the standard CLI?", "gold": {"must_contain": ["vllm", "serve"]}, "requires_doc": "0.22.0"}
+{"id": "lora_01", "type": "lora", "question": "Does vLLM support serving LoRA adapters at inference time?", "gold": {"must_contain": ["lora"]}, "requires_doc": "0.22.0"}
+{"id": "install_01", "type": "install", "question": "What pip package do you install to use vLLM?", "gold": {"must_contain": ["vllm"]}, "requires_doc": "0.22.0"}
+{"id": "release_01", "type": "release", "question": "In vLLM v0.23.0, which dense model families use Model Runner V2 by default?", "gold": {"must_contain": ["Llama", "Mistral"]}, "requires_doc": "0.23.0"}
+{"id": "release_02", "type": "release", "question": "What experimental frontend language gained streaming generate and dynamic LoRA endpoints in vLLM v0.23.0?", "gold": {"must_contain": ["Rust"]}, "requires_doc": "0.23.0"}

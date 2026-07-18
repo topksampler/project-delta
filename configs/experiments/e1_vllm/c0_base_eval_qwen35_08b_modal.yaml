@@ -1,0 +1,15 @@
+run_id: e1-vllm-c0-base-eval-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: c0_base
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+
+eval:
+  path: data/experiments/e1_vllm/eval_v2.jsonl
+  output_dir: runs/e1-vllm-c0-base-eval-qwen35-08b-modal
+  max_new_tokens: 256
+  temperature: 0.0
+  top_p: 1.0

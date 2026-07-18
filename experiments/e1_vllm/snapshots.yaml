@@ -1,0 +1,36 @@
+# Frozen at phase 0. Edit only with a deliberate protocol bump (v2).
+
+experiment_id: e1_vllm
+
+hypothesis: >
+  How do small LMs preserve version fidelity when technical docs move (v0.22→v0.23)?
+  Measure failure modes (stale version, retrieval miss, abstain) — not just RAG vs LoRA accuracy.
+
+# Student model (what we teach about vLLM)
+model:
+  id: Qwen/Qwen3.5-0.8B
+  slug: qwen35-08b
+
+# Inference engine for eval/train smoke on workers (phase 2+)
+inference:
+  engine: vllm
+  pip_pin: "vllm==0.23.0"
+
+# Moving target: two doc snapshots (not lalith-ai-lab git)
+vllm_docs:
+  doc_0:
+    version: "0.22.0"
+    git_tag: v0.22.0
+    docs_base: https://docs.vllm.ai/en/v0.22.0/
+    use: train_cutoff, rag_index_stale, lora_train_corpus
+  doc_8:
+    version: "0.23.0"
+    git_tag: v0.23.0
+    docs_base: https://docs.vllm.ai/en/v0.23.0/
+    use: eval_primary, rag_index_fresh
+
+frozen_at: "2026-06-27"
+
+notes:
+  - "doc_0 vs doc_8 replaces sha_0/sha_8 on our repo — drift is vLLM release velocity."
+  - "fixtures/eval_v1.jsonl includes items tagged requires_doc: 0.23.0 for stale tests."

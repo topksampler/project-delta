@@ -16,7 +16,7 @@ def read_jsonl(path: str):
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
-            if line:
+            if line.startswith("{"):
                 yield json.loads(line)
 
 

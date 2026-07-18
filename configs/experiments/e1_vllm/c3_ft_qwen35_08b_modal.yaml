@@ -1,0 +1,38 @@
+run_id: e1-vllm-c3-ft-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: c3_ft
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+
+data:
+  train_path: data/experiments/e1_vllm/train_doc_0_messages.jsonl
+  eval_path: data/experiments/e1_vllm/eval_doc_0_messages.jsonl
+
+output:
+  dir: runs/e1-vllm-c3-ft-qwen35-08b-modal
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  max_steps: 150
+  learning_rate: 0.0002
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 8
+  logging_steps: 10
+  save_strategy: "steps"
+  bf16: true
+  fp16: false

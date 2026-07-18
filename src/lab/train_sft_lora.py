@@ -40,11 +40,18 @@ def main():
     train_dataset = Dataset.from_list(train_rows).select_columns(["messages"])
     eval_dataset = Dataset.from_list(eval_rows).select_columns(["messages"])
 
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_name,
+        trust_remote_code=cfg["model"].get("trust_remote_code", False),
+    )
     print(f"Loaded tokenizer: {tokenizer}")
 
     dtype = torch.bfloat16 if device == "cuda" else torch.float32
-    model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=dtype)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name,
+        torch_dtype=dtype,
+        trust_remote_code=cfg["model"].get("trust_remote_code", False),
+    )
     model.to(device)
     model.train()
     print(f"Loaded base model: {model}")
