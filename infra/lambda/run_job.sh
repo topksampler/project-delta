@@ -44,7 +44,7 @@ if [ "${LAB_SKIP_GIT:-0}" != "1" ]; then
 fi
 lab_timing "git_sync"
 
-scripts/remote/bootstrap_env.sh
+infra/lambda/bootstrap_env.sh
 lab_timing "env_bootstrap"
 
 export PYTHONPATH="${REPO_DIR}/src:${PYTHONPATH:-}"

@@ -10,6 +10,8 @@ import yaml
 from lab.dispatch.timing import RunTimer
 
 LAMBDA_API = os.environ.get("LAMBDA_API_BASE", "https://cloud.lambdalabs.com/api/v1")
+LAMBDA_RUN_JOB_PATH = Path("infra/lambda/run_job.sh")
+LAMBDA_BOOTSTRAP_PATH = Path("infra/lambda/bootstrap_env.sh")
 SSH_OPTS = [
     "-o",
     "StrictHostKeyChecking=no",
@@ -224,7 +226,8 @@ def build_env(
     remote_exec(
         host=host,
         user=user,
-        body=preamble + f"cd {_shell_quote(remote_dir)}\nscripts/remote/bootstrap_env.sh\n",
+        body=preamble
+        + f"cd {_shell_quote(remote_dir)}\n{LAMBDA_BOOTSTRAP_PATH.as_posix()}\n",
     )
 
 
@@ -285,7 +288,7 @@ def dispatch(
     timer: RunTimer | None = None,
 ) -> None:
     runtime = load_runtime_defaults(repo_root)
-    remote_script = repo_root / "scripts/remote/run_job.sh"
+    remote_script = repo_root / LAMBDA_RUN_JOB_PATH
     repo_url = os.environ.get("LAB_REPO_URL", runtime.get("repo_url", ""))
     repo_branch = os.environ.get("LAB_REPO_BRANCH", runtime.get("repo_branch", "main"))
     ssh_user = runtime.get("ssh_user", "ubuntu")
