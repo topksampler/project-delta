@@ -1,0 +1,64 @@
+{
+  "schema": "delta.truthsource_compare.v0",
+  "n_bridge_claims": 75,
+  "gap_sizes": {
+    "D": 51,
+    "C_distill": 54,
+    "C_full": 54
+  },
+  "jaccard": {
+    "D_vs_C_distill": 0.7213,
+    "C_distill_vs_C_full": 1.0,
+    "D_vs_C_full": 0.7213
+  },
+  "flip_rate": {
+    "D_vs_C_distill": 0.2267,
+    "C_distill_vs_C_full": 0.0,
+    "D_vs_C_full": 0.2267
+  },
+  "honesty_negation_acc": {
+    "D": 0.9917,
+    "C_distill": 0.9917,
+    "C_full": 0.9917
+  },
+  "honesty_material_ge_0.10": {
+    "D_vs_C_distill": false,
+    "D_vs_C_full": false,
+    "C_distill_vs_C_full": false
+  },
+  "pre_registered_same_map": false,
+  "decision": "distill_enough",
+  "reading": "D \u2260 C_distill \u2248 C_full \u2014 distill earns its keep; thorough wasted",
+  "status_counts_bridge": {
+    "D": {
+      "known": 24,
+      "unknown": 31,
+      "partial": 16,
+      "unstable": 4
+    },
+    "C_distill": {
+      "known": 21,
+      "unknown": 31,
+      "partial": 19,
+      "unstable": 4
+    },
+    "C_full": {
+      "known": 21,
+      "unknown": 31,
+      "partial": 19,
+      "unstable": 4
+    }
+  },
+  "validity": {
+    "bridge_probes_identical_D_vs_C_distill": false,
+    "bridge_probes_identical_C_distill_vs_C_full": true,
+    "confound": "recognition hard-negatives sampled from arm-specific flag universe; 96/465 bridge probe questions differ D vs C_distill; all 17 status flips are flag_exists (recognition), zero meaning flips",
+    "primary_decision_status": "invalidated_for_D_vs_code \u2014 re-run with frozen shared bridge probes required",
+    "what_still_holds": [
+      "C_distill and C_full share identical bridge probes and identical bridge statuses (flip 0) \u2014 thorough adds no bridge signal by construction in this design",
+      "bridge meaning statuses did not flip across arms",
+      "bridge honesty (negation) identical at 0.9917",
+      "arm-private difficulty differs: docs meanings hard; code exports/envs easy \u2014 not a truth-source contrast"
+    ]
+  }
+}

@@ -1,0 +1,2103 @@
+{
+  "schema": "delta.topic_knowledge_profile.v1",
+  "protocol_version": "e1_profile_v0",
+  "model_state": {
+    "name": "Qwen/Qwen3.5-0.8B",
+    "adapter": null,
+    "run_id": "e1-vllm-profile-v022-qwen35-08b-modal"
+  },
+  "subject": "vllm",
+  "source_revision": "v0.22.0",
+  "legacy_alias": "doc_0",
+  "mode": "closed_book",
+  "claim_bank_hash": "c8a4b0ba29c648ffd7a8a50736837f25d40f120e7b3f25af1000b297637e26db",
+  "created_at": "2026-07-18T11:57:51.758090+00:00",
+  "aggregate": {
+    "n_claims": 135,
+    "n_probes": 840,
+    "status_counts": {
+      "known": 52,
+      "partial": 53,
+      "unknown": 25,
+      "unstable": 5
+    },
+    "status_rates": {
+      "known": 0.3852,
+      "partial": 0.3926,
+      "unknown": 0.1852,
+      "unstable": 0.037
+    },
+    "by_claim_type": {
+      "env_exists": {
+        "known": 22,
+        "partial": 3
+      },
+      "flag_exists": {
+        "known": 30,
+        "partial": 10
+      },
+      "flag_meaning": {
+        "unknown": 25,
+        "unstable": 5
+      },
+      "path_exists": {
+        "partial": 40
+      }
+    },
+    "by_zone": {
+      "cli": {
+        "known": 30,
+        "partial": 10
+      },
+      "cli_meaning": {
+        "unknown": 25,
+        "unstable": 5
+      },
+      "docs_path": {
+        "partial": 40
+      },
+      "env": {
+        "known": 22,
+        "partial": 3
+      }
+    },
+    "known_rate": 0.3852
+  },
+  "claims": [
+    {
+      "claim_id": "env.exists.VLLM_API_BASE",
+      "claim_type": "env_exists",
+      "entity": "VLLM_API_BASE",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_API_KEY",
+      "claim_type": "env_exists",
+      "entity": "VLLM_API_KEY",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_ASSETS_CACHE",
+      "claim_type": "env_exists",
+      "entity": "VLLM_ASSETS_CACHE",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_CACHE_ROOT",
+      "claim_type": "env_exists",
+      "entity": "VLLM_CACHE_ROOT",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_COMPILE",
+      "claim_type": "env_exists",
+      "entity": "VLLM_COMPILE",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_CPU_KVCACHE_SPACE",
+      "claim_type": "env_exists",
+      "entity": "VLLM_CPU_KVCACHE_SPACE",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_CPU_NUM_OF_RESERVED_CPU",
+      "claim_type": "env_exists",
+      "entity": "VLLM_CPU_NUM_OF_RESERVED_CPU",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_CPU_OMP_THREADS_BIND",
+      "claim_type": "env_exists",
+      "entity": "VLLM_CPU_OMP_THREADS_BIND",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_CPU_SGL_KERNEL",
+      "claim_type": "env_exists",
+      "entity": "VLLM_CPU_SGL_KERNEL",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_CUTLASS_SRC_DIR",
+      "claim_type": "env_exists",
+      "entity": "VLLM_CUTLASS_SRC_DIR",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_DISABLE_COMPILE_CACHE",
+      "claim_type": "env_exists",
+      "entity": "VLLM_DISABLE_COMPILE_CACHE",
+      "zone": "env",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_ENABLE_CUDA_COMPATIBILITY",
+      "claim_type": "env_exists",
+      "entity": "VLLM_ENABLE_CUDA_COMPATIBILITY",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_GPT_OSS_SYSTEM_TOOL_MCP_LABELS",
+      "claim_type": "env_exists",
+      "entity": "VLLM_GPT_OSS_SYSTEM_TOOL_MCP_LABELS",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_IMAGE",
+      "claim_type": "env_exists",
+      "entity": "VLLM_IMAGE",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_MAX_N_SEQUENCES",
+      "claim_type": "env_exists",
+      "entity": "VLLM_MAX_N_SEQUENCES",
+      "zone": "env",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_MEDIA_LOADING_THREAD_COUNT",
+      "claim_type": "env_exists",
+      "entity": "VLLM_MEDIA_LOADING_THREAD_COUNT",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_MOE_DP_CHUNK_SIZE",
+      "claim_type": "env_exists",
+      "entity": "VLLM_MOE_DP_CHUNK_SIZE",
+      "zone": "env",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_MOONCAKE_DISK_STAGING_USABLE_RATIO",
+      "claim_type": "env_exists",
+      "entity": "VLLM_MOONCAKE_DISK_STAGING_USABLE_RATIO",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_NIXL_SIDE_CHANNEL_HOST",
+      "claim_type": "env_exists",
+      "entity": "VLLM_NIXL_SIDE_CHANNEL_HOST",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_NO_USAGE_STATS",
+      "claim_type": "env_exists",
+      "entity": "VLLM_NO_USAGE_STATS",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_RANDOMIZE_DP_DUMMY_INPUTS",
+      "claim_type": "env_exists",
+      "entity": "VLLM_RANDOMIZE_DP_DUMMY_INPUTS",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_RPC_TIMEOUT",
+      "claim_type": "env_exists",
+      "entity": "VLLM_RPC_TIMEOUT",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_VERSION",
+      "claim_type": "env_exists",
+      "entity": "VLLM_VERSION",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_VIDEO_FETCH_TIMEOUT",
+      "claim_type": "env_exists",
+      "entity": "VLLM_VIDEO_FETCH_TIMEOUT",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "env.exists.VLLM_XLA_CACHE_PATH",
+      "claim_type": "env_exists",
+      "entity": "VLLM_XLA_CACHE_PATH",
+      "zone": "env",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--api-key",
+      "claim_type": "flag_exists",
+      "entity": "--api-key",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--block-size",
+      "claim_type": "flag_exists",
+      "entity": "--block-size",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "flag.exists.--custom-skip-chat-template",
+      "claim_type": "flag_exists",
+      "entity": "--custom-skip-chat-template",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--data-parallel-",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "flag.exists.--data-parallel-address",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-address",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--data-parallel-rank",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-rank",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--data-parallel-size",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-size",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--data-parallel-size-local",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-size-local",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--data-parallel-start-rank",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-start-rank",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--decoder-port",
+      "claim_type": "flag_exists",
+      "entity": "--decoder-port",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--decoder-ports",
+      "claim_type": "flag_exists",
+      "entity": "--decoder-ports",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--default-chat-template-kwargs",
+      "claim_type": "flag_exists",
+      "entity": "--default-chat-template-kwargs",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--default-mm-loras",
+      "claim_type": "flag_exists",
+      "entity": "--default-mm-loras",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "flag.exists.--dtype",
+      "claim_type": "flag_exists",
+      "entity": "--dtype",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--enable-auto-tool-choice",
+      "claim_type": "flag_exists",
+      "entity": "--enable-auto-tool-choice",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--enable-chunked-prefill",
+      "claim_type": "flag_exists",
+      "entity": "--enable-chunked-prefill",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--enable-cumem-allocator",
+      "claim_type": "flag_exists",
+      "entity": "--enable-cumem-allocator",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "flag.exists.--enable-expert-parallel",
+      "claim_type": "flag_exists",
+      "entity": "--enable-expert-parallel",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "flag.exists.--enable-lora",
+      "claim_type": "flag_exists",
+      "entity": "--enable-lora",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--enable-mm-embeds",
+      "claim_type": "flag_exists",
+      "entity": "--enable-mm-embeds",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "flag.exists.--enable-multimodal-chat",
+      "claim_type": "flag_exists",
+      "entity": "--enable-multimodal-chat",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--enable-prompt-embeds",
+      "claim_type": "flag_exists",
+      "entity": "--enable-prompt-embeds",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--enable-request-id-headers",
+      "claim_type": "flag_exists",
+      "entity": "--enable-request-id-headers",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--enable-sleep-mode",
+      "claim_type": "flag_exists",
+      "entity": "--enable-sleep-mode",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "flag.exists.--enable-tokenizer-info-endpoint",
+      "claim_type": "flag_exists",
+      "entity": "--enable-tokenizer-info-endpoint",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "flag.exists.--host",
+      "claim_type": "flag_exists",
+      "entity": "--host",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--lora-modules",
+      "claim_type": "flag_exists",
+      "entity": "--lora-modules",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--lora-path",
+      "claim_type": "flag_exists",
+      "entity": "--lora-path",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--max-model-len",
+      "claim_type": "flag_exists",
+      "entity": "--max-model-len",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--max-num-seqs",
+      "claim_type": "flag_exists",
+      "entity": "--max-num-seqs",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--port",
+      "claim_type": "flag_exists",
+      "entity": "--port",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--prefiller-host",
+      "claim_type": "flag_exists",
+      "entity": "--prefiller-host",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--prefiller-hosts",
+      "claim_type": "flag_exists",
+      "entity": "--prefiller-hosts",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--prefiller-port",
+      "claim_type": "flag_exists",
+      "entity": "--prefiller-port",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--prefiller-ports",
+      "claim_type": "flag_exists",
+      "entity": "--prefiller-ports",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--quantization-config",
+      "claim_type": "flag_exists",
+      "entity": "--quantization-config",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--seed",
+      "claim_type": "flag_exists",
+      "entity": "--seed",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "flag.exists.--tensor-parallel-size",
+      "claim_type": "flag_exists",
+      "entity": "--tensor-parallel-size",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--tokenizer",
+      "claim_type": "flag_exists",
+      "entity": "--tokenizer",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.exists.--tokenizer-mode",
+      "claim_type": "flag_exists",
+      "entity": "--tokenizer-mode",
+      "zone": "cli",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--block-size",
+      "claim_type": "flag_meaning",
+      "entity": "--block-size",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--custom-skip-chat-template",
+      "claim_type": "flag_meaning",
+      "entity": "--custom-skip-chat-template",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--data-parallel-",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--data-parallel-hybrid-lb",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-hybrid-lb",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--data-parallel-rpc-port",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-rpc-port",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--data-parallel-size",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-size",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--data-parallel-size-local",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-size-local",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--data-parallel-start-rank",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-start-rank",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--decoder-host",
+      "claim_type": "flag_meaning",
+      "entity": "--decoder-host",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--default-chat-template-kwargs",
+      "claim_type": "flag_meaning",
+      "entity": "--default-chat-template-kwargs",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--enable-lora",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-lora",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--enable-mfu-metrics",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-mfu-metrics",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--enable-mixed-moe-lora-format",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-mixed-moe-lora-format",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--enable-mm-embeds",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-mm-embeds",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--enable-offline-docs",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-offline-docs",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--enable-prompt-embeds",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-prompt-embeds",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--enable-tokenizer-info-endpoint",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-tokenizer-info-endpoint",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 2,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--kv-port",
+      "claim_type": "flag_meaning",
+      "entity": "--kv-port",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 2,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--lora-modules",
+      "claim_type": "flag_meaning",
+      "entity": "--lora-modules",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--lora-path",
+      "claim_type": "flag_meaning",
+      "entity": "--lora-path",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--max-lora-rank",
+      "claim_type": "flag_meaning",
+      "entity": "--max-lora-rank",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--max-num-seqs",
+      "claim_type": "flag_meaning",
+      "entity": "--max-num-seqs",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--prefiller-host",
+      "claim_type": "flag_meaning",
+      "entity": "--prefiller-host",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--prefiller-hosts",
+      "claim_type": "flag_meaning",
+      "entity": "--prefiller-hosts",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--quant",
+      "claim_type": "flag_meaning",
+      "entity": "--quant",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--quantization",
+      "claim_type": "flag_meaning",
+      "entity": "--quantization",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--served-model-name",
+      "claim_type": "flag_meaning",
+      "entity": "--served-model-name",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--tokenizer",
+      "claim_type": "flag_meaning",
+      "entity": "--tokenizer",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--tokenizer-mode",
+      "claim_type": "flag_meaning",
+      "entity": "--tokenizer-mode",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "flag.meaning.--tokenizer-revision",
+      "claim_type": "flag_meaning",
+      "entity": "--tokenizer-revision",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.cli.serve.md",
+      "claim_type": "path_exists",
+      "entity": "docs/cli/serve.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 4,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 0.3333,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.configuration.optimization.md",
+      "claim_type": "path_exists",
+      "entity": "docs/configuration/optimization.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.configuration.serve_args.md",
+      "claim_type": "path_exists",
+      "entity": "docs/configuration/serve_args.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 4,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 0.3333,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.lora.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/lora.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.README.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/README.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.fp8_vit_attn.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/fp8_vit_attn.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.gguf.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/gguf.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.gptqmodel.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/gptqmodel.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.inc.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/inc.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.int4.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/int4.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.int8.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/int8.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.llm_compressor.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/llm_compressor.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.modelopt.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/modelopt.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.online.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/online.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.quark.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/quark.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.features.quantization.torchao.md",
+      "claim_type": "path_exists",
+      "entity": "docs/features/quantization/torchao.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.getting_started.installation.cpu.s390x.inc.md",
+      "claim_type": "path_exists",
+      "entity": "docs/getting_started/installation/cpu.s390x.inc.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 4,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 0.3333,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.getting_started.installation.cpu.x86.inc.md",
+      "claim_type": "path_exists",
+      "entity": "docs/getting_started/installation/cpu.x86.inc.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.getting_started.installation.device.template.md",
+      "claim_type": "path_exists",
+      "entity": "docs/getting_started/installation/device.template.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.getting_started.installation.gpu.apple.inc.md",
+      "claim_type": "path_exists",
+      "entity": "docs/getting_started/installation/gpu.apple.inc.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.getting_started.installation.gpu.md",
+      "claim_type": "path_exists",
+      "entity": "docs/getting_started/installation/gpu.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.getting_started.installation.gpu.rocm.inc.md",
+      "claim_type": "path_exists",
+      "entity": "docs/getting_started/installation/gpu.rocm.inc.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.getting_started.installation.gpu.xpu.inc.md",
+      "claim_type": "path_exists",
+      "entity": "docs/getting_started/installation/gpu.xpu.inc.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 4,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 0.3333,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.extensions.fastsafetensor.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/extensions/fastsafetensor.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 4,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 0.3333,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.extensions.runai_model_streamer.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/extensions/runai_model_streamer.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 4,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 0.3333,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.extensions.tensorizer.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/extensions/tensorizer.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.generative_models.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/generative_models.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 4,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 0.3333,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.hardware_supported_models.xpu.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/hardware_supported_models/xpu.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.pooling_models.README.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/pooling_models/README.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.pooling_models.classify.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/pooling_models/classify.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.pooling_models.embed.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/pooling_models/embed.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.pooling_models.scoring.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/pooling_models/scoring.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.pooling_models.token_classify.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/pooling_models/token_classify.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.pooling_models.token_embed.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/pooling_models/token_embed.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.models.supported_models.md",
+      "claim_type": "path_exists",
+      "entity": "docs/models/supported_models.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.serving.online_serving.generative_scoring.md",
+      "claim_type": "path_exists",
+      "entity": "docs/serving/online_serving/generative_scoring.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.serving.online_serving.openai_compatible_server.md",
+      "claim_type": "path_exists",
+      "entity": "docs/serving/online_serving/openai_compatible_server.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.serving.online_serving.renderer.md",
+      "claim_type": "path_exists",
+      "entity": "docs/serving/online_serving/renderer.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 3,
+      "probe_accuracy": 0.5,
+      "by_probe_form": {
+        "negation": 0.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.serving.online_serving.speech_to_text.md",
+      "claim_type": "path_exists",
+      "entity": "docs/serving/online_serving/speech_to_text.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 4,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 0.3333,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "path.exists.docs.serving.parallelism_scaling.md",
+      "claim_type": "path_exists",
+      "entity": "docs/serving/parallelism_scaling.md",
+      "zone": "docs_path",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 4,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 0.3333,
+        "recall": 1.0
+      }
+    }
+  ]
+}

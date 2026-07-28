@@ -14,12 +14,29 @@ Status describes repository reality, not intent.
 ## current position
 
 ```text
-Phase A — grounded change environment: in progress
+Phase A — grounded change environment: complete (e1_vllm vertical slice)
+Phase C — intervention matrix:         complete (e1_vllm, manual selection)
+Phase B — trustworthy drift measurement: partial (DriftEvent v1 + baseline)
+TopicKnowledgeProfile — dense v1 locked (meanings+honesty; docs-grounded)
+Profile→adapt LoRA — frozen at seq v7; further FT paused
 ```
 
-The execution platform is ahead of the DELTA loop: dispatch, B2 manifests,
-disposable workers, LoRA training, and adapter reload exist. They are prerequisites,
-not evidence that drift detection, policy selection, or promotion exists.
+Phase C ran ahead of Phase B on purpose for `e1_vllm`: the intervention matrix
+needed frozen eval + conditions before a typed `DriftEvent` existed. Phase B now
+has a behavioral `DriftEvent` + baseline report; full exit still needs corpus
+structural signal and executable probes.
+
+**Locked profile→adapt result (2026-07-28):** on Qwen3.5-0.8B / v0.22.0, a
+docs-grounded meanings+honesty profile finds a real hole (chance recognition,
+acquiescent false-accept). A profile wheel LoRA (v5) repairs that manifold and
+survives paraphrase holdout; it does **not** transfer to `eval_v3`. Sequential
+stage-2 from v5 (`e1-vllm-c3-ft-seq-v7-*`, `train_v0.22.0_v7`) is the frozen
+checkpoint: ~41% `eval_v3` with paraphrase false-reject ~97%. Flat blend v6
+raises `eval_v3` further but wrecks honesty — do not promote v6 as the honesty
+adapter. Full-weight FT deferred; LoRA FT paused.
+
+The execution platform (dispatch, B2, Modal/Lambda, LoRA train/reload) remains a
+prerequisite, not proof that SENSE → DECIDE → VERIFY is closed.
 
 ```mermaid
 flowchart LR
@@ -29,47 +46,70 @@ flowchart LR
   PhaseD --> PhaseE["E: learned policy and post-training"]
 ```
 
+Note: dependency order above is the system order. Empirical work on `e1_vllm`
+produced Phase C evidence before Phase B’s exit artifact.
+
 ## Phase A — grounded change environment
 
 **Goal:** turn `repo + old revision + new revision` into provenance-bearing corpora,
-a structural diff, typed train candidates, and held-out eval candidates.
+a structural index, typed train candidates, and held-out eval candidates.
 
-**Implemented:**
+**Status:** complete for `e1_vllm`.
 
-- pinned vLLM v0.22.0/v0.23.0 snapshots;
+**Implemented (evidence):**
+
+- pinned vLLM v0.22.0 (`doc_0`) / v0.23.0 (`doc_8`) via mill `pin`;
 - chunked corpora on B2;
-- corpus inspection and gold validation;
-- 40-row hand-authored `eval_v2`.
+- `structure_index.json` + mill generators **T1–T7**;
+- gate: eval denylist, dedupe, grounding checks; rejected JSONL;
+- `eval_v3` (A–D) + validation tooling;
+- Q&A-aligned doc_0 train sets (`train_v0.22.0_v{3,4}.jsonl` + manifests).
 
-**Missing:**
+**Still not claimed (out of Phase A exit):**
 
-- generic repository/tag input contract;
-- structural index and typed T1–T7 generators;
-- contamination, deduplication, and balance gates;
-- `eval_v3` classes A–D;
-- Q&A-aligned doc_0 training data.
+- multi-experiment generic mill in `src/lab/` (still under `experiments/e1_vllm/mill/`);
+- recipe-driven class balance beyond T7 candidate cap;
+- automatic structural *diff* product (two-tag delta / T8).
 
-**Exit artifact:**
+**Exit artifact (present):**
 
 ```text
 DatasetManifest + train JSONL + eval JSONL + rejected JSONL
 ```
 
-The manifest binds source revisions, corpus hashes, recipe hash, generator
-versions, class counts, and rejection reasons.
+Concrete: `data/experiments/e1_vllm/manifest_v0.22.0_v4.json`, matching train/eval
+JSONL, mill `gated/rejected.jsonl`, frozen `eval_v3.jsonl` on B2.
 
 ## Phase B — trustworthy drift measurement
 
 **Goal:** quantify and localize model drift using corpus changes plus behavioral
 evidence.
 
-**Required work:**
+**Status:** partial — DriftEvent v1 + baseline report exist; corpus structural
+signal and executable probes still open.
 
-- harden failure-mode scoring;
-- add version attribution and correct abstention scoring;
-- measure stable-knowledge regressions separately from changed knowledge;
-- add executable tests for procedural/API behavior;
-- emit a versioned `DriftEvent`.
+**Have:**
+
+- c0 vs c3 and c0 vs c1 typed `DriftEvent` JSON (behavioral, rescored labels);
+- baseline report separating stable (A) vs changed (B/D) deltas;
+- hardened failure modes: `confident_hallucination` for unknown-gold misses;
+  shared scorer in `src/lab/qa_score.py`.
+
+**Still required for full exit:**
+
+- attach structural doc_0↔doc_8 corpus signal to `DriftEvent.corpus_signal`;
+- executable tests for procedural/API behavior where possible;
+- freeze DriftEvent schema beyond `delta.drift_event.v1` after one more iteration.
+
+**Related (feeds DECIDE / BUILD, not Phase B exit alone):**
+
+- closed-book dense `TopicKnowledgeProfile` on source_before (v0.22.0 / `doc_0`):
+  85 code-verified meaning claims, 996 probes, protocol
+  `e1_profile_meaning_honesty_v1` under `experiments/e1_vllm/knowledge_profile/`;
+- TruthSource v2: docs-only sufficient for shared bridge meanings (code arms
+  deferred);
+- frozen adapt checkpoint: seq v7 LoRA from profile v5 + eval-hole paraphrases
+  (`manifest_v0.22.0_v7.json`); reports under `artifacts/reports/topic_knowledge_profile_*`.
 
 **Exit artifact:**
 
@@ -77,35 +117,48 @@ evidence.
 DriftEvent + reproducible baseline report
 ```
 
-The first credible result is c0 versus c3 on a frozen eval with aligned train data.
-It is not an aggregate substring score.
+Present (behavioral v1):
+
+```text
+artifacts/reports/drift_events/drift_c0_base_to_c3_ft.json
+artifacts/reports/drift_events/drift_c0_base_to_c1_rag_fresh.json
+artifacts/reports/e1_vllm_drift_baseline.md
+```
+
+Generator: `experiments/e1_vllm/sense_drift.py`.
 
 ## Phase C — intervention matrix
 
 **Goal:** measure quality recovery, regression, latency, and cost for each available
 intervention.
 
-**Required work:**
+**Status:** complete for `e1_vllm` (manual intervention selection).
 
-- context-injection condition;
-- fresh/stale/shuffled retrieval indexes and eval paths;
-- doc_0 LoRA condition;
-- LoRA plus fresh retrieval;
-- one comparison report with per-class failure modes and costs.
+**Implemented (evidence):**
 
-**Exit artifact:**
+- context injection via BM25 retrieval path;
+- fresh (`doc_8`), stale (`doc_0`), and shuffled retrieval conditions;
+- doc_0 LoRA (mill v3/v4) and LoRA + fresh RAG (c4);
+- comparison report: `artifacts/reports/e1_vllm_failure_modes.md` (on B2).
+
+**Headline locked result:** fresh BM25 (c1) beats stale RAG, LoRA@doc_0, and
+shuffle; c4 LoRA+RAG interferes. See the report for A/B/C/D and failure counts.
+
+**Exit artifact (present for this slice):**
 
 ```text
-InterventionOutcome[] covering L0-L3
+InterventionOutcome evidence covering no-op / fresh RAG / stale RAG / LoRA / LoRA+RAG / shuffle
 ```
 
-Interventions are selected manually in this phase. That is intentional: policy
-learning without outcome data is fiction.
+Formal `InterventionOutcome[]` schema + automatic selection remain Phase D inputs,
+not a reason to reopen Phase C for `e1_vllm`.
 
 ## Phase D — deterministic closed loop
 
 **Goal:** execute SENSE → BUILD → DECIDE → VERIFY without human construction of
 evidence.
+
+**Status:** not started.
 
 **Required work:**
 
@@ -126,6 +179,8 @@ one end-to-end reconcile run that promotes or rejects automatically
 
 **Goal:** learn intervention selection from accumulated outcomes and evaluate
 whether execution-reward post-training helps at sub-1B scale.
+
+**Status:** not started.
 
 **Required work:**
 
@@ -149,8 +204,8 @@ Dates are planning inputs, not system milestones.
 
 | target | status as of 2026-07-18 | required evidence |
 |---|---|---|
-| NeurIPS 2026 workshop contribution | suggested date 2026-08-29; workshop-specific deadlines vary | Phase A plus a credible Phase B result |
-| arXiv systems report | no fixed deadline | Phases A–C with reproducible artifacts |
+| NeurIPS 2026 workshop contribution | suggested date 2026-08-29; workshop-specific deadlines vary | Phase A (done) + credible Phase B `DriftEvent` |
+| arXiv systems report | no fixed deadline | Phases A–C with reproducible artifacts (A+C done for e1; B still open) |
 | MLSys 2027 | expected around late Oct 2026; official deadline not yet recorded here | deterministic closed loop plus systems evaluation |
 
 Do not copy these dates into experiment documents. Update this table only after
@@ -177,12 +232,22 @@ checking the official venue.
 
 ## command
 
-Current Phase A commands:
+Reproduce Phase A / C evidence for `e1_vllm`:
 
 ```bash
 python experiments/e1_vllm/build_corpus.py
-python experiments/e1_vllm/inspect_data.py stats
-python experiments/e1_vllm/inspect_data.py validate-eval eval_v2.jsonl
+python experiments/e1_vllm/inspect_data.py validate-eval eval_v3.jsonl
+python experiments/e1_vllm/mill/cli.py build \
+  --repo https://github.com/vllm-project/vllm.git \
+  --tag v0.22.0 \
+  --eval-denylist experiments/e1_vllm/fixtures/eval_v3.jsonl \
+  --version 4
+python experiments/e1_vllm/build_index.py \
+  --corpus data/experiments/e1_vllm/corpus_doc_8.jsonl \
+  --out data/experiments/e1_vllm/indexes/doc_8_bm25.json
+python experiments/e1_vllm/compare.py --metrics-dir /path/to/metrics \
+  --out artifacts/reports/e1_vllm_failure_modes.md
+python experiments/e1_vllm/sense_drift.py --metrics-dir /path/to/metrics
 ```
 
 No phase should be marked complete solely because these commands exit zero.

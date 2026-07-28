@@ -113,26 +113,43 @@ def cmd_validate_eval(args: argparse.Namespace) -> None:
     if not eval_path.exists():
         eval_path = FIXTURES_DIR / args.eval
     items = load_jsonl(eval_path)
-    corpus_key = "doc_8" if args.against == "0.23.0" else "doc_0"
-    rows = load_corpus(CORPORA[corpus_key])
+
+    corpora = {
+        "0.22.0": load_corpus(CORPORA["doc_0"]),
+        "0.23.0": load_corpus(CORPORA["doc_8"]),
+    }
 
     print(f"eval: {eval_path} ({len(items)} items)")
-    print(f"corpus: {corpus_key} ({CORPORA[corpus_key]})")
+    print("corpus: per-item requires_doc (doc_0 / doc_8)")
     print()
     ok = 0
+    skipped = 0
     for item in items:
-        needles = item["gold"]["must_contain"]
+        req = item.get("requires_doc", args.against)
+        gold = item.get("gold") or {}
+        if gold.get("abstain_if_unknown"):
+            skipped += 1
+            print(
+                f"  {item['id']:14} requires={req:6}  SKIP abstain  "
+                f"hint={item.get('source_hint', '-')}"
+            )
+            continue
+
+        rows = corpora.get(req) or corpora[args.against]
+        needles = gold["must_contain"]
         valid, missing, hits = gold_in_corpus(rows, needles)
-        req = item.get("requires_doc", "?")
         mark = "OK" if valid else f"MISSING {missing}"
         if valid:
             ok += 1
         hint = item.get("source_hint", "-")
-        print(f"  {item['id']:14} requires={req:6}  {mark:20}  hint={hint}")
+        ec = item.get("eval_class", "-")
+        print(f"  {item['id']:14} class={ec} requires={req:6}  {mark:20}  hint={hint}")
         if args.verbose and hits:
             h = hits[0]
             print(f"    e.g. {h['source_path']} [{h['chunk_index']}]")
-    print(f"\n{ok}/{len(items)} items have all gold strings somewhere in {corpus_key}")
+
+    checked = len(items) - skipped
+    print(f"\n{ok}/{checked} non-abstain items grounded; {skipped} abstain skipped")
 
 
 def build_parser() -> argparse.ArgumentParser:

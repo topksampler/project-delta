@@ -16,7 +16,8 @@ distributed training or post-training is credible.
 
 - reproducible cockpit, B2 storage, and disposable workers: implemented;
 - single-node LoRA train, upload, reload, and eval: implemented;
-- trustworthy DELTA eval and comparison: in progress;
+- e1_vllm Phase A exit + Phase C comparison report: implemented (see DELTA roadmap);
+- trustworthy DriftEvent (DELTA Phase B): in progress;
 - post-training and distributed optimization: deferred until the verifier is trusted.
 
 ## what goes where

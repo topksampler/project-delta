@@ -1,0 +1,19 @@
+run_id: e1-vllm-profile-dense-v1-qwen35-4b-nthink-modal
+
+experiment_id: e1_vllm
+condition_id: profile_dense_meaning_honesty_control_4b
+
+model:
+  name: Qwen/Qwen3.5-4B
+  trust_remote_code: true
+
+eval:
+  # Same verified probe bank as the 0.8B analysis subset.
+  path: data/experiments/e1_vllm/profile/dense_v1/probes_verified.jsonl
+  output_dir: runs/e1-vllm-profile-dense-v1-qwen35-4b-nthink-modal
+  max_new_tokens: 96
+  batch_size: 8
+  temperature: 0.0
+  top_p: 1.0
+  # First 4B attempt burned max_new_tokens inside <think>; scores invalid.
+  enable_thinking: false

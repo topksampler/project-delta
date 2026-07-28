@@ -1,0 +1,339 @@
+{
+  "schema": "delta.drift_event.v1",
+  "experiment_id": "e1_vllm",
+  "created_at": "2026-07-18T09:59:32Z",
+  "source_before": {
+    "repo": "https://github.com/vllm-project/vllm.git",
+    "revision": "v0.22.0",
+    "alias": "doc_0"
+  },
+  "source_after": {
+    "repo": "https://github.com/vllm-project/vllm.git",
+    "revision": "v0.23.0",
+    "alias": "doc_8"
+  },
+  "model": {
+    "id": "Qwen/Qwen3.5-0.8B"
+  },
+  "eval": {
+    "fixture": "eval_v3.jsonl",
+    "n": 46
+  },
+  "baseline": {
+    "condition_id": "c0_base",
+    "run_id": "e1-vllm-c0-base-eval-v3-qwen35-08b-modal",
+    "metrics": {
+      "n": 46,
+      "accuracy": 0.2609,
+      "avg_content_score": 0.2935,
+      "by_eval_class": {
+        "A": 0.2,
+        "B": 0.1,
+        "C": 0.4375,
+        "D": 0.625
+      },
+      "by_failure_mode": {
+        "correct": 12,
+        "wrong": 28,
+        "stale_version": 3,
+        "confident_hallucination": 3
+      }
+    }
+  },
+  "probe": {
+    "condition_id": "c1_rag_fresh",
+    "run_id": "e1-vllm-c1-rag-fresh-eval-v3-qwen35-08b-modal",
+    "metrics": {
+      "n": 46,
+      "accuracy": 0.4565,
+      "avg_content_score": 0.4565,
+      "by_eval_class": {
+        "A": 0.45,
+        "B": 0.3,
+        "C": 0.625,
+        "D": 0.5
+      },
+      "by_failure_mode": {
+        "correct": 21,
+        "wrong": 18,
+        "stale_version": 2,
+        "abstain_wrong": 1,
+        "confident_hallucination": 4
+      }
+    }
+  },
+  "drift_score": {
+    "accuracy_delta": 0.1956,
+    "by_eval_class_delta": {
+      "A": 0.25,
+      "B": 0.2,
+      "C": 0.1875,
+      "D": -0.125
+    }
+  },
+  "stable_knowledge": {
+    "class": "A",
+    "baseline": 0.2,
+    "probe": 0.45,
+    "delta": 0.25,
+    "note": "stable facts; drop here is regression"
+  },
+  "changed_knowledge": {
+    "B": {
+      "baseline": 0.1,
+      "probe": 0.3,
+      "delta": 0.2
+    },
+    "D": {
+      "baseline": 0.625,
+      "probe": 0.5,
+      "delta": -0.125
+    },
+    "note": "version-sensitive / new-fact classes"
+  },
+  "failure_mode_delta": {
+    "abstain_wrong": 1,
+    "confident_hallucination": 1,
+    "correct": 9,
+    "stale_version": -1,
+    "wrong": -10
+  },
+  "probe_failures": [
+    {
+      "id": "A02",
+      "eval_class": "A",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "A05",
+      "eval_class": "A",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "A06",
+      "eval_class": "A",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "A07",
+      "eval_class": "A",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "A08",
+      "eval_class": "A",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "A09",
+      "eval_class": "A",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "A10",
+      "eval_class": "A",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "A12",
+      "eval_class": "A",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "A14",
+      "eval_class": "A",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "A18",
+      "eval_class": "A",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "A19",
+      "eval_class": "A",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "B01",
+      "eval_class": "B",
+      "requires_doc": "0.23.0",
+      "baseline_mode": "stale_version",
+      "probe_mode": "stale_version",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "B02",
+      "eval_class": "B",
+      "requires_doc": "0.23.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "B04",
+      "eval_class": "B",
+      "requires_doc": "0.23.0",
+      "baseline_mode": "stale_version",
+      "probe_mode": "stale_version",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "B05",
+      "eval_class": "B",
+      "requires_doc": "0.23.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "B06",
+      "eval_class": "B",
+      "requires_doc": "0.23.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "abstain_wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "B07",
+      "eval_class": "B",
+      "requires_doc": "0.23.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "B10",
+      "eval_class": "B",
+      "requires_doc": "0.23.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "C06",
+      "eval_class": "C",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "C07",
+      "eval_class": "C",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.5,
+      "probe_score": 0.0
+    },
+    {
+      "id": "C08",
+      "eval_class": "C",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "wrong",
+      "probe_mode": "wrong",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "D02",
+      "eval_class": "D",
+      "requires_doc": "0.23.0",
+      "baseline_mode": "confident_hallucination",
+      "probe_mode": "confident_hallucination",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "D03",
+      "eval_class": "D",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "correct",
+      "probe_mode": "confident_hallucination",
+      "baseline_score": 1.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "D06",
+      "eval_class": "D",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "confident_hallucination",
+      "probe_mode": "confident_hallucination",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    },
+    {
+      "id": "D08",
+      "eval_class": "D",
+      "requires_doc": "0.22.0",
+      "baseline_mode": "confident_hallucination",
+      "probe_mode": "confident_hallucination",
+      "baseline_score": 0.0,
+      "probe_score": 0.0
+    }
+  ],
+  "corpus_signal": {
+    "status": "deferred",
+    "note": "behavioral probe only in v1; structural doc_0\u2194doc_8 diff not yet attached"
+  },
+  "drift_type": "changed",
+  "affected_zones": [
+    "eval_class:B",
+    "eval_class:D",
+    "eval_class:A",
+    "eval_class:C"
+  ]
+}

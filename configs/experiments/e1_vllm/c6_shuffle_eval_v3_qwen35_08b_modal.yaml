@@ -1,0 +1,23 @@
+run_id: e1-vllm-c6-shuffle-eval-v3-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: c6_shuffle
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+
+eval:
+  path: data/experiments/e1_vllm/eval_v3.jsonl
+  output_dir: runs/e1-vllm-c6-shuffle-eval-v3-qwen35-08b-modal
+  max_new_tokens: 256
+  temperature: 0.0
+  top_p: 1.0
+
+retrieval:
+  enabled: true
+  mode: shuffle
+  seed: 1337
+  corpus_path: data/experiments/e1_vllm/corpus_doc_8.jsonl
+  top_k: 4
+  max_chars: 3500

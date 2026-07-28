@@ -2,8 +2,6 @@ import subprocess
 import time
 from pathlib import Path
 
-from lab.dispatch.timing import RunTimer
-
 
 def _modal_bin(repo_root: Path) -> str:
     venv_modal = repo_root / ".venv" / "bin" / "modal"
@@ -21,17 +19,22 @@ def dispatch(
     gpu: str | None,
 ) -> None:
     app_path = repo_root / "infra/modal/app.py"
-    fn_name = "train" if task == "train" else "eval_run"
-    fn = f"{app_path}::{fn_name}"
+    # Use local entrypoint so --gpu actually overrides the decorator default.
+    default_gpu = "H100" if task == "train" else "A10G"
+    chosen = gpu or default_gpu
 
     cmd = [
         _modal_bin(repo_root),
         "run",
-        fn,
+        str(app_path),
         "--run-id",
         run_id,
         "--config",
         str(config_path.relative_to(repo_root)),
+        "--task",
+        "train" if task == "train" else "eval",
+        "--gpu",
+        chosen,
     ]
 
     print(f"+ {' '.join(cmd)}")

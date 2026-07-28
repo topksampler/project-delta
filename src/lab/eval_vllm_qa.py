@@ -5,7 +5,9 @@ from __future__ import annotations
 import argparse
 import json
 import platform
+import random
 import subprocess
+import sys
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,6 +19,76 @@ from rich import print
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from lab.eval_base import append_jsonl, choose_device, read_jsonl, write_json
+from lab.qa_score import classify_failure_mode, score_gold, score_must_contain
+
+
+def _resolve(path: str | Path, repo_root: Path) -> Path:
+    p = Path(path)
+    return p if p.is_absolute() else repo_root / p
+
+
+class RetrievalBundle:
+    """Load corpus (+ BM25 index); return context for a question.
+
+    mode=bm25   → lexical top-k (c1/c2/c4)
+    mode=shuffle → seeded random k chunks from same corpus (c6 control)
+    """
+
+    def __init__(
+        self,
+        corpus_path: Path,
+        index_path: Path | None = None,
+        *,
+        top_k: int = 4,
+        max_chars: int = 3500,
+        mode: str = "bm25",
+        seed: int = 1337,
+    ):
+        self.top_k = top_k
+        self.max_chars = max_chars
+        self.mode = mode
+        self.seed = seed
+        self.texts: dict[str, str] = {}
+        for row in read_jsonl(str(corpus_path)):
+            self.texts[row["chunk_id"]] = row["text"]
+        self.all_ids = list(self.texts.keys())
+        self.index = None
+        if mode == "bm25":
+            if index_path is None or not index_path.exists():
+                raise FileNotFoundError("bm25 mode requires index_path")
+            harness = Path(__file__).resolve().parents[2] / "experiments" / "e1_vllm"
+            if str(harness) not in sys.path:
+                sys.path.insert(0, str(harness))
+            from bm25 import BM25Index  # noqa: WPS433 — experiment harness
+
+            payload = json.loads(index_path.read_text(encoding="utf-8"))
+            self.index = BM25Index.from_dict(payload["index"])
+
+    def _format(self, chunk_ids: list[str]) -> tuple[str, list[str]]:
+        parts: list[str] = []
+        used = 0
+        for cid in chunk_ids:
+            text = self.texts.get(cid, "").strip()
+            if not text:
+                continue
+            block = f"[{cid}]\n{text}"
+            if used + len(block) + 2 > self.max_chars and parts:
+                break
+            parts.append(block)
+            used += len(block) + 2
+        if not parts:
+            return "", chunk_ids
+        return "Retrieved documentation:\n\n" + "\n\n".join(parts), chunk_ids
+
+    def retrieve(self, question: str) -> tuple[str, list[str]]:
+        if self.mode == "shuffle":
+            rng = random.Random(f"{self.seed}:{question}")
+            k = min(self.top_k, len(self.all_ids))
+            chunk_ids = rng.sample(self.all_ids, k) if k else []
+            return self._format(chunk_ids)
+        assert self.index is not None
+        hits = self.index.top_k(question, self.top_k)
+        return self._format([cid for cid, _ in hits])
 
 
 def git_commit() -> str:
@@ -28,33 +100,6 @@ def git_commit() -> str:
         ).strip()
     except Exception:
         return "unknown"
-
-
-def score_must_contain(output: str, needles: list[str]) -> tuple[float, list[str], list[str]]:
-    out = output.lower()
-    hits = [n for n in needles if n.lower() in out]
-    misses = [n for n in needles if n.lower() not in out]
-    score = len(hits) / max(1, len(needles))
-    return score, hits, misses
-
-
-def classify_failure_mode(
-    *,
-    score: float,
-    output: str,
-    requires_doc: str,
-    misses: list[str],
-) -> str:
-    lower = output.lower()
-    if score >= 1.0:
-        return "correct"
-    if any(p in lower for p in ("unknown", "not sure", "don't know", "do not know")):
-        return "abstain_wrong"
-    if requires_doc == "0.23.0" and any(
-        x in lower for x in ("llm_compressor.md", "0.22", "v0.22")
-    ):
-        return "stale_version"
-    return "wrong"
 
 
 def resolve_adapter_path(cfg: dict, repo_root: Path) -> Path | None:
@@ -92,6 +137,11 @@ def load_model(cfg: dict, device: str, repo_root: Path):
     return model, tokenizer
 
 
+def _chat_template_kwargs(eval_cfg: dict) -> dict:
+    """Qwen3.5+ defaults to open <think>; disable unless explicitly requested."""
+    return {"enable_thinking": bool(eval_cfg.get("enable_thinking", False))}
+
+
 def generate_answer(
     model,
     tokenizer,
@@ -99,18 +149,28 @@ def generate_answer(
     question: str,
     device: str,
     eval_cfg: dict,
+    context: str = "",
 ) -> str:
+    user_content = question
+    if context:
+        user_content = f"{context}\n\nQuestion: {question}"
     messages = [
         {
             "role": "system",
             "content": (
                 "You answer questions about vLLM documentation. "
+                "Use the retrieved documentation when provided. "
                 "Reply in 1–3 sentences. If unsure, say unknown."
             ),
         },
-        {"role": "user", "content": question},
+        {"role": "user", "content": user_content},
     ]
-    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    text = tokenizer.apply_chat_template(
+        messages,
+        tokenize=False,
+        add_generation_prompt=True,
+        **_chat_template_kwargs(eval_cfg),
+    )
     inputs = tokenizer(text, return_tensors="pt").to(device)
     temperature = float(eval_cfg.get("temperature", 0.0))
     gen_kwargs = {
@@ -130,16 +190,80 @@ def generate_answer(
     return tokenizer.decode(generated, skip_special_tokens=True).strip()
 
 
+def generate_answers(
+    model,
+    tokenizer,
+    *,
+    questions: list[str],
+    device: str,
+    eval_cfg: dict,
+    contexts: list[str] | None = None,
+) -> list[str]:
+    """Batched closed-book/context generation; materially faster for profile runs."""
+    contexts = contexts or [""] * len(questions)
+    texts: list[str] = []
+    for question, context in zip(questions, contexts, strict=True):
+        user_content = f"{context}\n\nQuestion: {question}" if context else question
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You answer questions about vLLM documentation. "
+                    "Use the retrieved documentation when provided. "
+                    "Reply in 1–3 sentences. If unsure, say unknown."
+                ),
+            },
+            {"role": "user", "content": user_content},
+        ]
+        texts.append(
+            tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,
+                **_chat_template_kwargs(eval_cfg),
+            )
+        )
+
+    previous_padding_side = tokenizer.padding_side
+    tokenizer.padding_side = "left"
+    inputs = tokenizer(texts, return_tensors="pt", padding=True).to(device)
+    temperature = float(eval_cfg.get("temperature", 0.0))
+    gen_kwargs = {
+        "max_new_tokens": int(eval_cfg.get("max_new_tokens", 256)),
+        "pad_token_id": tokenizer.eos_token_id,
+    }
+    if temperature <= 0.0:
+        gen_kwargs["do_sample"] = False
+    else:
+        gen_kwargs.update(
+            do_sample=True,
+            temperature=temperature,
+            top_p=float(eval_cfg.get("top_p", 0.9)),
+        )
+    with torch.no_grad():
+        output_ids = model.generate(**inputs, **gen_kwargs)
+    prompt_len = inputs["input_ids"].shape[1]
+    outputs = [
+        tokenizer.decode(row[prompt_len:], skip_special_tokens=True).strip()
+        for row in output_ids
+    ]
+    tokenizer.padding_side = previous_padding_side
+    return outputs
+
+
 def aggregate(rows: list[dict]) -> dict:
     by_type: dict[str, list[float]] = defaultdict(list)
+    by_class: dict[str, list[float]] = defaultdict(list)
     by_requires: dict[str, list[float]] = defaultdict(list)
     by_failure: dict[str, int] = defaultdict(int)
     for row in rows:
         by_type[row["type"]].append(row["content_score"])
+        by_class[row.get("eval_class", "?")].append(row["content_score"])
         by_requires[row["requires_doc"]].append(row["content_score"])
         by_failure[row["failure_mode"]] += 1
     return {
         "by_type": {k: float(sum(v) / len(v)) for k, v in by_type.items()},
+        "by_eval_class": {k: float(sum(v) / len(v)) for k, v in by_class.items()},
         "by_requires_doc": {k: float(sum(v) / len(v)) for k, v in by_requires.items()},
         "by_failure_mode": {k: int(v) for k, v in by_failure.items()},
     }
@@ -174,41 +298,108 @@ def main() -> None:
     print(f"[bold]e1_vllm eval[/bold] run_id={run_id} device={device}")
     model, tokenizer = load_model(cfg, device, repo_root)
 
+    retrieval_cfg = cfg.get("retrieval") or {}
+    retriever: RetrievalBundle | None = None
+    if retrieval_cfg.get("enabled"):
+        corpus_path = _resolve(retrieval_cfg["corpus_path"], repo_root)
+        index_rel = retrieval_cfg.get("index_path")
+        index_path = _resolve(index_rel, repo_root) if index_rel else None
+        mode = str(retrieval_cfg.get("mode", "bm25"))
+        retriever = RetrievalBundle(
+            corpus_path,
+            index_path,
+            top_k=int(retrieval_cfg.get("top_k", 4)),
+            max_chars=int(retrieval_cfg.get("max_chars", 3500)),
+            mode=mode,
+            seed=int(retrieval_cfg.get("seed", 1337)),
+        )
+        print(
+            f"retrieval enabled mode={mode} corpus={corpus_path.name} "
+            f"top_k={retriever.top_k}"
+        )
+
     rows: list[dict] = []
     total_score = 0.0
     n = 0
+    retrieval_nonempty = 0
 
-    for ex in read_jsonl(str(eval_path)):
-        n += 1
-        question = ex["question"]
-        needles = ex.get("gold", {}).get("must_contain", [])
-        requires_doc = ex.get("requires_doc", "?")
+    examples = read_jsonl(str(eval_path))
+    prepared: list[tuple[dict, str, list[str]]] = []
+    for ex in examples:
+        context = ""
+        retrieved_chunk_ids: list[str] = []
+        if retriever is not None:
+            context, retrieved_chunk_ids = retriever.retrieve(ex["question"])
+            if retrieved_chunk_ids:
+                retrieval_nonempty += 1
+        prepared.append((ex, context, retrieved_chunk_ids))
 
-        output = generate_answer(model, tokenizer, question=question, device=device, eval_cfg=eval_cfg)
-        score, hits, misses = score_must_contain(output, needles)
-        failure_mode = classify_failure_mode(
-            score=score,
-            output=output,
-            requires_doc=requires_doc,
-            misses=misses,
+    batch_size = max(1, int(eval_cfg.get("batch_size", 1)))
+    for start in range(0, len(prepared), batch_size):
+        batch = prepared[start : start + batch_size]
+        outputs = generate_answers(
+            model,
+            tokenizer,
+            questions=[item[0]["question"] for item in batch],
+            contexts=[item[1] for item in batch],
+            device=device,
+            eval_cfg=eval_cfg,
         )
-        total_score += score
+        for (ex, _context, retrieved_chunk_ids), output in zip(
+            batch, outputs, strict=True
+        ):
+            n += 1
+            question = ex["question"]
+            gold = ex.get("gold") or {}
+            needles = gold.get("must_contain", [])
+            requires_doc = ex.get("requires_doc", "?")
+            if (
+                gold.get("choice")
+                or gold.get("boolean")
+                or gold.get("must_contain_any")
+                or gold.get("must_not_contain")
+                or gold.get("abstain_if_unknown")
+            ):
+                score, hits, misses = score_gold(output, gold)
+            else:
+                score, hits, misses = score_must_contain(output, needles)
+            failure_mode = classify_failure_mode(
+                score=score,
+                output=output,
+                requires_doc=requires_doc,
+                misses=misses,
+                needles=needles,
+                gold=gold,
+            )
+            total_score += score
 
-        row = {
-            "id": ex["id"],
-            "type": ex.get("type", "unknown"),
-            "requires_doc": requires_doc,
-            "question": question,
-            "gold_must_contain": needles,
-            "output": output,
-            "content_score": score,
-            "hits": hits,
-            "misses": misses,
-            "failure_mode": failure_mode,
-        }
-        append_jsonl(samples_path, row)
-        rows.append(row)
-        print(f"{ex['id']}: score={score:.2f} mode={failure_mode}")
+            row = {
+                "id": ex["id"],
+                "eval_class": ex.get("eval_class", "?"),
+                "type": ex.get("type", "unknown"),
+                "requires_doc": requires_doc,
+                "question": question,
+                "gold_must_contain": needles,
+                "output": output,
+                "content_score": score,
+                "hits": hits,
+                "misses": misses,
+                "failure_mode": failure_mode,
+            }
+            for key in (
+                "claim_id",
+                "probe_form",
+                "paraphrase_idx",
+                "zone",
+                "centrality",
+            ):
+                if key in ex:
+                    row[key] = ex[key]
+            if retriever is not None:
+                row["retrieved_chunk_ids"] = retrieved_chunk_ids
+            append_jsonl(samples_path, row)
+            rows.append(row)
+            print(f"{ex['id']}: score={score:.2f} mode={failure_mode}")
 
     avg = total_score / max(1, n)
     metrics = {
@@ -223,6 +414,14 @@ def main() -> None:
         "breakdown": aggregate(rows),
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
+    if retriever is not None:
+        metrics["retrieval"] = {
+            "enabled": True,
+            "mode": retriever.mode,
+            "top_k": retriever.top_k,
+            "seed": retriever.seed if retriever.mode == "shuffle" else None,
+            "hit_rate_nonempty": round(retrieval_nonempty / max(1, n), 4),
+        }
 
     write_json(metrics_path, metrics)
     ledger = {

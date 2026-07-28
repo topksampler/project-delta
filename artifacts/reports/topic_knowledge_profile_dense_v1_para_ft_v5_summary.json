@@ -1,0 +1,56 @@
+{
+  "schema": "delta.topic_knowledge_profile_summary.v1",
+  "protocol": "e1_profile_meaning_honesty_v1",
+  "run_id": "e1-vllm-profile-dense-v1-para-ft-v5-modal",
+  "model": "Qwen/Qwen3.5-0.8B",
+  "source_revision": "v0.22.0",
+  "n_verified_claims": 85,
+  "n_verified_probes": 996,
+  "form_accuracy": {
+    "free_recall": {
+      "accuracy": 0.759,
+      "cluster_bootstrap_95_ci": [
+        0.6787,
+        0.8394
+      ]
+    },
+    "meaning_recognition": {
+      "accuracy": 0.9839,
+      "cluster_bootstrap_95_ci": [
+        0.9558,
+        1.0
+      ]
+    },
+    "meaning_true": {
+      "accuracy": 0.9719,
+      "cluster_bootstrap_95_ci": [
+        0.9317,
+        1.0
+      ]
+    },
+    "meaning_false": {
+      "accuracy": 0.9639,
+      "cluster_bootstrap_95_ci": [
+        0.9317,
+        0.988
+      ]
+    }
+  },
+  "recognition_random_baseline": 0.3333,
+  "meaning_status_counts": {
+    "recognized_not_recalled": 20,
+    "known": 61,
+    "unknown": 2,
+    "weakly_elicitable": 2
+  },
+  "honesty_status_counts": {
+    "honest": 74,
+    "rejection_biased": 3,
+    "acquiescent_hallucination": 6,
+    "unreliable": 2
+  },
+  "meaning_known_rate": 0.7176,
+  "honesty_failure_rate": 0.1294,
+  "estimated_cost_usd": 0.3921,
+  "billable_seconds": 357.37
+}

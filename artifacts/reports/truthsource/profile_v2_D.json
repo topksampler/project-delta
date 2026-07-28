@@ -1,0 +1,1608 @@
+{
+  "schema": "delta.topic_knowledge_profile.v1",
+  "protocol_version": "e1_profile_v0",
+  "model_state": {
+    "name": "Qwen/Qwen3.5-0.8B",
+    "adapter": null,
+    "run_id": "e1-vllm-truthsource-v2-D-qwen35-08b-modal"
+  },
+  "subject": "vllm",
+  "source_revision": "v0.22.0",
+  "legacy_alias": "doc_0",
+  "mode": "closed_book",
+  "claim_bank_hash": "c683ca12a3d8340b555818f49c893755127c6ce01cf9220b43b5227b8162fefb",
+  "created_at": "2026-07-18T15:07:38.182721+00:00",
+  "aggregate": {
+    "n_claims": 105,
+    "n_probes": 555,
+    "status_counts": {
+      "known": 24,
+      "unknown": 59,
+      "partial": 17,
+      "unstable": 5
+    },
+    "status_rates": {
+      "known": 0.2286,
+      "partial": 0.1619,
+      "unknown": 0.5619,
+      "unstable": 0.0476
+    },
+    "by_claim_type": {
+      "flag_exists": {
+        "known": 23,
+        "partial": 17
+      },
+      "flag_meaning": {
+        "unknown": 59,
+        "unstable": 5,
+        "known": 1
+      }
+    },
+    "by_zone": {
+      "bridge": {
+        "known": 23,
+        "unknown": 31,
+        "partial": 17,
+        "unstable": 4
+      },
+      "cli_meaning": {
+        "unknown": 28,
+        "known": 1,
+        "unstable": 1
+      }
+    },
+    "known_rate": 0.2286
+  },
+  "claims": [
+    {
+      "claim_id": "bridge.flag.exists.--all2all-backend",
+      "claim_type": "flag_exists",
+      "entity": "--all2all-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--all2all-backend",
+      "claim_type": "flag_meaning",
+      "entity": "--all2all-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--allowed-local-media-path",
+      "claim_type": "flag_exists",
+      "entity": "--allowed-local-media-path",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--allowed-local-media-path",
+      "claim_type": "flag_meaning",
+      "entity": "--allowed-local-media-path",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--allowed-media-domains",
+      "claim_type": "flag_exists",
+      "entity": "--allowed-media-domains",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--allowed-media-domains",
+      "claim_type": "flag_meaning",
+      "entity": "--allowed-media-domains",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--async-scheduling",
+      "claim_type": "flag_exists",
+      "entity": "--async-scheduling",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--async-scheduling",
+      "claim_type": "flag_meaning",
+      "entity": "--async-scheduling",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--attention-backend",
+      "claim_type": "flag_exists",
+      "entity": "--attention-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--attention-backend",
+      "claim_type": "flag_meaning",
+      "entity": "--attention-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--attention-config",
+      "claim_type": "flag_exists",
+      "entity": "--attention-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--attention-config",
+      "claim_type": "flag_meaning",
+      "entity": "--attention-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--block-size",
+      "claim_type": "flag_exists",
+      "entity": "--block-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--block-size",
+      "claim_type": "flag_meaning",
+      "entity": "--block-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--collect-detailed-traces",
+      "claim_type": "flag_exists",
+      "entity": "--collect-detailed-traces",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--collect-detailed-traces",
+      "claim_type": "flag_meaning",
+      "entity": "--collect-detailed-traces",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--compilation-config",
+      "claim_type": "flag_exists",
+      "entity": "--compilation-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--compilation-config",
+      "claim_type": "flag_meaning",
+      "entity": "--compilation-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--convert",
+      "claim_type": "flag_exists",
+      "entity": "--convert",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--convert",
+      "claim_type": "flag_meaning",
+      "entity": "--convert",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--cpu-offload-gb",
+      "claim_type": "flag_exists",
+      "entity": "--cpu-offload-gb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--cpu-offload-gb",
+      "claim_type": "flag_meaning",
+      "entity": "--cpu-offload-gb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-address",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-address",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-address",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-address",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-backend",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-hybrid-lb",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-hybrid-lb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-hybrid-lb",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-hybrid-lb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-rank",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-rank",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-rpc-port",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-rpc-port",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-rpc-port",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-rpc-port",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-size",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-size",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-size-local",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-size-local",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-size-local",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-size-local",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-start-rank",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-start-rank",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-start-rank",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-start-rank",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--dbo-decode-token-threshold",
+      "claim_type": "flag_exists",
+      "entity": "--dbo-decode-token-threshold",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--dbo-decode-token-threshold",
+      "claim_type": "flag_meaning",
+      "entity": "--dbo-decode-token-threshold",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--dbo-prefill-token-threshold",
+      "claim_type": "flag_exists",
+      "entity": "--dbo-prefill-token-threshold",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 6,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--dbo-prefill-token-threshold",
+      "claim_type": "flag_meaning",
+      "entity": "--dbo-prefill-token-threshold",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--decode-context-parallel-size",
+      "claim_type": "flag_exists",
+      "entity": "--decode-context-parallel-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--decode-context-parallel-size",
+      "claim_type": "flag_meaning",
+      "entity": "--decode-context-parallel-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--default-mm-loras",
+      "claim_type": "flag_exists",
+      "entity": "--default-mm-loras",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--distributed-executor-backend",
+      "claim_type": "flag_exists",
+      "entity": "--distributed-executor-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--distributed-executor-backend",
+      "claim_type": "flag_meaning",
+      "entity": "--distributed-executor-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--dtype",
+      "claim_type": "flag_exists",
+      "entity": "--dtype",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--ec-transfer-config",
+      "claim_type": "flag_exists",
+      "entity": "--ec-transfer-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--ec-transfer-config",
+      "claim_type": "flag_meaning",
+      "entity": "--ec-transfer-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-chunked-prefill",
+      "claim_type": "flag_exists",
+      "entity": "--enable-chunked-prefill",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-chunked-prefill",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-chunked-prefill",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-cumem-allocator",
+      "claim_type": "flag_exists",
+      "entity": "--enable-cumem-allocator",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-cumem-allocator",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-cumem-allocator",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-dbo",
+      "claim_type": "flag_exists",
+      "entity": "--enable-dbo",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-dbo",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-dbo",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-eplb",
+      "claim_type": "flag_exists",
+      "entity": "--enable-eplb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-eplb",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-eplb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-expert-parallel",
+      "claim_type": "flag_exists",
+      "entity": "--enable-expert-parallel",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-expert-parallel",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-expert-parallel",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-lora",
+      "claim_type": "flag_exists",
+      "entity": "--enable-lora",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-lora",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-lora",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-mfu-metrics",
+      "claim_type": "flag_exists",
+      "entity": "--enable-mfu-metrics",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-mfu-metrics",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-mfu-metrics",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-mixed-moe-lora-format",
+      "claim_type": "flag_exists",
+      "entity": "--enable-mixed-moe-lora-format",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-mixed-moe-lora-format",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-mixed-moe-lora-format",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-mm-embeds",
+      "claim_type": "flag_exists",
+      "entity": "--enable-mm-embeds",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-mm-embeds",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-mm-embeds",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-prefix-caching",
+      "claim_type": "flag_exists",
+      "entity": "--enable-prefix-caching",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-prompt-embeds",
+      "claim_type": "flag_exists",
+      "entity": "--enable-prompt-embeds",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-prompt-embeds",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-prompt-embeds",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-sleep-mode",
+      "claim_type": "flag_exists",
+      "entity": "--enable-sleep-mode",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-sleep-mode",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-sleep-mode",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enforce-eager",
+      "claim_type": "flag_exists",
+      "entity": "--enforce-eager",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enforce-eager",
+      "claim_type": "flag_meaning",
+      "entity": "--enforce-eager",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--eplb-config",
+      "claim_type": "flag_exists",
+      "entity": "--eplb-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 6,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--eplb-config",
+      "claim_type": "flag_meaning",
+      "entity": "--eplb-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--after-bench-cmd",
+      "claim_type": "flag_meaning",
+      "entity": "--after-bench-cmd",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--all-files",
+      "claim_type": "flag_meaning",
+      "entity": "--all-files",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--api-key",
+      "claim_type": "flag_meaning",
+      "entity": "--api-key",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--api-server-count",
+      "claim_type": "flag_meaning",
+      "entity": "--api-server-count",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 3,
+      "n_correct": 3,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--async-load",
+      "claim_type": "flag_meaning",
+      "entity": "--async-load",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--backend",
+      "claim_type": "flag_meaning",
+      "entity": "--backend",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--bench-cmd",
+      "claim_type": "flag_meaning",
+      "entity": "--bench-cmd",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--bench-params",
+      "claim_type": "flag_meaning",
+      "entity": "--bench-params",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--bin-by",
+      "claim_type": "flag_meaning",
+      "entity": "--bin-by",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--build",
+      "claim_type": "flag_meaning",
+      "entity": "--build",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--build-arg",
+      "claim_type": "flag_meaning",
+      "entity": "--build-arg",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--burstiness",
+      "claim_type": "flag_meaning",
+      "entity": "--burstiness",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--cache-dir",
+      "claim_type": "flag_meaning",
+      "entity": "--cache-dir",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--cap-add",
+      "claim_type": "flag_meaning",
+      "entity": "--cap-add",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--chat-template",
+      "claim_type": "flag_meaning",
+      "entity": "--chat-template",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--chat-template-content-format",
+      "claim_type": "flag_meaning",
+      "entity": "--chat-template-content-format",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--col-by",
+      "claim_type": "flag_meaning",
+      "entity": "--col-by",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--compilation",
+      "claim_type": "flag_meaning",
+      "entity": "--compilation",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--config",
+      "claim_type": "flag_meaning",
+      "entity": "--config",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--cpunodebind",
+      "claim_type": "flag_meaning",
+      "entity": "--cpunodebind",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--cuda-graph-trace",
+      "claim_type": "flag_meaning",
+      "entity": "--cuda-graph-trace",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--curve-by",
+      "claim_type": "flag_meaning",
+      "entity": "--curve-by",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--custom-skip-chat-template",
+      "claim_type": "flag_meaning",
+      "entity": "--custom-skip-chat-template",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--data",
+      "claim_type": "flag_meaning",
+      "entity": "--data",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--data-parallel-",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-",
+      "zone": "cli_meaning",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--dataset",
+      "claim_type": "flag_meaning",
+      "entity": "--dataset",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--dataset-name",
+      "claim_type": "flag_meaning",
+      "entity": "--dataset-name",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--dataset-path",
+      "claim_type": "flag_meaning",
+      "entity": "--dataset-path",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--debug",
+      "claim_type": "flag_meaning",
+      "entity": "--debug",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "D.flag.meaning.--decode",
+      "claim_type": "flag_meaning",
+      "entity": "--decode",
+      "zone": "cli_meaning",
+      "centrality": "medium",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    }
+  ]
+}

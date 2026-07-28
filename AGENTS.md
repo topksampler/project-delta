@@ -31,6 +31,50 @@
 
 **Invariant:** launching jobs (Modal/Lambda) is platform — exceptional and safe to automate. *What* to run and *what it means* stays with the user unless they explicitly delegate.
 
+## e1_vllm knowledge-profile guardrails (frozen Jul 2026)
+
+**Invariant:** two scoreboards, never one. `TopicKnowledgeProfile` (dense bank:
+85 claims / 996 probes) measures what the model knows. `eval_v3` (46 hand items)
+compares interventions. A number from one never substitutes for the other.
+
+**Adapter roles (do not swap):**
+
+- `v5` = SENSE/profile wheel — repairs meanings+honesty; **regresses** eval_v3.
+- `v6` = negative result — lifts eval_v3, wrecks false-reject (~67%). Never
+  promote as the honesty adapter; its hand bank mixes v0.23 facts into a
+  v0.22-tagged train set on purpose (Phase C intervention, not a knowledge pin).
+- `v7` = frozen checkpoint — sequential from v5; ~41% eval_v3, ~97% false-reject.
+- FT (LoRA and full-weight) is **paused**. Do not restart without an explicit go.
+
+**Traps a fresh agent will fall into:**
+
+- The mill eval denylist is **optional** (`--eval-denylist`) and Jaccard-only;
+  `build_wheel.py` (v5) has no eval_v3 check at all. Any new train set must pass
+  the denylist explicitly — policy, not enforced by code.
+- `dense.py`, `build_wheel.py`, `aggregate*.py` hardcode `v0.22.0` / `doc_0`
+  strings. Moving to v0.23.0 requires parameterizing revisions, not editing
+  outputs.
+- Free-recall keyword scoring is **advisory** (one OR-group = full credit). Do
+  not headline free-recall numbers; trust choice/boolean scorers (audited 42/50).
+- c0/c3 accuracy differs between `e1_vllm_failure_modes.md` (pre-rescore) and
+  the DriftEvent JSONs (rescored). Cite the source you actually used.
+- Profile-wheel train surfaces ≈ dense probe surfaces by design; paraphrase
+  holdout is the anti-memorization control. Do not claim generalization beyond
+  new-wording-on-same-claims.
+
+**What can die:** rejected adapters after B2 push, local run caches.
+**What must survive:** manifests (`manifest_v0.22.0_v{4..7}.json`), frozen
+`eval_v3.jsonl`, probe banks, the role split above, negative results (v6).
+
+**Command (readouts, safe to re-run):**
+
+```bash
+./scripts/lab run --target modal --gpu H100 \
+  --config configs/experiments/e1_vllm/profile_dense_v1_para_ft_v7_modal.yaml
+./scripts/lab run --target modal --gpu H100 \
+  --config configs/experiments/e1_vllm/c3_ft_seq_v7_eval_v3_qwen35_08b_modal.yaml
+```
+
 ## lessons
 
 ### B2 + s5cmd: export creds before every child process

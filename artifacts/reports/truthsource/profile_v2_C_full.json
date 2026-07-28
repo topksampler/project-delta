@@ -1,0 +1,2392 @@
+{
+  "schema": "delta.topic_knowledge_profile.v1",
+  "protocol_version": "e1_profile_v0",
+  "model_state": {
+    "name": "Qwen/Qwen3.5-0.8B",
+    "adapter": null,
+    "run_id": "e1-vllm-truthsource-v2-C-full-qwen35-08b-modal"
+  },
+  "subject": "vllm",
+  "source_revision": "v0.22.0",
+  "legacy_alias": "doc_0",
+  "mode": "closed_book",
+  "claim_bank_hash": "21298e9d7880311e32f1b29fe56dff52e604023afd9845eb63ac59e113cf7e1f",
+  "created_at": "2026-07-18T15:07:38.277958+00:00",
+  "aggregate": {
+    "n_claims": 155,
+    "n_probes": 945,
+    "status_counts": {
+      "known": 73,
+      "unknown": 31,
+      "partial": 26,
+      "unstable": 25
+    },
+    "status_rates": {
+      "known": 0.471,
+      "partial": 0.1677,
+      "unknown": 0.2,
+      "unstable": 0.1613
+    },
+    "by_claim_type": {
+      "flag_exists": {
+        "known": 23,
+        "partial": 17
+      },
+      "flag_meaning": {
+        "unknown": 31,
+        "unstable": 4
+      },
+      "symbol_exists": {
+        "known": 50,
+        "partial": 9,
+        "unstable": 21
+      }
+    },
+    "by_zone": {
+      "bridge": {
+        "known": 23,
+        "unknown": 31,
+        "partial": 17,
+        "unstable": 4
+      },
+      "symbol": {
+        "known": 50,
+        "partial": 9,
+        "unstable": 21
+      }
+    },
+    "known_rate": 0.471
+  },
+  "claims": [
+    {
+      "claim_id": "bridge.flag.exists.--all2all-backend",
+      "claim_type": "flag_exists",
+      "entity": "--all2all-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--all2all-backend",
+      "claim_type": "flag_meaning",
+      "entity": "--all2all-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--allowed-local-media-path",
+      "claim_type": "flag_exists",
+      "entity": "--allowed-local-media-path",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--allowed-local-media-path",
+      "claim_type": "flag_meaning",
+      "entity": "--allowed-local-media-path",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--allowed-media-domains",
+      "claim_type": "flag_exists",
+      "entity": "--allowed-media-domains",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--allowed-media-domains",
+      "claim_type": "flag_meaning",
+      "entity": "--allowed-media-domains",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--async-scheduling",
+      "claim_type": "flag_exists",
+      "entity": "--async-scheduling",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--async-scheduling",
+      "claim_type": "flag_meaning",
+      "entity": "--async-scheduling",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--attention-backend",
+      "claim_type": "flag_exists",
+      "entity": "--attention-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--attention-backend",
+      "claim_type": "flag_meaning",
+      "entity": "--attention-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--attention-config",
+      "claim_type": "flag_exists",
+      "entity": "--attention-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--attention-config",
+      "claim_type": "flag_meaning",
+      "entity": "--attention-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--block-size",
+      "claim_type": "flag_exists",
+      "entity": "--block-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--block-size",
+      "claim_type": "flag_meaning",
+      "entity": "--block-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--collect-detailed-traces",
+      "claim_type": "flag_exists",
+      "entity": "--collect-detailed-traces",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--collect-detailed-traces",
+      "claim_type": "flag_meaning",
+      "entity": "--collect-detailed-traces",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--compilation-config",
+      "claim_type": "flag_exists",
+      "entity": "--compilation-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--compilation-config",
+      "claim_type": "flag_meaning",
+      "entity": "--compilation-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--convert",
+      "claim_type": "flag_exists",
+      "entity": "--convert",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--convert",
+      "claim_type": "flag_meaning",
+      "entity": "--convert",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--cpu-offload-gb",
+      "claim_type": "flag_exists",
+      "entity": "--cpu-offload-gb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--cpu-offload-gb",
+      "claim_type": "flag_meaning",
+      "entity": "--cpu-offload-gb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-address",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-address",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-address",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-address",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-backend",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-hybrid-lb",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-hybrid-lb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-hybrid-lb",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-hybrid-lb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-rank",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-rank",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-rpc-port",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-rpc-port",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-rpc-port",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-rpc-port",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-size",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-size",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-size-local",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-size-local",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-size-local",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-size-local",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--data-parallel-start-rank",
+      "claim_type": "flag_exists",
+      "entity": "--data-parallel-start-rank",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--data-parallel-start-rank",
+      "claim_type": "flag_meaning",
+      "entity": "--data-parallel-start-rank",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--dbo-decode-token-threshold",
+      "claim_type": "flag_exists",
+      "entity": "--dbo-decode-token-threshold",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--dbo-decode-token-threshold",
+      "claim_type": "flag_meaning",
+      "entity": "--dbo-decode-token-threshold",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--dbo-prefill-token-threshold",
+      "claim_type": "flag_exists",
+      "entity": "--dbo-prefill-token-threshold",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 6,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--dbo-prefill-token-threshold",
+      "claim_type": "flag_meaning",
+      "entity": "--dbo-prefill-token-threshold",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--decode-context-parallel-size",
+      "claim_type": "flag_exists",
+      "entity": "--decode-context-parallel-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--decode-context-parallel-size",
+      "claim_type": "flag_meaning",
+      "entity": "--decode-context-parallel-size",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--default-mm-loras",
+      "claim_type": "flag_exists",
+      "entity": "--default-mm-loras",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--distributed-executor-backend",
+      "claim_type": "flag_exists",
+      "entity": "--distributed-executor-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--distributed-executor-backend",
+      "claim_type": "flag_meaning",
+      "entity": "--distributed-executor-backend",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--dtype",
+      "claim_type": "flag_exists",
+      "entity": "--dtype",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--ec-transfer-config",
+      "claim_type": "flag_exists",
+      "entity": "--ec-transfer-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--ec-transfer-config",
+      "claim_type": "flag_meaning",
+      "entity": "--ec-transfer-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-chunked-prefill",
+      "claim_type": "flag_exists",
+      "entity": "--enable-chunked-prefill",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-chunked-prefill",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-chunked-prefill",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-cumem-allocator",
+      "claim_type": "flag_exists",
+      "entity": "--enable-cumem-allocator",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-cumem-allocator",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-cumem-allocator",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-dbo",
+      "claim_type": "flag_exists",
+      "entity": "--enable-dbo",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-dbo",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-dbo",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-eplb",
+      "claim_type": "flag_exists",
+      "entity": "--enable-eplb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-eplb",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-eplb",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-expert-parallel",
+      "claim_type": "flag_exists",
+      "entity": "--enable-expert-parallel",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-expert-parallel",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-expert-parallel",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unstable",
+      "n_probes": 3,
+      "n_correct": 1,
+      "probe_accuracy": 0.3333,
+      "by_probe_form": {
+        "recall": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-lora",
+      "claim_type": "flag_exists",
+      "entity": "--enable-lora",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-lora",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-lora",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-mfu-metrics",
+      "claim_type": "flag_exists",
+      "entity": "--enable-mfu-metrics",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-mfu-metrics",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-mfu-metrics",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-mixed-moe-lora-format",
+      "claim_type": "flag_exists",
+      "entity": "--enable-mixed-moe-lora-format",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-mixed-moe-lora-format",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-mixed-moe-lora-format",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-mm-embeds",
+      "claim_type": "flag_exists",
+      "entity": "--enable-mm-embeds",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "known",
+      "n_probes": 9,
+      "n_correct": 9,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 1.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-mm-embeds",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-mm-embeds",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-prefix-caching",
+      "claim_type": "flag_exists",
+      "entity": "--enable-prefix-caching",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-prompt-embeds",
+      "claim_type": "flag_exists",
+      "entity": "--enable-prompt-embeds",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-prompt-embeds",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-prompt-embeds",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enable-sleep-mode",
+      "claim_type": "flag_exists",
+      "entity": "--enable-sleep-mode",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 7,
+      "probe_accuracy": 0.7778,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.3333
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enable-sleep-mode",
+      "claim_type": "flag_meaning",
+      "entity": "--enable-sleep-mode",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--enforce-eager",
+      "claim_type": "flag_exists",
+      "entity": "--enforce-eager",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 8,
+      "probe_accuracy": 0.8889,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.6667
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--enforce-eager",
+      "claim_type": "flag_meaning",
+      "entity": "--enforce-eager",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.exists.--eplb-config",
+      "claim_type": "flag_exists",
+      "entity": "--eplb-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "partial",
+      "n_probes": 9,
+      "n_correct": 6,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0,
+        "recognition": 0.0
+      }
+    },
+    {
+      "claim_id": "bridge.flag.meaning.--eplb-config",
+      "claim_type": "flag_meaning",
+      "entity": "--eplb-config",
+      "zone": "bridge",
+      "centrality": "high",
+      "status": "unknown",
+      "n_probes": 3,
+      "n_correct": 0,
+      "probe_accuracy": 0.0,
+      "by_probe_form": {
+        "recall": 0.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:is_aiter_found",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:is_aiter_found",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:AiterCustomAllreduceProto",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:AiterCustomAllreduceProto",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:is_aiter_found_and_supported",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:is_aiter_found_and_supported",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_load_gemm_tuned_configs",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_load_gemm_tuned_configs",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_check_kernel_tuned",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_check_kernel_tuned",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:if_aiter_supported",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:if_aiter_supported",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_fused_moe_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_fused_moe_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_fused_moe_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_fused_moe_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_asm_moe_tkw1_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_asm_moe_tkw1_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_asm_moe_tkw1_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_asm_moe_tkw1_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_topk_softmax_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_topk_softmax_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_topk_softmax_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_topk_softmax_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_topk_sigmoid_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_topk_sigmoid_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_topk_sigmoid_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_topk_sigmoid_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_biased_grouped_topk_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_biased_grouped_topk_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_biased_grouped_topk_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_biased_grouped_topk_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_grouped_topk_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_grouped_topk_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_grouped_topk_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_grouped_topk_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_fused_topk_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_fused_topk_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_fused_topk_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_fused_topk_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:check_aiter_fused_qk_rmsnorm",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:check_aiter_fused_qk_rmsnorm",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_check_aiter_mla_fp8_support",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_check_aiter_mla_fp8_support",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_mla_decode_fwd_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_mla_decode_fwd_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_mla_decode_fwd_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_mla_decode_fwd_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_w8a8_gemm_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_w8a8_gemm_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_w8a8_gemm_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_w8a8_gemm_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_preshuffled_per_token_w8a8_gemm_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_preshuffled_per_token_w8a8_gemm_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_preshuffled_per_token_w8a8_gemm_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_preshuffled_per_token_w8a8_gemm_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_triton_gemm_a8w8_blockscale_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_triton_gemm_a8w8_blockscale_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_triton_gemm_a8w8_blockscale_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_triton_gemm_a8w8_blockscale_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_gemm_a8w8_blockscale_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_gemm_a8w8_blockscale_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_gemm_a8w8_blockscale_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_gemm_a8w8_blockscale_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_rmsnorm_fused_add_dynamic_quant_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_rmsnorm_fused_add_dynamic_quant_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_rmsnorm_fused_add_dynamic_quant_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_rmsnorm_fused_add_dynamic_quant_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_rmsnorm_fused_dynamic_quant_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_rmsnorm_fused_dynamic_quant_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_rmsnorm_fused_dynamic_quant_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_rmsnorm_fused_dynamic_quant_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_fused_allreduce_rmsnorm_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_fused_allreduce_rmsnorm_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_fused_allreduce_rmsnorm_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_fused_allreduce_rmsnorm_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_per_tensor_quant_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_per_tensor_quant_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_per_tensor_quant_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_per_tensor_quant_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_per_token_quant_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_per_token_quant_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_per_token_quant_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_per_token_quant_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_rmsnorm_with_add_fp8_group_quant_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_rmsnorm_with_add_fp8_group_quant_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_rmsnorm_with_add_fp8_group_quant_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_rmsnorm_with_add_fp8_group_quant_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_rmsnorm_fp8_group_quant_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_rmsnorm_fp8_group_quant_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_rmsnorm_fp8_group_quant_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_rmsnorm_fp8_group_quant_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_fused_rms_gated_fp8_group_quant_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_fused_rms_gated_fp8_group_quant_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_fused_rms_gated_fp8_group_quant_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_fused_rms_gated_fp8_group_quant_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_group_fp8_quant_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_group_fp8_quant_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_group_fp8_quant_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_group_fp8_quant_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_act_mul_and_fp8_group_quant_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_act_mul_and_fp8_group_quant_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_act_mul_and_fp8_group_quant_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_act_mul_and_fp8_group_quant_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_triton_add_rmsnorm_pad_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_triton_add_rmsnorm_pad_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_triton_add_rmsnorm_pad_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_triton_add_rmsnorm_pad_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_fused_mla_dual_rms_norm_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_fused_mla_dual_rms_norm_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_fused_mla_dual_rms_norm_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_fused_mla_dual_rms_norm_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_gemm_a8wfp4_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_gemm_a8wfp4_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_rocm_aiter_gemm_a8wfp4_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_rocm_aiter_gemm_a8wfp4_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "unstable",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 0.6667
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_triton_rotary_embedding_impl",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_triton_rotary_embedding_impl",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:_triton_rotary_embedding_fake",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:_triton_rotary_embedding_fake",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._aiter_ops.py:rocm_aiter_ops",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_aiter_ops.py:rocm_aiter_ops",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:create_fp4_scale_tensor",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:create_fp4_scale_tensor",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:create_fp4_output_tensors",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:create_fp4_output_tensors",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:paged_attention_v1",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:paged_attention_v1",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:paged_attention_v2",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:paged_attention_v2",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:paged_attention_rocm",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:paged_attention_rocm",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:mla_decode_kvcache_cpu",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:mla_decode_kvcache_cpu",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:merge_attn_states",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:merge_attn_states",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:rotary_embedding",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:rotary_embedding",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:rms_norm",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:rms_norm",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:fused_add_rms_norm",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:fused_add_rms_norm",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:fused_qk_norm_rope",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:fused_qk_norm_rope",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:apply_repetition_penalties_torch",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:apply_repetition_penalties_torch",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:apply_repetition_penalties_cuda",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:apply_repetition_penalties_cuda",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 4,
+      "probe_accuracy": 0.6667,
+      "by_probe_form": {
+        "negation": 0.3333,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:apply_repetition_penalties",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:apply_repetition_penalties",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:rms_norm_dynamic_per_token_quant",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:rms_norm_dynamic_per_token_quant",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:rms_norm_per_block_quant",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:rms_norm_per_block_quant",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:silu_and_mul_per_block_quant",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:silu_and_mul_per_block_quant",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "known",
+      "n_probes": 6,
+      "n_correct": 6,
+      "probe_accuracy": 1.0,
+      "by_probe_form": {
+        "negation": 1.0,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:awq_dequantize",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:awq_dequantize",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    },
+    {
+      "claim_id": "C_full.symbol.exists.vllm._custom_ops.py:awq_gemm",
+      "claim_type": "symbol_exists",
+      "entity": "vllm/_custom_ops.py:awq_gemm",
+      "zone": "symbol",
+      "centrality": "medium",
+      "status": "partial",
+      "n_probes": 6,
+      "n_correct": 5,
+      "probe_accuracy": 0.8333,
+      "by_probe_form": {
+        "negation": 0.6667,
+        "recall": 1.0
+      }
+    }
+  ]
+}

@@ -23,12 +23,28 @@ run_id: e1-vllm-{condition}-{model_slug}-{target}
 
 | file | role |
 |---|---|
-| `c0_base_eval_qwen35_08b_modal.yaml` | evaluate frozen base model |
-| `c3_ft_qwen35_08b_modal.yaml` | train doc_0 LoRA adapter |
-| `c3_ft_eval_qwen35_08b_modal.yaml` | reload and evaluate c3 adapter |
+| `c0_base_eval_*` | evaluate frozen base model |
+| `c1_rag_fresh_eval_v3_*` | base + BM25 top-k from doc_8 |
+| `c2_rag_stale_eval_v3_*` | base + BM25 top-k from doc_0 |
+| `c3_ft_*` / `c3_ft_eval_*` | train / reload LoRA on doc_0 |
+| `c4_ft_rag_fresh_eval_v3_*` | mill-v3 LoRA + BM25 doc_8 |
+| `c6_shuffle_eval_v3_*` | base + random chunks from doc_8 |
+| `c3_ft_mill_v4_*` | train / eval LoRA on mill T1–T7 |
+| `profile_v022_*` | closed-book TopicKnowledgeProfile pilot |
+| `truthsource_*` | TruthSource D / C_distill / C_full profile arms |
 
-Retrieval configs do not exist because the index and retrieval path are not
-implemented.
+## retrieval fields (c1)
+
+```yaml
+retrieval:
+  enabled: true
+  corpus_path: data/experiments/e1_vllm/corpus_doc_8.jsonl
+  index_path: data/experiments/e1_vllm/indexes/doc_8_bm25.json
+  top_k: 4
+  max_chars: 3500
+```
+
+Absent `retrieval` → no context injection (c0/c3).
 
 ## what goes where
 
@@ -51,4 +67,8 @@ the `adapter_run_id` of the c3 training run.
 ```bash
 ./scripts/lab run --target modal \
   --config configs/experiments/e1_vllm/c0_base_eval_qwen35_08b_modal.yaml
+
+# mill T1 LoRA (after mill build)
+./scripts/lab run --target modal \
+  --config configs/experiments/e1_vllm/c3_ft_mill_t1_qwen35_08b_modal.yaml
 ```

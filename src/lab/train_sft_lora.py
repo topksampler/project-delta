@@ -4,12 +4,24 @@ from pathlib import Path
 import torch
 import yaml
 from datasets import Dataset
-from peft import LoraConfig
+from peft import LoraConfig, PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import SFTConfig, SFTTrainer
 
 from lab.eval_base import choose_device
 from lab.eval_run_spec import read_jsonl
+
+
+def resolve_continue_adapter(cfg: dict, repo_root: Path) -> Path | None:
+    """Continue training an existing LoRA when model.adapter_run_id is set."""
+    model_cfg = cfg.get("model", {})
+    if model_cfg.get("adapter_path"):
+        path = Path(model_cfg["adapter_path"])
+        return path if path.is_absolute() else repo_root / path
+    run_id = model_cfg.get("adapter_run_id")
+    if run_id:
+        return repo_root / "runs" / run_id / "adapter"
+    return None
 
 
 def main():
@@ -25,6 +37,7 @@ def main():
     train_path = cfg["data"]["train_path"]
     eval_path = cfg["data"]["eval_path"]
     out_dir = Path(cfg["output"]["dir"])
+    repo_root = Path(__file__).resolve().parents[2]
 
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -47,22 +60,35 @@ def main():
     print(f"Loaded tokenizer: {tokenizer}")
 
     dtype = torch.bfloat16 if device == "cuda" else torch.float32
-    model = AutoModelForCausalLM.from_pretrained(
+    base = AutoModelForCausalLM.from_pretrained(
         model_name,
         torch_dtype=dtype,
         trust_remote_code=cfg["model"].get("trust_remote_code", False),
     )
+
+    continue_adapter = resolve_continue_adapter(cfg, repo_root)
+    peft_config = None
+    if continue_adapter and continue_adapter.exists():
+        print(f"continuing LoRA from {continue_adapter}")
+        model = PeftModel.from_pretrained(
+            base, str(continue_adapter), is_trainable=True
+        )
+    else:
+        if continue_adapter:
+            raise FileNotFoundError(
+                f"continue adapter missing at {continue_adapter}"
+            )
+        model = base
+        peft_config = LoraConfig(
+            task_type="CAUSAL_LM",
+            r=cfg["lora"]["r"],
+            lora_alpha=cfg["lora"]["alpha"],
+            lora_dropout=cfg["lora"]["dropout"],
+            target_modules=cfg["lora"]["target_modules"],
+        )
     model.to(device)
     model.train()
-    print(f"Loaded base model: {model}")
-
-    lora_config = LoraConfig(
-        task_type="CAUSAL_LM",
-        r=cfg["lora"]["r"],
-        lora_alpha=cfg["lora"]["alpha"],
-        lora_dropout=cfg["lora"]["dropout"],
-        target_modules=cfg["lora"]["target_modules"],
-    )
+    print(f"Loaded model: {model}")
 
     training_config = cfg["training"]
 
@@ -80,14 +106,16 @@ def main():
         assistant_only_loss=True,
     )
 
-    trainer = SFTTrainer(
-        model=model,
-        args=sft_args,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
-        processing_class=tokenizer,
-        peft_config=lora_config,
-    )
+    trainer_kwargs = {
+        "model": model,
+        "args": sft_args,
+        "train_dataset": train_dataset,
+        "eval_dataset": eval_dataset,
+        "processing_class": tokenizer,
+    }
+    if peft_config is not None:
+        trainer_kwargs["peft_config"] = peft_config
+    trainer = SFTTrainer(**trainer_kwargs)
 
     trainer.train()
     trainer.model.save_pretrained(out_dir / "adapter")

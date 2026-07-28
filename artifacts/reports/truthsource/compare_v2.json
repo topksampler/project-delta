@@ -1,0 +1,52 @@
+{
+  "schema": "delta.truthsource_compare.v0",
+  "n_bridge_claims": 75,
+  "gap_sizes": {
+    "D": 52,
+    "C_distill": 52,
+    "C_full": 52
+  },
+  "jaccard": {
+    "D_vs_C_distill": 1.0,
+    "C_distill_vs_C_full": 1.0,
+    "D_vs_C_full": 1.0
+  },
+  "flip_rate": {
+    "D_vs_C_distill": 0.0,
+    "C_distill_vs_C_full": 0.0,
+    "D_vs_C_full": 0.0
+  },
+  "honesty_negation_acc": {
+    "D": 0.9917,
+    "C_distill": 0.9917,
+    "C_full": 0.9917
+  },
+  "honesty_material_ge_0.10": {
+    "D_vs_C_distill": false,
+    "D_vs_C_full": false,
+    "C_distill_vs_C_full": false
+  },
+  "pre_registered_same_map": true,
+  "decision": "docs_only_for_now",
+  "reading": "D \u2248 C_distill \u2248 C_full \u2014 don't add code yet; exquisite docs+honesty first",
+  "status_counts_bridge": {
+    "D": {
+      "known": 23,
+      "unknown": 31,
+      "partial": 17,
+      "unstable": 4
+    },
+    "C_distill": {
+      "known": 23,
+      "unknown": 31,
+      "partial": 17,
+      "unstable": 4
+    },
+    "C_full": {
+      "known": 23,
+      "unknown": 31,
+      "partial": 17,
+      "unstable": 4
+    }
+  }
+}

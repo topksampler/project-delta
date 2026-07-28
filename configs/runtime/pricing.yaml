@@ -3,7 +3,7 @@
 # Modal rates are list prices; actual invoice may differ with credits/plan.
 
 modal:
-  default_gpu: T4
+  default_gpu: H100
   gpu_usd_per_hour:
     T4: 0.59
     L4: 0.80

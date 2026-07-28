@@ -18,7 +18,7 @@ program vision  →  docs/project-delta.md
 
 | ID | status | charter | question |
 |----|--------|---------|----------|
-| `e1_vllm` | **active: DELTA Phase A** | [thesis](./e1_vllm_thesis.md) · [charter](./e1_vllm.md) | First slice: version fidelity and failure modes on a vLLM doc delta |
+| `e1_vllm` | **A+C done; B partial (DriftEvent v1)** | [thesis](./e1_vllm_thesis.md) · [charter](./e1_vllm.md) | First slice: version fidelity and failure modes on a vLLM doc delta |
 | `e1_repo_drift` | archived | [e1_repo_drift.md](./e1_repo_drift.md) | Early time-split design; surviving drift idea moved into DELTA SENSE |
 
 Add a row when you start `e2_*`. Do not delete old rows — mark `done` or `abandoned`.

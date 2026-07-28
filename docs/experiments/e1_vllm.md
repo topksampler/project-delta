@@ -38,11 +38,11 @@ The authoritative model and source revisions live in
 | id | retrieval | train | what we learn |
 |----|-----------|-------|---------------|
 | c0_base | — | — | implemented config; baseline behavior |
-| c1_rag_fresh | doc_8 | — | planned; retrieval recovery |
-| c2_rag_stale | doc_0 | — | planned; stale-index penalty |
+| c1_rag_fresh | doc_8 | — | implemented config; BM25 fresh retrieval |
+| c2_rag_stale | doc_0 | — | implemented config; stale-index penalty |
 | c3_ft | — | LoRA doc_0 | implemented config; stale memorized knowledge |
-| c4_ft_rag | doc_8 | LoRA doc_0 | planned; combination attribution |
-| c6_shuffle | shuffled | — | planned; retrieval control |
+| c4_ft_rag | doc_8 | LoRA doc_0 | implemented config; combination attribution |
+| c6_shuffle | shuffled | — | implemented config; retrieval control |
 
 **Headline run:** c3 on class **D** and **B** items → `stale_version` rate.
 
@@ -54,7 +54,7 @@ The authoritative model and source revisions live in
 |------|--------|
 | `fixtures/eval_v2.jsonl` | 40 items, corpus-validated, topic-typed |
 | `fixtures/EVAL_SCHEMA.md` | v3 schema (eval_class A–D) |
-| `fixtures/eval_v3.jsonl` | planned — re-tag + add B/C/D gaps |
+| `fixtures/eval_v3.jsonl` | 46 items (A20/B10/C8/D8), corpus-validated |
 
 **Eval task:** short answer Q&A. See thesis doc — not MC, not code-first.
 
@@ -69,15 +69,19 @@ python experiments/e1_vllm/inspect_data.py validate-eval eval_v2.jsonl
 ## operational status
 
 ```text
-implemented  snapshots, corpora, inspect/validate tooling, eval_v2,
-             c0/c3 Modal configs, LoRA train/reload path
-partial      short-answer evaluator and failure labels
-planned      eval_v3, aligned Q&A train data, retrieval, comparison report
-deferred     executable verifier and RL reward
+implemented  snapshots, corpora, inspect/validate tooling, eval_v2, eval_v3,
+             c0–c6 Modal configs, BM25 index builder, LoRA train/reload path,
+             mill (T1–T7), comparison report,
+             dense TopicKnowledgeProfile + profile wheel (v5) + seq v7 LoRA
+partial      short-answer evaluator; Phase B DriftEvent v1 (behavioral only)
+planned      Phase B structural/executable signal; next version-delta sense
+deferred     full-weight FT; further LoRA FT past v7; executable verifier;
+             corpus structural DriftEvent signal; RL reward
 ```
 
-This work is part of DELTA Phase A. Delivery order and completion gates live in
-[the DELTA roadmap](../delta-roadmap.md), not in this charter.
+This work completed the Phase A exit and Phase C intervention matrix for the
+`e1_vllm` slice; Phase B has DriftEvent v1 + baseline. Remaining gates live in
+[the DELTA roadmap](../delta-roadmap.md).
 
 ---
 
@@ -86,8 +90,8 @@ This work is part of DELTA Phase A. Delivery order and completion gates live in
 ```text
 datasets/experiments/e1_vllm/corpus_doc_0.jsonl   # uploaded
 datasets/experiments/e1_vllm/corpus_doc_8.jsonl   # uploaded
-datasets/experiments/e1_vllm/eval_v3.jsonl        # when frozen
-artifacts/reports/e1_vllm_failure_modes.md
+datasets/experiments/e1_vllm/eval_v3.jsonl        # uploaded
+artifacts/reports/e1_vllm_failure_modes.md       # uploaded
 ```
 
 ---

@@ -1,0 +1,15 @@
+run_id: e1-vllm-truthsource-v2-C-distill-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: truthsource_v2_C_distill
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+
+eval:
+  path: data/experiments/e1_vllm/profile/truthsource/probes_C_distill.jsonl
+  output_dir: runs/e1-vllm-truthsource-v2-C-distill-qwen35-08b-modal
+  max_new_tokens: 128
+  temperature: 0.0
+  top_p: 1.0

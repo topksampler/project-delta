@@ -44,6 +44,7 @@ image = (
     .env({"PYTHONPATH": "/root/lalith-ai-lab/src"})
     .add_local_dir("src", remote_path="/root/lalith-ai-lab/src")
     .add_local_dir("configs", remote_path="/root/lalith-ai-lab/configs")
+    .add_local_dir("experiments", remote_path="/root/lalith-ai-lab/experiments")
 )
 
 secrets = [modal.Secret.from_name("lalith-lab")]
@@ -75,6 +76,13 @@ def _sync_inputs(run_id: str, config_rel: str) -> Path:
         block = cfg.get(block_key, {})
         for field in ("train_path", "eval_path", "path"):
             value = block.get(field)
+            if value:
+                paths.append(value)
+
+    retrieval = cfg.get("retrieval") or {}
+    if retrieval.get("enabled"):
+        for field in ("corpus_path", "index_path"):
+            value = retrieval.get(field)
             if value:
                 paths.append(value)
 
@@ -167,7 +175,7 @@ def _run_module(module: str, config_path: Path) -> dict:
 
 @app.function(
     image=image,
-    gpu="T4",
+    gpu="A10G",
     secrets=secrets,
     timeout=60 * 60,
 )
@@ -187,7 +195,7 @@ def eval_run(run_id: str, config: str) -> None:
 
 @app.function(
     image=image,
-    gpu="T4",
+    gpu="H100",
     secrets=secrets,
     timeout=60 * 60 * 6,
 )
@@ -197,3 +205,13 @@ def train(run_id: str, config: str) -> None:
     cfg = _timed("compute", lambda: _run_module("lab.train_sft_lora", config_path))
     _timed("b2_push_outputs", lambda: _sync_outputs(run_id, cfg))
     print(f"train complete: {run_id}")
+
+
+@app.local_entrypoint()
+def main(run_id: str, config: str, task: str = "train", gpu: str = "") -> None:
+    """Dispatch train/eval with an optional GPU override (e.g. H100, A100, A10G)."""
+    fn = train if task == "train" else eval_run
+    default_gpu = "H100" if task == "train" else "A10G"
+    chosen = gpu or default_gpu
+    print(f"modal: task={task} gpu={chosen} run_id={run_id}")
+    fn.with_options(gpu=chosen).remote(run_id=run_id, config=config)

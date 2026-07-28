@@ -1,0 +1,18 @@
+run_id: e1-vllm-profile-dense-v1-para-ft-v6-modal
+
+experiment_id: e1_vllm
+condition_id: profile_dense_paraphrase_holdout_ft_v6
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+  adapter_run_id: e1-vllm-c3-ft-mill-v6-qwen35-08b-modal
+
+eval:
+  path: data/experiments/e1_vllm/profile/dense_v1_paraphrase/probes.jsonl
+  output_dir: runs/e1-vllm-profile-dense-v1-para-ft-v6-modal
+  max_new_tokens: 96
+  batch_size: 16
+  temperature: 0.0
+  top_p: 1.0
+  enable_thinking: false

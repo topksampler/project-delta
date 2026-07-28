@@ -1,0 +1,30 @@
+# mill recipe — scaffold placeholder. Schemas not frozen yet.
+# Do not treat this as a runnable config.
+
+snapshot:
+  repo: https://github.com/vllm-project/vllm.git
+  tag: v0.22.0
+
+docs_glob:
+  - "docs/**"
+  - "examples/**"
+  - "README.md"
+
+teacher:
+  enabled: false
+
+mix:
+  T1: 0.45
+  T2: 0.20
+  T3: 0.15
+  T4: 0.10
+  T5: 0.05
+  T6: 0.05
+
+target_n: 2000
+seed: 1337
+
+gates:
+  eval_denylist: experiments/e1_vllm/fixtures/eval_v3.jsonl
+  require_corpus_hit: true
+  max_near_dup_jaccard: 0.85

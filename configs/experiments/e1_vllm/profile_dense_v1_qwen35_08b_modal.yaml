@@ -1,0 +1,16 @@
+run_id: e1-vllm-profile-dense-v1-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: profile_dense_meaning_honesty
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+
+eval:
+  path: data/experiments/e1_vllm/profile/dense_v1/probes.jsonl
+  output_dir: runs/e1-vllm-profile-dense-v1-qwen35-08b-modal
+  max_new_tokens: 96
+  batch_size: 16
+  temperature: 0.0
+  top_p: 1.0

@@ -1,0 +1,86 @@
+{
+  "n": 50,
+  "agree": 42,
+  "agree_rate": 0.84,
+  "pass_threshold": 0.8,
+  "passed": true,
+  "by_form": {
+    "free_recall": {
+      "agree": 8,
+      "disagree": 4
+    },
+    "meaning_false": {
+      "agree": 12
+    },
+    "meaning_recognition": {
+      "agree": 10,
+      "disagree": 4
+    },
+    "meaning_true": {
+      "agree": 12
+    }
+  },
+  "disagreements": [
+    {
+      "id": "A06",
+      "form": "free_recall",
+      "auto": "wrong",
+      "human_model_label": "correct",
+      "notes": "semantically OK; keyword grader too strict"
+    },
+    {
+      "id": "A15",
+      "form": "free_recall",
+      "auto": "correct",
+      "human_model_label": "wrong",
+      "notes": "auto over-credit via substring 'set' in dataset"
+    },
+    {
+      "id": "A31",
+      "form": "free_recall",
+      "auto": "correct",
+      "human_model_label": "wrong",
+      "notes": "auto over-credit via stopword keywords"
+    },
+    {
+      "id": "A38",
+      "form": "free_recall",
+      "auto": "correct",
+      "human_model_label": "wrong",
+      "notes": "auto over-credit free-recall keywords"
+    },
+    {
+      "id": "A40",
+      "form": "meaning_recognition",
+      "auto": "wrong",
+      "human_model_label": "correct",
+      "notes": "chose B correctly; missing ANSWER: prefix"
+    },
+    {
+      "id": "A42",
+      "form": "meaning_recognition",
+      "auto": "wrong",
+      "human_model_label": "correct",
+      "notes": "chose B correctly; missing ANSWER: prefix"
+    },
+    {
+      "id": "A44",
+      "form": "meaning_recognition",
+      "auto": "wrong",
+      "human_model_label": "correct",
+      "notes": "chose A correctly; missing ANSWER: prefix"
+    },
+    {
+      "id": "A45",
+      "form": "meaning_recognition",
+      "auto": "wrong",
+      "human_model_label": "correct",
+      "notes": "chose B correctly; missing ANSWER: prefix"
+    }
+  ],
+  "findings": [
+    "recognition exact-choice scorer rejects bare \"B. ...\" answers \u2014 format bug, not knowledge",
+    "free_recall keyword OR-groups over-credit stopwords (and/set/can)",
+    "boolean true/false scorers are trustworthy"
+  ]
+}
