@@ -1,0 +1,47 @@
+schema: delta.source_split_contract.v1
+
+contract_id: delta-v2-development-source-split-v1
+repository: vllm-project/vllm
+transition: development
+
+eligible_sources:
+  atomic_fact_delta:
+    schema: delta.atomic_fact_delta.v1
+    statuses: [stable, added, removed, changed]
+    verification: deterministic-extractor
+  feature_delta:
+    schema: delta.feature_delta.v1
+    statuses: [stable, added, removed, changed]
+    verification: promoted-with-passing-behavior-probe
+
+split_units:
+  algorithm: referenced-source-connected-components-v1
+  anchor: lexicographically-smallest-source-id
+  edges:
+    - feature-delta-to-referenced-atomic-fact
+  invariant: every-source-in-one-unit-and-every-unit-in-one-split
+
+development_assignment:
+  algorithm: sha256-anchor-threshold-v1
+  salt: delta-v2-development-source-split-v1
+  hash_input: "salt + NUL + unit_anchor_id"
+  hash_value: unsigned-big-endian-first-64-bits
+  thresholds:
+    train:
+      lower_inclusive: "0"
+      upper_exclusive: "14757395258967641292"
+    dev:
+      lower_inclusive: "14757395258967641292"
+      upper_exclusive: "18446744073709551616"
+  eval_sources: forbidden
+
+acceptance_assignment:
+  state: sealed
+  future_split: eval
+  development_builder_behavior: reject
+
+wording_policy:
+  assignment_key: source_id
+  invariant: all-wording-variants-inherit-source-split
+
+freeze_state: unfrozen
