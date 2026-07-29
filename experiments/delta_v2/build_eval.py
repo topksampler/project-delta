@@ -20,6 +20,7 @@ PROBE_RESULT_SCHEMA = "delta.behavior_probe_result.v1"
 EVAL_SCHEMA = "delta.eval_item.v1"
 AUDIT_ROW_SCHEMA = "delta.human_eval_audit_item.v1"
 SUMMARY_SCHEMA = "delta.eval_item_build_audit.v1"
+EXCLUSION_SCHEMA = "delta.eval_item_exclusion.v1"
 FACT_STATUSES = ("stable", "added", "removed", "changed")
 NONSTABLE_STATUSES = {"added", "removed", "changed"}
 DEVELOPMENT_SPLITS = {"train", "dev"}
@@ -202,11 +203,24 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
         or split_policy.get("acceptance_future_split") != "eval"
     ):
         raise EvalBuildError("invalid development split policy")
-    if transition == "acceptance" and (
-        split_policy.get("acceptance_eval_items") != "required"
-        or split_policy.get("empty_eval_policy") != "fail-build"
-    ):
-        raise EvalBuildError("invalid acceptance split policy")
+    if transition == "acceptance":
+        exclusion = _mapping(
+            split_policy.get("cross_transition_source_exclusion"),
+            "split_policy.cross_transition_source_exclusion",
+        )
+        if (
+            contract.get("contract_id")
+            != "delta-v2-acceptance-eval-items-v2"
+            or split_policy.get("acceptance_eval_items") != "required"
+            or split_policy.get("empty_eval_policy") != "fail-build"
+            or exclusion.get("input") != "development_source_splits.jsonl"
+            or exclusion.get("scope") != "all-development-source-ids"
+            or exclusion.get("action") != "exclude-before-selection"
+            or exclusion.get("audit") != "required"
+            or exclusion.get("amendment_timing")
+            != "after-acceptance-unseal-before-target-model"
+        ):
+            raise EvalBuildError("invalid acceptance split policy")
 
     human_audit = _mapping(contract.get("human_audit"), "human_audit")
     if (
@@ -252,7 +266,9 @@ def select_fact_records(
     fact_records: Iterable[Mapping[str, Any]],
     splits: Mapping[str, str],
     contract: Mapping[str, Any],
+    denied_source_ids: set[str] | None = None,
 ) -> list[tuple[Mapping[str, Any], str]]:
+    denied_source_ids = denied_source_ids or set()
     facts: list[Mapping[str, Any]] = []
     seen: set[str] = set()
     for record in fact_records:
@@ -269,6 +285,8 @@ def select_fact_records(
             raise EvalBuildError(f"unsupported fact status: {status}")
         _string(record.get("family"), "fact.family")
         _string(record.get("semantic_key"), "fact.semantic_key")
+        if fact_id in denied_source_ids:
+            continue
         facts.append(record)
 
     nonstable: list[tuple[Mapping[str, Any], str]] = []
@@ -312,6 +330,32 @@ def select_fact_records(
         nonstable + selected_controls,
         key=lambda pair: str(pair[0]["fact_id"]),
     )
+
+
+def build_exclusion_records(
+    fact_records: Iterable[Mapping[str, Any]],
+    denied_source_ids: set[str],
+) -> list[dict[str, Any]]:
+    exclusions = []
+    for record in fact_records:
+        fact_id = _string(record.get("fact_id"), "fact_id")
+        if fact_id not in denied_source_ids:
+            continue
+        exclusions.append(
+            {
+                "schema": EXCLUSION_SCHEMA,
+                "source_id": fact_id,
+                "source_kind": "atomic_fact_delta",
+                "reason": "seen-in-development-source-splits",
+                "status": _string(record.get("status"), "fact.status"),
+                "family": _string(record.get("family"), "fact.family"),
+                "semantic_key": _string(
+                    record.get("semantic_key"),
+                    "fact.semantic_key",
+                ),
+            }
+        )
+    return sorted(exclusions, key=lambda row: row["source_id"])
 
 
 def _display_fact(record: Mapping[str, Any]) -> tuple[str, str]:
@@ -483,8 +527,17 @@ def build_items(
     feature_records: Iterable[Mapping[str, Any]],
     split_records: Iterable[Mapping[str, Any]],
     probe_results: Mapping[str, Mapping[str, Any]],
+    denied_source_ids: set[str] | None = None,
 ) -> list[dict[str, Any]]:
     validate_contract(contract)
+    if contract["transition"] == "acceptance" and denied_source_ids is None:
+        raise EvalBuildError(
+            "acceptance requires development source identities"
+        )
+    if contract["transition"] == "development" and denied_source_ids is not None:
+        raise EvalBuildError(
+            "development must not apply cross-transition exclusions"
+        )
     allowed_splits = set(contract["split_policy"]["allowed_splits"])
     splits = index_splits(
         split_records,
@@ -492,7 +545,12 @@ def build_items(
         allowed_splits,
     )
     items: list[dict[str, Any]] = []
-    for fact, reason in select_fact_records(fact_records, splits, contract):
+    for fact, reason in select_fact_records(
+        fact_records,
+        splits,
+        contract,
+        denied_source_ids,
+    ):
         items.append(
             build_fact_item(
                 fact,
@@ -544,6 +602,7 @@ def audit_items(
     items: Sequence[Mapping[str, Any]],
     split_records: Iterable[Mapping[str, Any]],
     contract: Mapping[str, Any],
+    denied_source_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     allowed_splits = set(contract["split_policy"]["allowed_splits"])
     splits = index_splits(
@@ -565,6 +624,9 @@ def audit_items(
             if item.get("split") not in allowed_splits
         }
     )
+    cross_transition_source_overlap = sorted(
+        set(source_ids).intersection(denied_source_ids or set())
+    )
     selected_counts = Counter(
         (str(item["split"]), str(item["provenance"].get("family")))
         for item in items
@@ -583,6 +645,7 @@ def audit_items(
         and len(source_ids) == len(set(source_ids))
         and not split_mismatches
         and not invalid_splits
+        and not cross_transition_source_overlap
         and control_balance_matches
         and eval_ids == sorted(eval_ids)
         and (
@@ -606,6 +669,7 @@ def audit_items(
         "unique_source_ids": len(source_ids) == len(set(source_ids)),
         "split_mismatches": split_mismatches,
         "invalid_splits": invalid_splits,
+        "cross_transition_source_overlap": cross_transition_source_overlap,
         "control_balance_matches": control_balance_matches,
         "split_counts": dict(sorted(split_counts.items())),
         "task_counts": dict(sorted(task_counts.items())),
@@ -715,9 +779,12 @@ def write_outputs(
     items_path: Path,
     packet_path: Path,
     summary_path: Path,
+    exclusions: Sequence[Mapping[str, Any]] = (),
+    exclusions_path: Path | None = None,
 ) -> dict[str, Any]:
     item_bytes = _serialize_jsonl(items)
     packet_bytes = _serialize_jsonl(packet)
+    exclusion_bytes = _serialize_jsonl(exclusions)
     for path in (items_path, packet_path, summary_path):
         path.parent.mkdir(parents=True, exist_ok=True)
     items_path.write_bytes(item_bytes)
@@ -745,6 +812,20 @@ def write_outputs(
         },
         "freeze_state": "unfrozen",
     }
+    if exclusions_path is not None:
+        exclusions_path.parent.mkdir(parents=True, exist_ok=True)
+        exclusions_path.write_bytes(exclusion_bytes)
+        summary["outputs"]["cross_transition_exclusions"] = {
+            "filename": exclusions_path.name,
+            "rows": len(exclusions),
+            "sha256": hashlib.sha256(exclusion_bytes).hexdigest(),
+            "status_counts": dict(
+                sorted(Counter(str(row["status"]) for row in exclusions).items())
+            ),
+            "family_counts": dict(
+                sorted(Counter(str(row["family"]) for row in exclusions).items())
+            ),
+        }
     summary_path.write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -779,6 +860,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=[],
     )
     parser.add_argument("--splits", type=Path, required=True)
+    parser.add_argument("--development-source-splits", type=Path)
     parser.add_argument(
         "--probe-result",
         action="append",
@@ -788,6 +870,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--summary", type=Path, required=True)
     parser.add_argument("--human-audit-packet", type=Path, required=True)
+    parser.add_argument("--exclusions", type=Path)
     return parser
 
 
@@ -801,6 +884,33 @@ def main(argv: Sequence[str] | None = None) -> int:
     fact_records = load_jsonl(args.facts)
     feature_records = [load_yaml(path) for path in feature_paths]
     split_records = load_jsonl(args.splits)
+    development_split_records = (
+        load_jsonl(args.development_source_splits)
+        if args.development_source_splits is not None
+        else None
+    )
+    if contract["transition"] == "acceptance":
+        if development_split_records is None or args.exclusions is None:
+            raise EvalBuildError(
+                "acceptance requires --development-source-splits and --exclusions"
+            )
+        development_splits = index_splits(
+            development_split_records,
+            str(contract["source_split_contract_id"]),
+            DEVELOPMENT_SPLITS,
+        )
+        denied_source_ids: set[str] | None = set(development_splits)
+        exclusions = build_exclusion_records(
+            fact_records,
+            denied_source_ids,
+        )
+    else:
+        if development_split_records is not None or args.exclusions is not None:
+            raise EvalBuildError(
+                "cross-transition exclusion inputs are acceptance-only"
+            )
+        denied_source_ids = None
+        exclusions = []
     probe_results = {
         probe_id: load_json(path)
         for probe_id, path in sorted(probe_paths.items())
@@ -811,14 +921,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         feature_records=feature_records,
         split_records=split_records,
         probe_results=probe_results,
+        denied_source_ids=denied_source_ids,
     )
-    audit = audit_items(items, split_records, contract)
+    audit = audit_items(
+        items,
+        split_records,
+        contract,
+        denied_source_ids,
+    )
     packet = build_human_audit_packet(items, contract)
     inputs = {
         "contract": _file_record(args.contract),
         "facts": _file_record(args.facts),
         "features": [_file_record(path) for path in feature_paths],
         "source_splits": _file_record(args.splits),
+        "development_source_splits": (
+            _file_record(args.development_source_splits)
+            if args.development_source_splits is not None
+            else None
+        ),
         "probe_results": [
             {
                 "probe_id": probe_id,
@@ -835,6 +956,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         items_path=args.out,
         packet_path=args.human_audit_packet,
         summary_path=args.summary,
+        exclusions=exclusions,
+        exclusions_path=args.exclusions,
     )
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0 if summary["status"] == "pass" else 1

@@ -1,0 +1,68 @@
+schema: delta.eval_item_contract.v1
+
+contract_id: delta-v2-acceptance-eval-items-v2
+transition: acceptance
+source_split_contract_id: delta-v2-development-source-split-v1
+
+eligibility:
+  atomic_fact_delta:
+    include_nonstable_statuses: [added, removed, changed]
+    stable_controls:
+      ratio_to_nonstable: "1:1"
+      strata: [split, family]
+      ranking_algorithm: sha256-source-id-v1
+      salt: delta-v2-stable-control-v1
+  feature_delta:
+    include: none
+    reason: acceptance-feature-verification-not-yet-generalized
+  exclude:
+    - feature_candidate
+    - file_delta
+    - pull_request_evidence
+    - rejected_fact_observation
+    - development_source_identity
+
+templates:
+  atomic_fact_change_status:
+    version: delta-v2-fact-status-template-v1
+    response_labels: [stable, added, removed, changed]
+    scorer: exact-enum-v1
+
+generator:
+  version: delta-v2-acceptance-eval-generator-v2
+  method: deterministic-template-only
+  teacher_role: forbidden
+  revisions:
+    before: v0.25.1
+    after: v0.26.0
+
+split_policy:
+  source: acceptance_source_splits.jsonl
+  invariant: every-item-inherits-source-split
+  allowed_splits: [eval]
+  acceptance_eval_items: required
+  empty_eval_policy: fail-build
+  cross_transition_source_exclusion:
+    input: development_source_splits.jsonl
+    scope: all-development-source-ids
+    action: exclude-before-selection
+    audit: required
+    amendment_timing: after-acceptance-unseal-before-target-model
+    reason: >-
+      The first acceptance item build exposed semantic source identities that
+      had already been assigned during development. Excluding every development
+      source identity preserves the source-level split boundary.
+
+human_audit:
+  algorithm: stratified-hash-sample-v1
+  sample_size: 32
+  mandatory:
+    - every-feature-item
+    - one-atomic-item-per-nonempty-split-family-status-stratum
+  fill_ranking:
+    algorithm: sha256-eval-id-v1
+    salt: delta-v2-acceptance-audit-v1
+  judgments: [truth, version_status, answerability]
+  pass_threshold_per_judgment: 0.90
+
+freeze_state: unfrozen

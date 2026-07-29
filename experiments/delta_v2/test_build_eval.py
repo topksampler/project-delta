@@ -11,6 +11,7 @@ from experiments.delta_v2.build_eval import (
     EvalBuildError,
     audit_items,
     build_fact_item,
+    build_exclusion_records,
     build_human_audit_packet,
     build_items,
     index_splits,
@@ -22,7 +23,7 @@ from experiments.delta_v2.build_eval import (
 
 CONTRACT_PATH = Path(__file__).with_name("eval_item_contract.yaml")
 ACCEPTANCE_CONTRACT_PATH = Path(__file__).with_name(
-    "acceptance_eval_item_contract.yaml"
+    "acceptance_eval_item_contract_v2.yaml"
 )
 
 
@@ -166,6 +167,12 @@ class ContractTest(unittest.TestCase):
         self.assertEqual(
             contract["split_policy"]["allowed_splits"],
             ["eval"],
+        )
+        self.assertEqual(
+            contract["split_policy"]["cross_transition_source_exclusion"][
+                "scope"
+            ],
+            "all-development-source-ids",
         )
 
 
@@ -345,14 +352,76 @@ class ItemGenerationTest(unittest.TestCase):
             feature_records=[],
             split_records=splits,
             probe_results={},
+            denied_source_ids=set(),
         )
-        audit = audit_items(items, splits, contract)
+        audit = audit_items(items, splits, contract, set())
 
         self.assertEqual(len(items), 2)
         self.assertEqual({item["split"] for item in items}, {"eval"})
         self.assertIn("v0.25.1 to v0.26.0", items[0]["prompt"])
         self.assertEqual(audit["status"], "pass")
         self.assertTrue(audit["acceptance_accessed"])
+
+    def test_acceptance_excludes_every_development_source_before_selection(
+        self,
+    ) -> None:
+        import yaml
+
+        contract = yaml.safe_load(
+            ACCEPTANCE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        facts = [
+            fact_record("fact:seen-added", status="added"),
+            fact_record("fact:unseen-added", status="added"),
+            fact_record("fact:seen-stable", status="stable"),
+            fact_record("fact:unseen-stable", status="stable"),
+        ]
+        splits = [
+            split_record(str(record["fact_id"]), "eval")
+            for record in facts
+        ]
+        seen = {"fact:seen-added", "fact:seen-stable"}
+
+        items = build_items(
+            contract=contract,
+            fact_records=facts,
+            feature_records=[],
+            split_records=splits,
+            probe_results={},
+            denied_source_ids=seen,
+        )
+        audit = audit_items(items, splits, contract, seen)
+        exclusions = build_exclusion_records(facts, seen)
+
+        self.assertEqual(
+            {item["source_id"] for item in items},
+            {"fact:unseen-added", "fact:unseen-stable"},
+        )
+        self.assertEqual(
+            {row["source_id"] for row in exclusions},
+            seen,
+        )
+        self.assertEqual(audit["cross_transition_source_overlap"], [])
+        self.assertEqual(audit["status"], "pass")
+
+    def test_acceptance_requires_development_source_identities(self) -> None:
+        import yaml
+
+        contract = yaml.safe_load(
+            ACCEPTANCE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+
+        with self.assertRaisesRegex(
+            EvalBuildError,
+            "requires development source identities",
+        ):
+            build_items(
+                contract=contract,
+                fact_records=[],
+                feature_records=[],
+                split_records=[],
+                probe_results={},
+            )
 
     def test_acceptance_fails_closed_on_empty_eval(self) -> None:
         import yaml
@@ -361,7 +430,7 @@ class ItemGenerationTest(unittest.TestCase):
             ACCEPTANCE_CONTRACT_PATH.read_text(encoding="utf-8")
         )
 
-        audit = audit_items([], [], contract)
+        audit = audit_items([], [], contract, set())
 
         self.assertEqual(audit["status"], "fail")
         self.assertTrue(audit["nonempty_required"])
