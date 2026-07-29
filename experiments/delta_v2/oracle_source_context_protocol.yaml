@@ -1,0 +1,126 @@
+schema: delta.oracle_source_context_protocol.v1
+protocol_id: delta-v2-c2-oracle-source-context-qwen35-08b-v1
+experiment_id: delta_v2
+condition_id: c2_oracle_source_context
+state: preregistered-for-execution
+
+decision_trigger:
+  run_id: delta-v2-c1-task-calibration-qwen35-08b-modal-v1
+  metrics_sha256: 6dab2fc6870bb14a8a18aa9a3ea98816d751e4832e8560ce4b575dff1ae6f934
+  samples_sha256: 6b02d5342e57626d70e8a81dfe20adc8547c5ef4f28db3b3e693bac0005de58d
+  state: baseline-incapable-of-localizing-drift
+  observed_fact_responses:
+    added: 14
+    changed: 26
+    removed: 2
+    stable: 0
+  feature_correct: true
+  rationale: >-
+    Establish whether the target can use exact source evidence after
+    development-only task calibration failed to restore stable capability.
+
+baseline_contract:
+  path: experiments/delta_v2/target_baseline_protocol.yaml
+  sha256: e26985e78b94365123cb8f4c0d1cf34d377d6b488f70f7ca618946336eb9b98d
+  acceptance_eval_items_sha256: 1125a7a5429cf847d16475259ffeb6578b8d4841c81f2f01d20d4065f4c188cb
+  acceptance_rows: 43
+
+truth_sources:
+  atomic_fact_deltas:
+    path: >-
+      data/experiments/delta_v2/acceptance_attempt_2/facts/atomic_fact_deltas_acceptance.jsonl
+    sha256: 52f5f8bfa247550ef50277657900725db6ed8cc99bc3fe21d8a112629ffec75a
+    routing: exact-evalitem-source-id
+    model_visible_projection:
+      - semantic_key
+      - before_present
+      - before_canonical_sha256
+      - after_present
+      - after_canonical_sha256
+  feature_probe:
+    path: >-
+      data/experiments/delta_v2/acceptance_attempt_2/probes/endpoint_plugins_framework.result.json
+    sha256: 3352044178ac07f2988d0fb70ce66536ab485755b788a1ed773f6293819921f5
+    probe_id: behavior-probe:vllm-endpoint-plugins-framework-v1
+    routing: sole-verified-feature-item
+    model_visible_projection:
+      - default_off
+      - allowlisted_task_match_loads
+      - required_task_miss_skips
+      - factory_failure_isolated
+      - route_phase_attaches
+      - attach_router_hook
+      - state_phase_initializes
+      - async_init_state_hook
+  forbidden_model_inputs:
+    - gold
+    - status
+    - provenance
+    - scorer
+    - fact_id
+    - verifier
+    - expected_probe_values
+    - source_paths
+    - development_items
+
+adaptation:
+  method: oracle-routed-frozen-source-context-v1
+  role: upper-bound-control
+  production_retrieval_claim: forbidden
+  weight_updates: false
+  fact_instruction: >-
+    Use only the machine-extracted source evidence below. A contract absent in
+    both revisions is invalid evidence. If it is present in both and the two
+    canonical hashes are equal, answer stable. If it is absent before and
+    present after, answer added. If it is present before and absent after,
+    answer removed. If it is present in both and the hashes differ, answer
+    changed. Return exactly one label and no explanation.
+  feature_instruction: >-
+    Use only the verified behavior evidence below. Map default_off=true to
+    default_without_allowlist=not_loaded; allowlisted_task_match_loads=true to
+    allowlisted_matching_task=loaded; required_task_miss_skips=true to
+    required_task_mismatch=skipped; factory_failure_isolated=true to
+    factory_exception=isolated; route_phase_attaches=true together with
+    attach_router_hook=true to route_phase=attach_router; and
+    state_phase_initializes=true together with async_init_state_hook=true to
+    post_engine_state_phase=await_init_state. Return one plain JSON object with
+    exactly the requested keys and no Markdown fences or explanation.
+  message_template:
+    role: user
+    sections:
+      - instruction
+      - source_evidence_canonical_json
+      - acceptance_prompt
+
+generation:
+  method: greedy
+  do_sample: false
+  temperature: none
+  max_new_tokens: 128
+  num_return_sequences: 1
+  repeats: 2
+  seed: 20260730
+  repeat_invariant: byte-identical-raw-continuation
+
+scoring_and_reporting:
+  inherited_from: delta-v2-c0-base-qwen35-08b-v1
+  target_scorers_unchanged: true
+  pooled_overall_accuracy: forbidden
+  required_strata:
+    atomic_fact_added: 21
+    atomic_fact_stable: 21
+    feature_added: 1
+  primary_question: >-
+    Can the target transform exact frozen source evidence into correct outputs?
+  interpretation_limit: >-
+    This is an oracle routing upper bound and is not evidence that retrieval is
+    implemented.
+  feature_signal: report-separately
+
+execution_boundary:
+  expected_request_sha256: b4b39f0e325b502d3cf8fb7d5e7fb9329b92ce1301d26e4f2758619c91a98023
+  model_invocations_completed: 0
+  target_model_results_exist: false
+  modal_authorized: true
+  training: forbidden
+  fine_tuning: forbidden

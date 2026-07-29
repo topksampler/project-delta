@@ -1,0 +1,55 @@
+schema: delta.target_model_run_config.v1
+run_id: delta-v2-c2-oracle-source-context-qwen35-08b-modal-v1
+experiment_id: delta_v2
+condition_id: c2_oracle_source_context
+eval_environment_id: delta-v2-vllm-source-build-v2
+task: eval
+
+protocol:
+  protocol_id: delta-v2-c2-oracle-source-context-qwen35-08b-v1
+  path: experiments/delta_v2/oracle_source_context_protocol.yaml
+  sha256: c16136937d87bb6b51269ae39f6f4ab5f4e37fa6ead48aa49a0d9239294c322a
+  baseline_protocol_sha256: e26985e78b94365123cb8f4c0d1cf34d377d6b488f70f7ca618946336eb9b98d
+  request_sha256: b4b39f0e325b502d3cf8fb7d5e7fb9329b92ce1301d26e4f2758619c91a98023
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter: none
+  quantization: none
+
+runtime:
+  profile: delta-v2-baseline-modal-v2
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  attention_implementation: eager
+  deterministic_algorithms: true
+
+truth:
+  fact_deltas_path: data/experiments/delta_v2/acceptance_attempt_2/facts/atomic_fact_deltas_acceptance.jsonl
+  fact_deltas_sha256: 52f5f8bfa247550ef50277657900725db6ed8cc99bc3fe21d8a112629ffec75a
+  feature_probe_path: data/experiments/delta_v2/acceptance_attempt_2/probes/endpoint_plugins_framework.result.json
+  feature_probe_sha256: 3352044178ac07f2988d0fb70ce66536ab485755b788a1ed773f6293819921f5
+
+eval:
+  module: experiments.delta_v2.run_oracle_source_context
+  path: data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_eval_items_v3.jsonl
+  sha256: 1125a7a5429cf847d16475259ffeb6578b8d4841c81f2f01d20d4065f4c188cb
+
+output:
+  dir: runs/delta-v2-c2-oracle-source-context-qwen35-08b-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_baseline_app.py
+  gpu: A10G
+  timeout_seconds: 3600

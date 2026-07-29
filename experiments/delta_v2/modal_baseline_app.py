@@ -18,6 +18,14 @@ EVAL_DATA = (
 DEVELOPMENT_DATA = (
     "data/experiments/delta_v2/eval/development_eval_items.jsonl"
 )
+FACT_DELTAS_DATA = (
+    "data/experiments/delta_v2/acceptance_attempt_2/facts/"
+    "atomic_fact_deltas_acceptance.jsonl"
+)
+FEATURE_PROBE_DATA = (
+    "data/experiments/delta_v2/acceptance_attempt_2/probes/"
+    "endpoint_plugins_framework.result.json"
+)
 
 app = modal.App("lalith-ai-lab-delta-v2-baseline")
 secrets = [modal.Secret.from_name("lalith-lab")]
@@ -68,6 +76,14 @@ image = (
     .add_local_file(
         DEVELOPMENT_DATA,
         remote_path=f"/root/lalith-ai-lab/{DEVELOPMENT_DATA}",
+    )
+    .add_local_file(
+        FACT_DELTAS_DATA,
+        remote_path=f"/root/lalith-ai-lab/{FACT_DELTAS_DATA}",
+    )
+    .add_local_file(
+        FEATURE_PROBE_DATA,
+        remote_path=f"/root/lalith-ai-lab/{FEATURE_PROBE_DATA}",
     )
 )
 
