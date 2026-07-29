@@ -1,0 +1,112 @@
+schema: delta.target_model_baseline_protocol.v1
+
+protocol_id: delta-v2-c0-base-qwen35-08b-v1
+experiment_id: delta_v2
+condition_id: c0_base
+state: preregistered-not-executed
+
+eval_environment:
+  environment_id: delta-v2-vllm-source-build-v2
+  path: experiments/delta_v2/eval_environment_v2.yaml
+  sha256: 8e12ebdb685eceb8f9b590c67c05c449d71cc4b8a95f7d2bf3c8f3b4064991c4
+
+target_model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  training_stage: post-trained
+  role: active-base-state
+  adapter: none
+  quantization: none
+  parameter_class: sub-1B
+  temporal_relation: checkpoint-predates-acceptance-transition
+
+runtime:
+  backend: transformers-generate-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    transformers: 5.14.1
+  device_policy: single-cuda-gpu
+  dtype: bfloat16
+  batch_size: 1
+  deterministic_algorithms: required
+
+evaluation_input:
+  path: >-
+    data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_eval_items_v3.jsonl
+  sha256: 1125a7a5429cf847d16475259ffeb6578b8d4841c81f2f01d20d4065f4c188cb
+  rows: 43
+  split: eval
+  item_order: eval_id-ascending
+  model_visible_fields: [prompt]
+  forbidden_model_inputs:
+    - gold
+    - provenance
+    - scorer
+    - source_snapshot
+    - atomic_fact_record
+    - feature_delta_record
+    - behavior_probe_result
+    - judge_evidence
+    - development_train_items
+    - development_dev_items
+
+prompting:
+  interface: official-chat-template
+  messages:
+    - role: user
+      content_from: prompt
+  add_generation_prompt: true
+  chat_template_kwargs:
+    enable_thinking: false
+  system_prompt: none
+
+generation:
+  method: greedy
+  do_sample: false
+  temperature: none
+  max_new_tokens: 128
+  num_return_sequences: 1
+  repeats: 2
+  seed: 20260730
+  repeat_invariant: byte-identical-raw-continuation
+
+scoring:
+  authority: frozen-deterministic-evalitem-scorer
+  scorer_ids: [exact-enum-v1, exact-structured-json-v1]
+  input: raw-decoded-continuation
+  invalid_or_unparseable: incorrect
+  repair: forbidden
+  llm_judge: forbidden
+
+reporting:
+  pooled_overall_accuracy: forbidden
+  required_strata:
+    atomic_fact_added: 21
+    atomic_fact_stable: 21
+    feature_added: 1
+  required_metrics:
+    - exact_accuracy
+    - parseable_rate
+    - invalid_response_count
+  drift_localization:
+    stable_null_accuracy: 0.25
+    stable_capability_test: one-sided-exact-binomial
+    added_vs_stable_test: one-sided-fisher-exact
+    alpha: 0.05
+    feature_signal: report-separately
+
+execution_boundary:
+  model_invocations_completed: 0
+  target_model_results_exist: false
+  run_config_state: absent-until-owner-review
+  dispatch_authorized_by_this_file: false
+  prohibited_actions:
+    - model-download
+    - local-model-evaluation
+    - modal-job
+    - lambda-job
+    - b2-write
+    - training
+    - fine-tuning
+
