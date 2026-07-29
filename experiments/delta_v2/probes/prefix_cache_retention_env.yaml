@@ -1,0 +1,67 @@
+schema: delta.behavior_probe.v1
+
+probe_id: behavior-probe:vllm-prefix-cache-retention-env-interface-v1
+candidate_id: feature-candidate:vllm-prefix-cache-retention
+transition: development
+
+claim: >-
+  The vLLM environment interface adds
+  VLLM_PREFIX_CACHE_RETENTION_INTERVAL and parses its value as an optional
+  integer.
+claim_scope: configuration-interface-only
+
+setup:
+  source_path: vllm/envs.py
+  source_loader: exact-git-blob-importlib-v1
+  attribute: VLLM_PREFIX_CACHE_RETENTION_INTERVAL
+
+cases:
+  - case_id: unset
+    environment_value: null
+    expected_before:
+      kind: attribute_error
+    expected_after:
+      kind: value
+      value: null
+
+  - case_id: zero
+    environment_value: "0"
+    expected_before:
+      kind: attribute_error
+    expected_after:
+      kind: value
+      value: 0
+
+  - case_id: positive
+    environment_value: "64"
+    expected_before:
+      kind: attribute_error
+    expected_after:
+      kind: value
+      value: 64
+
+  - case_id: negative
+    environment_value: "-32"
+    expected_before:
+      kind: attribute_error
+    expected_after:
+      kind: value
+      value: -32
+
+  - case_id: malformed
+    environment_value: not-an-integer
+    expected_before:
+      kind: attribute_error
+    expected_after:
+      kind: value_error
+
+environment:
+  python: ">=3.11"
+  dependencies: standard-library-only
+  process_isolation: fresh-module-per-case
+
+promotion_boundary: >-
+  A passing result verifies only the added parsing interface. It cannot promote
+  the broader selective cache-retention FeatureCandidate until a separate
+  runtime probe demonstrates the cache behavior on both revisions.
+
