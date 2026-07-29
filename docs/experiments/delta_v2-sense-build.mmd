@@ -1,0 +1,54 @@
+flowchart TD
+    World["World / source changes"] --> Pins["Four pinned SourceSnapshots<br/>tag + commit SHA + tree hash"]
+
+    Pins --> Dev["Development transition<br/>v0.22.0 → v0.23.0"]
+    Pins --> Accept["Acceptance transition<br/>v0.25.0 → v0.25.1"]
+
+    subgraph Sense["SENSE — structural source evidence"]
+        Dev --> Trees["Enumerate complete Git trees"]
+        Trees --> FD["FileDelta inventory<br/>stable · added · removed · modified · renamed"]
+
+        Dev --> CG["Commit graph delta<br/>merge base · before-only · after-only commits"]
+        CG --> PR["PullRequestEvidence<br/>proposed, non-scored"]
+    end
+
+    FD --> FileGate{"File inventory gates<br/>complete · reproducible · reconstructs both trees"}
+
+    subgraph Build["BUILD — grounded evaluation construction"]
+        FileGate --> AF["AtomicFactDelta<br/>independent extraction from both revisions"]
+
+        FD --> FC["FeatureCandidate<br/>unverified and never scored"]
+        AF --> FC
+        PR -. "context and grouping only" .-> FC
+        Docs["Pinned documentation"] --> FC
+        Tests["Pinned source tests"] --> FC
+
+        FC --> Static["Static / deterministic verification"]
+        FC --> BP["BehaviorProbe<br/>run old and new software"]
+        Static --> Promote{"Verification gate"}
+        BP --> Promote
+
+        Promote --> Feature["FeatureDelta<br/>verified capability"]
+        AF --> Split["Split by source identity"]
+        Feature --> Split
+        Split --> Items["EvalItems<br/>wording generated after split"]
+        Items --> Freeze{"Audit and freeze"}
+        Freeze --> Env["EvalEnvironment"]
+    end
+
+    Accept --> Locked["Held sealed<br/>no diff, PR, or release-content inspection"]
+    Freeze --> RunAccept["Run identical frozen recipes"]
+    Locked --> RunAccept
+    RunAccept --> AcceptGate{"Acceptance gates"}
+    AcceptGate -->|"pass"| Env
+    AcceptGate -->|"fail"| Failure["Record failure<br/>protocol bump — no silent tuning"]
+
+    subgraph Later["Later DELTA loop — out of current scope"]
+        Env --> Episode["Active-model EvalEpisode"]
+        Episode --> Drift["DriftEvent"]
+        Drift --> Decide["DECIDE"]
+        Decide --> Adapt["ADAPT"]
+        Adapt --> Verify["VERIFY"]
+        Verify --> Memory["MEMORY"]
+        Memory -. "next source transition" .-> World
+    end
