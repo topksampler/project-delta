@@ -1,0 +1,53 @@
+schema: delta.behavior_probe.v1
+
+probe_id: behavior-probe:vllm-endpoint-plugins-framework-v1
+candidate_id: feature-candidate:vllm-endpoint-plugins
+transition: acceptance
+
+claim: >-
+  vLLM adds an opt-in endpoint-plugin framework with task-gated discovery,
+  isolated factory failures, a runtime-checkable two-hook protocol, and
+  two-phase route attachment and state initialization.
+claim_scope: complete-candidate
+
+source_contract:
+  loader: vllm/plugins/__init__.py
+  server: vllm/entrypoints/openai/api_server.py
+  protocol: vllm/plugins/endpoint_plugins/interface.py
+  documentation: docs/design/endpoint_plugins.md
+  tests: tests/plugins_tests/test_endpoint_plugins.py
+
+cases:
+  - case_id: complete_endpoint_plugin_framework
+    expected_before:
+      kind: unavailable
+      loader: false
+      protocol: false
+      route_phase: false
+      state_phase: false
+    expected_after:
+      kind: endpoint_plugin_framework
+      runtime_checkable_protocol: true
+      attach_router_hook: true
+      async_init_state_hook: true
+      default_off: true
+      allowlisted_task_match_loads: true
+      required_task_miss_skips: true
+      factory_failure_isolated: true
+      route_phase_attaches: true
+      state_phase_initializes: true
+      documentation_present: true
+      upstream_tests_present: true
+
+runtime:
+  target: local-cpu
+  environment_status: acceptance-feature-unfrozen
+  python_requirement: ">=3.11"
+  source_execution: exact-git-blob-isolated-ast-v1
+  dependency_policy: stdlib-and-probe-stubs-only
+
+promotion_rule: >-
+  The exact v0.25.1 source must report the complete capability unavailable,
+  while the exact v0.26.0 source must satisfy every protocol, loader, gating,
+  lifecycle, documentation, and test check. PR prose cannot substitute for
+  these observations.
