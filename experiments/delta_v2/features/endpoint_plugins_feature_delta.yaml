@@ -1,0 +1,53 @@
+schema: delta.feature_delta.v1
+
+feature_id: feature:vllm-endpoint-plugins
+source_candidate_id: feature-candidate:vllm-endpoint-plugins
+repository: vllm-project/vllm
+transition: acceptance
+
+summary: >-
+  vLLM adds an opt-in endpoint-plugin framework whose runtime-checkable
+  protocol supports route attachment before engine creation and asynchronous
+  state initialization afterward, with allowlist and task gates.
+status: added
+fact_policy: no-post-unseal-fact-family-expansion
+
+evidence_ids:
+  - file:21c8e640f4bdfa361d658b8e7400b29e44054132ce2cc0617ae019b4bb7984ef
+  - file:9d9bdc0a8040b5e8af6363a5f6543c58fdf06b096402a20b6104e8daf6492462
+  - file:2e903dfb6796e5f1a3d2f6ef9133d53ba956954c7a9dbf7573efb3d4819a1923
+  - file:05f5030d631a4f5eac95ef8db84cde0aa3ca86984ddd5550eaf8d68402336907
+  - file:1b46a1b7fd26accebbcb5df469b2e096cff85c77ac4812ede01f54d963189b6a
+  - file:2cb83411dd3c7e214d1176e34e63712c67abd178a8889af4492f40ab8e455b67
+  - file:913e26da291e57023d0dedc2830ca8ed79809d7ac64ff6eb7c56e84a7c1c920d
+  - file:32c460b1e59b07cce670c07d878fd289608ed3afa44428a627f424a0343a672f
+  - file:164a70181586962386b87c5399423d68c85a0dfc4070606b800e4aaab38923f0
+  - file:5893dace923bc299e910bb62e92be598fc3e7da58800a77b7fc343bcc24a7ffa
+  - file:6840cafc5cb54070b51be528758de6d8d6a4c89dfb2233d77915a7a914a30ef1
+  - file:87d58ba8bfeb7b91a4943c90a0554747972e8df3e9bdb8eac20b46a2a7ef9783
+  - pull-request:vllm-project/vllm#47454
+
+behavior_probe_ids:
+  - behavior-probe:vllm-endpoint-plugins-framework-v1
+
+verification:
+  old_revision: unavailable
+  new_revision: pass
+  recipe: delta-v2-endpoint-plugins-promotion-v1
+  probe_results:
+    behavior-probe:vllm-endpoint-plugins-framework-v1:
+      sha256: 3352044178ac07f2988d0fb70ce66536ab485755b788a1ed773f6293819921f5
+      claim_scope: complete-candidate
+
+environment_status: acceptance-feature-unfrozen
+
+limitations:
+  - >-
+    The probe executes exact loader and lifecycle definitions in an isolated
+    stdlib runtime with dependency stubs; it does not start a full vLLM server.
+  - >-
+    Documentation and upstream tests are exact pinned evidence, while behavior
+    truth comes from the executable old/new probe.
+  - >-
+    This feature was selected after acceptance unsealing. No new atomic-fact
+    family or target-model result was created.

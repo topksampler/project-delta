@@ -14,6 +14,11 @@ FEATURE_DELTA_SCHEMA = "delta.feature_delta.v1"
 RESULT_SCHEMA = "delta.behavior_probe_result.v1"
 HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 DEVELOPMENT_ROLES = {"development_before", "development_after"}
+ACCEPTANCE_ROLES = {"acceptance_before", "acceptance_after"}
+TRANSITION_ROLES = {
+    "development": DEVELOPMENT_ROLES,
+    "acceptance": ACCEPTANCE_ROLES,
+}
 
 
 class FeaturePromotionError(ValueError):
@@ -62,13 +67,22 @@ def validate_feature_delta(record: Mapping[str, Any]) -> None:
         raise FeaturePromotionError(
             "source_candidate_id must use feature-candidate: prefix"
         )
-    if record.get("transition") != "development":
-        raise FeaturePromotionError("FeatureDelta may only use development")
+    transition = record.get("transition")
+    if transition not in TRANSITION_ROLES:
+        raise FeaturePromotionError("FeatureDelta transition must be known")
     if record.get("status") not in {"stable", "added", "removed", "changed"}:
         raise FeaturePromotionError("unsupported FeatureDelta status")
     evidence_ids = _unique_strings(record.get("evidence_ids"), "evidence_ids")
-    if not any(item.startswith("fact:") for item in evidence_ids):
+    if transition == "development" and not any(
+        item.startswith("fact:") for item in evidence_ids
+    ):
         raise FeaturePromotionError("FeatureDelta requires atomic-fact evidence")
+    if transition == "acceptance" and record.get("fact_policy") != (
+        "no-post-unseal-fact-family-expansion"
+    ):
+        raise FeaturePromotionError(
+            "acceptance FeatureDelta must preserve the frozen fact boundary"
+        )
     if not any(item.startswith("file:") for item in evidence_ids):
         raise FeaturePromotionError("FeatureDelta requires FileDelta evidence")
     if not any(item.startswith("pull-request:") for item in evidence_ids):
@@ -109,10 +123,12 @@ def validate_feature_delta(record: Mapping[str, Any]) -> None:
         raise FeaturePromotionError(
             "promotion requires a complete-candidate BehaviorProbe"
         )
-    if record.get("environment_status") != "development-only-unfrozen":
-        raise FeaturePromotionError(
-            "FeatureDelta must not claim an EvalEnvironment freeze"
-        )
+    expected_environment_status = {
+        "development": "development-only-unfrozen",
+        "acceptance": "acceptance-feature-unfrozen",
+    }[str(transition)]
+    if record.get("environment_status") != expected_environment_status:
+        raise FeaturePromotionError("FeatureDelta must not claim a freeze")
 
 
 def load_probe_result(path: Path) -> tuple[Mapping[str, Any], str]:
@@ -144,6 +160,10 @@ def audit_promotion(
         raise FeaturePromotionError(
             "FeatureDelta evidence must exactly preserve candidate evidence"
         )
+    transition = str(feature_delta["transition"])
+    candidate_transition = str(candidate.get("transition", "development"))
+    if candidate_transition != transition:
+        raise FeaturePromotionError("candidate and FeatureDelta transitions disagree")
 
     declared_results = feature_delta["verification"]["probe_results"]
     expected_probe_ids = set(feature_delta["behavior_probe_ids"])
@@ -155,14 +175,18 @@ def audit_promotion(
         result, observed_sha256 = probe_results[probe_id]
         declared = declared_results[probe_id]
         sources = result.get("sources")
-        if not isinstance(sources, Mapping) or set(sources) != DEVELOPMENT_ROLES:
+        expected_roles = TRANSITION_ROLES[transition]
+        if not isinstance(sources, Mapping) or set(sources) != expected_roles:
             raise FeaturePromotionError(
-                f"{probe_id} did not use exactly the development snapshots"
+                f"{probe_id} did not use exactly the {transition} snapshots"
             )
         checks = {
             "result_id_matches": result.get("probe_id") == probe_id,
             "candidate_id_matches": result.get("candidate_id") == candidate_id,
             "status_passes": result.get("status") == "pass",
+            "transition_matches": (
+                result.get("transition", "development") == transition
+            ),
             "claim_scope_matches": (
                 result.get("claim_scope") == declared["claim_scope"]
             ),
@@ -184,7 +208,7 @@ def audit_promotion(
         "source_candidate_id": candidate_id,
         "status": status,
         "probe_audits": audits,
-        "acceptance_accessed": False,
+        "acceptance_accessed": transition == "acceptance",
         "eval_environment_frozen": False,
     }
 

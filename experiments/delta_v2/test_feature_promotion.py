@@ -102,6 +102,15 @@ class FeatureDeltaValidationTest(unittest.TestCase):
         with self.assertRaisesRegex(FeaturePromotionError, "unavailable"):
             validate_feature_delta(feature)
 
+    def test_accepts_fact_frozen_acceptance_feature(self) -> None:
+        feature = feature_record()
+        feature["transition"] = "acceptance"
+        feature["evidence_ids"].remove("fact:one")
+        feature["fact_policy"] = "no-post-unseal-fact-family-expansion"
+        feature["environment_status"] = "acceptance-feature-unfrozen"
+
+        validate_feature_delta(feature)
+
 
 class PromotionAuditTest(unittest.TestCase):
     def matching_inputs(self) -> tuple[dict, dict, dict]:
@@ -158,6 +167,34 @@ class PromotionAuditTest(unittest.TestCase):
                 feature,
                 {"behavior-probe:complete": (result, digest)},
             )
+
+    def test_acceptance_promotion_requires_acceptance_roles(self) -> None:
+        candidate, feature, _ = self.matching_inputs()
+        candidate["transition"] = "acceptance"
+        candidate["evidence_ids"].remove("fact:one")
+        feature["transition"] = "acceptance"
+        feature["evidence_ids"].remove("fact:one")
+        feature["fact_policy"] = "no-post-unseal-fact-family-expansion"
+        feature["environment_status"] = "acceptance-feature-unfrozen"
+        result = probe_result()
+        result["transition"] = "acceptance"
+        result["sources"] = {
+            "acceptance_before": {"commit_sha": "a" * 40},
+            "acceptance_after": {"commit_sha": "b" * 40},
+        }
+        result, digest = serialized_result(result)
+        feature["verification"]["probe_results"]["behavior-probe:complete"][
+            "sha256"
+        ] = digest
+
+        audit = audit_promotion(
+            candidate,
+            feature,
+            {"behavior-probe:complete": (result, digest)},
+        )
+
+        self.assertEqual(audit["status"], "pass")
+        self.assertTrue(audit["acceptance_accessed"])
 
 
 class ProbeResultLoadingTest(unittest.TestCase):
