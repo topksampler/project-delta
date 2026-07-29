@@ -1,0 +1,35 @@
+schema: delta.llm_judge_attestation.v1
+
+contract_id: delta-v2-evidence-grounded-llm-judge-v1
+evidence_bundle_sha256: 43712d6b7da6293b777b9536c995920e5fd3ebf0b548d46cf1aa675fcbf08ed0
+reviewed_eval_ids_sha256: ce81fdd9bc45717955a42ab9502324733677b426232a1c608b2393f192a7004d
+reviewed_items: 32
+
+judge_run:
+  judge_run_id: judge:delta-v2-development-codex-2026-07-29
+  kind: llm
+  runtime: codex-desktop
+  model_family: GPT-5
+  target_model: false
+
+default_dimensions:
+  truth:
+    verdict: pass
+    reason: >-
+      Each atomic answer equals the independently extracted AtomicFactDelta
+      status for the exact semantic key; the feature answer reconstructs from
+      all five passing complete-candidate probe observations.
+  version_status:
+    verdict: pass
+    reason: >-
+      Each prompt names v0.22.0 and v0.23.0 (or v0.23.0 for verified feature
+      behavior), and its added, removed, stable, or changed label agrees with
+      the presence and normalized values of the pinned before/after evidence.
+  answerability:
+    verdict: pass
+    reason: >-
+      Each prompt identifies one exact source unit, fixes the relevant
+      revisions, and constrains the response vocabulary or JSON keys enough
+      for a single deterministic scorer-backed answer.
+
+exceptions: []
