@@ -29,7 +29,7 @@ from experiments.delta_v2.baseline_protocol import (
 
 RUN_CONFIG_SCHEMA = "delta.target_model_run_config.v1"
 RUN_RECEIPT_SCHEMA = "delta.target_model_run_receipt.v1"
-EXPECTED_RUN_ID = "delta-v2-c0-base-qwen35-08b-modal-v2"
+EXPECTED_RUN_ID = "delta-v2-c0-base-qwen35-08b-modal-v3"
 EXPECTED_PROTOCOL_PATH = Path(
     "experiments/delta_v2/target_baseline_protocol.yaml"
 )

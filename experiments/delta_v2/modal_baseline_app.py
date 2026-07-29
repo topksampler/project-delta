@@ -7,16 +7,17 @@ from pathlib import Path
 import modal
 import yaml
 
-from infra.modal import app as platform
+from lab.dispatch import modal_worker
 
 
-REPO_ROOT = platform.REPO_ROOT
+REPO_ROOT = Path("/root/lalith-ai-lab")
 EVAL_DATA = (
     "data/experiments/delta_v2/acceptance_attempt_2/eval/"
     "acceptance_eval_items_v3.jsonl"
 )
 
 app = modal.App("lalith-ai-lab-delta-v2-baseline")
+secrets = [modal.Secret.from_name("lalith-lab")]
 
 image = (
     modal.Image.debian_slim(python_version="3.11.9")
@@ -67,28 +68,43 @@ image = (
 @app.function(
     image=image,
     gpu="A10G",
-    secrets=platform.secrets,
+    secrets=secrets,
     timeout=60 * 60,
 )
 def eval_run(run_id: str, config: str) -> None:
-    platform._timed(
+    modal_worker.timed(
         "env_receipts",
-        lambda: platform._write_receipts(run_id),
+        lambda: modal_worker.write_receipts(
+            repo_root=REPO_ROOT,
+            run_id=run_id,
+        ),
     )
-    config_path = platform._timed(
+    config_path = modal_worker.timed(
         "b2_pull_inputs",
-        lambda: platform._sync_inputs(run_id, config),
+        lambda: modal_worker.sync_inputs(
+            repo_root=REPO_ROOT,
+            run_id=run_id,
+            config_rel=config,
+        ),
     )
 
     def _compute() -> dict:
         with open(config_path, "r", encoding="utf-8") as stream:
             cfg = yaml.safe_load(stream)
-        return platform._run_module(platform._eval_module(cfg), config_path)
+        return modal_worker.run_module(
+            repo_root=REPO_ROOT,
+            module=modal_worker.eval_module(cfg),
+            config_path=config_path,
+        )
 
-    cfg = platform._timed("compute", _compute)
-    platform._timed(
+    cfg = modal_worker.timed("compute", _compute)
+    modal_worker.timed(
         "b2_push_outputs",
-        lambda: platform._sync_outputs(run_id, cfg),
+        lambda: modal_worker.sync_outputs(
+            repo_root=REPO_ROOT,
+            run_id=run_id,
+            config=cfg,
+        ),
     )
     print(f"delta_v2 baseline complete: {run_id}")
 

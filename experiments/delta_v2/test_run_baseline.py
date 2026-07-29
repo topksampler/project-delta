@@ -21,7 +21,7 @@ from lab.dispatch import modal_driver
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = (
     REPO_ROOT
-    / "configs/experiments/delta_v2/c0_base_qwen35_08b_modal_v2.yaml"
+    / "configs/experiments/delta_v2/c0_base_qwen35_08b_modal_v3.yaml"
 )
 
 
