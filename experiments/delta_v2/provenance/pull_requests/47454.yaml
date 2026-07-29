@@ -1,0 +1,54 @@
+schema: delta.pull_request_evidence.v1
+
+evidence_id: pull-request:vllm-project/vllm#47454
+repository: vllm-project/vllm
+number: 47454
+url: https://github.com/vllm-project/vllm/pull/47454
+title: "[Frontend] Add endpoint plugins framework"
+state: merged
+author: hickeyma
+merged_at: "2026-07-08T02:00:42Z"
+merge_commit_sha: f7fc0ca9933ff4903dc6240a62e4194e38283c70
+transition: acceptance
+
+base:
+  ref: main
+  sha: 65a7b4628409a77cc9d89246397e793ce41367fe
+head:
+  ref: add-ep-plugin-fwork
+  sha: 7076162baafd42680727cea46981406d934c4084
+
+counts:
+  commits: 10
+  changed_files: 12
+  additions: 660
+  deletions: 1
+
+changed_paths:
+  - .buildkite/test-amd.yaml
+  - .buildkite/test_areas/plugins.yaml
+  - docs/design/endpoint_plugins.md
+  - docs/design/plugin_system.md
+  - docs/usage/security.md
+  - tests/plugins/vllm_add_dummy_endpoint_plugin/setup.py
+  - tests/plugins/vllm_add_dummy_endpoint_plugin/vllm_add_dummy_endpoint_plugin/__init__.py
+  - tests/plugins_tests/test_endpoint_plugins.py
+  - vllm/entrypoints/openai/api_server.py
+  - vllm/plugins/__init__.py
+  - vllm/plugins/endpoint_plugins/__init__.py
+  - vllm/plugins/endpoint_plugins/interface.py
+
+acceptance_transition_membership:
+  acceptance_before_contains_merge: false
+  acceptance_after_contains_merge: true
+  verifier: git-merge-base-is-ancestor-v1
+
+provenance_role: candidate-discovery-and-grouping-only
+truth_policy: >-
+  The PR title, body, author, and test claims are not ground truth. File changes
+  route to the pinned Git trees; code contracts route to static verification;
+  runtime claims route to BehaviorProbe results.
+
+retrieval:
+  provider: github-public-api
+  retrieved_on: "2026-07-30"

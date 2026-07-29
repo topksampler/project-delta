@@ -20,6 +20,7 @@ CANDIDATE_SCHEMA = "delta.feature_candidate.v1"
 PR_SCHEMA = "delta.pull_request_evidence.v1"
 PENDING = "pending"
 HEX_SHA1 = re.compile(r"^[0-9a-f]{40}$")
+TRANSITIONS = {"development", "acceptance"}
 
 
 class FeatureTraceError(ValueError):
@@ -64,8 +65,9 @@ def validate_candidate(record: Mapping[str, Any]) -> None:
     ):
         raise FeatureTraceError("candidate_id must use feature-candidate: prefix")
     _string(record.get("repository"), "repository")
-    if record.get("transition") != "development":
-        raise FeatureTraceError("only the development transition may be traced")
+    transition = record.get("transition")
+    if transition not in TRANSITIONS:
+        raise FeatureTraceError("candidate transition must be known")
     if record.get("proposed_status") not in {
         "stable",
         "added",
@@ -84,8 +86,16 @@ def validate_candidate(record: Mapping[str, Any]) -> None:
             "FeatureCandidate must remain pending until promotion"
         )
     evidence_ids = _string_list(record.get("evidence_ids"), "evidence_ids")
-    if not any(item.startswith("fact:") for item in evidence_ids):
+    if transition == "development" and not any(
+        item.startswith("fact:") for item in evidence_ids
+    ):
         raise FeatureTraceError("FeatureCandidate requires atomic-fact evidence")
+    if transition == "acceptance" and record.get("fact_policy") != (
+        "no-post-unseal-fact-family-expansion"
+    ):
+        raise FeatureTraceError(
+            "acceptance candidate must preserve the frozen fact-family boundary"
+        )
     if not any(item.startswith("file:") for item in evidence_ids):
         raise FeatureTraceError("FeatureCandidate requires file evidence")
     if not any(item.startswith("pull-request:") for item in evidence_ids):
@@ -116,14 +126,21 @@ def validate_pr_evidence(record: Mapping[str, Any]) -> None:
     counts = _mapping(record.get("counts"), "counts")
     if counts.get("changed_files") != len(changed_paths):
         raise FeatureTraceError("changed_files count does not match changed_paths")
-    membership = _mapping(
-        record.get("development_transition_membership"),
-        "development_transition_membership",
-    )
-    if membership.get("development_before_contains_merge") is not False:
-        raise FeatureTraceError("PR merge must not be contained in development_before")
-    if membership.get("development_after_contains_merge") is not True:
-        raise FeatureTraceError("PR merge must be contained in development_after")
+    transition = record.get("transition", "development")
+    if transition not in TRANSITIONS:
+        raise FeatureTraceError("PR transition must be known")
+    membership_field = f"{transition}_transition_membership"
+    membership = _mapping(record.get(membership_field), membership_field)
+    before_field = f"{transition}_before_contains_merge"
+    after_field = f"{transition}_after_contains_merge"
+    if membership.get(before_field) is not False:
+        raise FeatureTraceError(
+            f"PR merge must not be contained in {transition}_before"
+        )
+    if membership.get(after_field) is not True:
+        raise FeatureTraceError(
+            f"PR merge must be contained in {transition}_after"
+        )
     if record.get("provenance_role") != "candidate-discovery-and-grouping-only":
         raise FeatureTraceError("PR evidence must not be labeled as truth")
 
@@ -153,6 +170,10 @@ def audit_evidence_links(
 ) -> dict[str, Any]:
     validate_candidate(candidate)
     validate_pr_evidence(pr_evidence)
+    candidate_transition = str(candidate["transition"])
+    pr_transition = str(pr_evidence.get("transition", "development"))
+    if candidate_transition != pr_transition:
+        raise FeatureTraceError("candidate and PR transitions disagree")
 
     evidence_ids = set(candidate["evidence_ids"])
     fact_ids = {record.get("fact_id") for record in fact_records}
@@ -213,10 +234,17 @@ def verify_transition_membership(
     repo: Path,
     snapshots_path: Path,
     pr_evidence: Mapping[str, Any],
+    *,
+    allow_acceptance: bool = False,
 ) -> dict[str, Any]:
     validate_pr_evidence(pr_evidence)
+    transition = str(pr_evidence.get("transition", "development"))
     manifest = load_snapshot_manifest(snapshots_path)
-    before, after = select_transition(manifest, "development")
+    before, after = select_transition(
+        manifest,
+        transition,
+        allow_acceptance=allow_acceptance,
+    )
     verify_snapshot(repo, before)
     verify_snapshot(repo, after)
     merge_sha = str(pr_evidence["merge_commit_sha"])
@@ -244,21 +272,19 @@ def verify_transition_membership(
     }:
         raise FeatureTraceError("git could not determine PR transition membership")
     observed = {
-        "development_before_contains_merge": before_result.returncode == 0,
-        "development_after_contains_merge": after_result.returncode == 0,
+        f"{transition}_before_contains_merge": before_result.returncode == 0,
+        f"{transition}_after_contains_merge": after_result.returncode == 0,
     }
-    declared = pr_evidence["development_transition_membership"]
+    declared = pr_evidence[f"{transition}_transition_membership"]
     matches_record = all(
         observed[key] is declared[key]
-        for key in (
-            "development_before_contains_merge",
-            "development_after_contains_merge",
-        )
+        for key in observed
     )
     return {
         "schema": "delta.pull_request_membership_audit.v1",
         "pull_request_evidence_id": pr_evidence["evidence_id"],
         "merge_commit_sha": merge_sha,
+        "transition": transition,
         **observed,
         "matches_record": matches_record,
         "status": "pass" if matches_record else "fail",
@@ -275,6 +301,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--files", type=Path, required=True)
     parser.add_argument("--repo", type=Path, required=True)
     parser.add_argument("--snapshots", type=Path, required=True)
+    parser.add_argument(
+        "--allow-acceptance",
+        action="store_true",
+        help="Use acceptance snapshots only after the development recipe freeze.",
+    )
     return parser
 
 
@@ -292,6 +323,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.repo,
         args.snapshots,
         pr_evidence,
+        allow_acceptance=args.allow_acceptance,
     )
     result = {
         "schema": "delta.feature_trace_check.v1",
@@ -309,4 +341,3 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

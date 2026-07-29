@@ -86,6 +86,29 @@ class RecordValidationTest(unittest.TestCase):
         with self.assertRaisesRegex(FeatureTraceError, "count does not match"):
             validate_pr_evidence(record)
 
+    def test_acceptance_candidate_preserves_frozen_fact_boundary(self) -> None:
+        candidate = candidate_record()
+        candidate["transition"] = "acceptance"
+        candidate["evidence_ids"].remove("fact:one")
+        candidate["fact_policy"] = "no-post-unseal-fact-family-expansion"
+        pr = pr_record()
+        pr["transition"] = "acceptance"
+        pr["acceptance_transition_membership"] = {
+            "acceptance_before_contains_merge": False,
+            "acceptance_after_contains_merge": True,
+        }
+        del pr["development_transition_membership"]
+
+        validate_candidate(candidate)
+        validate_pr_evidence(pr)
+
+        del candidate["fact_policy"]
+        with self.assertRaisesRegex(
+            FeatureTraceError,
+            "frozen fact-family boundary",
+        ):
+            validate_candidate(candidate)
+
 
 class EvidenceAuditTest(unittest.TestCase):
     def test_resolves_exact_fact_file_and_pr_links(self) -> None:
@@ -211,6 +234,58 @@ class TransitionMembershipTest(unittest.TestCase):
 
         with self.assertRaisesRegex(FeatureTraceError, "must not be contained"):
             validate_pr_evidence(record)
+
+    def test_acceptance_membership_requires_explicit_unlock(self) -> None:
+        record = pr_record()
+        record["transition"] = "acceptance"
+        record["acceptance_transition_membership"] = {
+            "acceptance_before_contains_merge": False,
+            "acceptance_after_contains_merge": True,
+        }
+        del record["development_transition_membership"]
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            snapshots = Path(temp_dir) / "snapshots.yaml"
+            snapshots.write_text(
+                "\n".join(
+                    [
+                        "schema: delta.source_snapshots.v1",
+                        "repository:",
+                        "  id: owner/repo",
+                        "  url: https://example.invalid/owner/repo.git",
+                        "content_hash_algorithm: git-tree-sha1",
+                        "snapshots:",
+                        "  - role: development_before",
+                        "    revision: dev-before",
+                        f"    commit_sha: \"{'1' * 40}\"",
+                        f"    content_hash: \"git-tree-sha1:{'2' * 40}\"",
+                        "  - role: development_after",
+                        "    revision: dev-after",
+                        f"    commit_sha: \"{'3' * 40}\"",
+                        f"    content_hash: \"git-tree-sha1:{'4' * 40}\"",
+                        "  - role: acceptance_before",
+                        "    revision: acceptance-before",
+                        f"    commit_sha: \"{'5' * 40}\"",
+                        f"    content_hash: \"git-tree-sha1:{'6' * 40}\"",
+                        "  - role: acceptance_after",
+                        "    revision: acceptance-after",
+                        f"    commit_sha: \"{'7' * 40}\"",
+                        f"    content_hash: \"git-tree-sha1:{'8' * 40}\"",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(
+                ValueError,
+                "acceptance transition is sealed",
+            ):
+                verify_transition_membership(
+                    Path(temp_dir),
+                    snapshots,
+                    record,
+                )
 
 
 class SerializationTest(unittest.TestCase):
