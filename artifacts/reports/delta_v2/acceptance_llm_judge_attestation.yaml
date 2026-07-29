@@ -1,0 +1,35 @@
+schema: delta.llm_judge_attestation.v1
+
+contract_id: delta-v2-acceptance-evidence-grounded-llm-judge-v1
+evidence_bundle_sha256: 0a8216dd7cf2bc1ff9669ca3da963f3cbd7dc16aef264674352c5be2df5acf7b
+reviewed_eval_ids_sha256: d61d855a24e7261793bcd7a932d8708c3f40755a4126deff497561f3262ca2ff
+reviewed_items: 32
+
+judge_run:
+  judge_run_id: judge:delta-v2-acceptance-codex-2026-07-29
+  kind: llm
+  runtime: codex-desktop
+  model_family: GPT-5
+  target_model: false
+
+default_dimensions:
+  truth:
+    verdict: pass
+    reason: >-
+      Each proposed label equals the independently extracted AtomicFactDelta
+      status for the exact semantic key, with stable/changed value equality and
+      added/removed evidence presence checked before the LLM verdict.
+  version_status:
+    verdict: pass
+    reason: >-
+      Each prompt names v0.25.1 and v0.26.0, and its label agrees with exact
+      acceptance_before and acceptance_after evidence rooted in the pinned
+      commits and Git trees.
+  answerability:
+    verdict: pass
+    reason: >-
+      Each prompt identifies one exact source unit, fixes both revisions, and
+      limits the answer to one of four mutually exclusive labels accepted by
+      the deterministic scorer.
+
+exceptions: []

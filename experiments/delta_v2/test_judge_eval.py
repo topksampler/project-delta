@@ -20,7 +20,13 @@ from experiments.delta_v2.judge_eval import (
 
 
 JUDGE_CONTRACT_PATH = Path(__file__).with_name("llm_judge_contract.yaml")
+ACCEPTANCE_JUDGE_CONTRACT_PATH = Path(__file__).with_name(
+    "acceptance_llm_judge_contract.yaml"
+)
 EVAL_CONTRACT_PATH = Path(__file__).with_name("eval_item_contract.yaml")
+ACCEPTANCE_EVAL_CONTRACT_PATH = Path(__file__).with_name(
+    "acceptance_eval_item_contract.yaml"
+)
 
 
 def load_contracts() -> tuple[dict, dict]:
@@ -215,6 +221,23 @@ class JudgeContractTest(unittest.TestCase):
         with self.assertRaisesRegex(JudgeAuditError, "ground truth"):
             validate_contract(altered)
 
+    def test_acceptance_contract_discloses_post_unseal_implementation(
+        self,
+    ) -> None:
+        import yaml
+
+        contract = yaml.safe_load(
+            ACCEPTANCE_JUDGE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+
+        validate_contract(contract)
+        amendment = contract["protocol_amendment"]
+        self.assertEqual(
+            amendment["implementation_timing"],
+            "validator-parameterized-after-acceptance-unseal",
+        )
+        self.assertFalse(amendment["source_or_gold_changed"])
+
 
 class EvidenceBundleTest(unittest.TestCase):
     def build(self) -> tuple[list[dict], dict]:
@@ -274,6 +297,50 @@ class EvidenceBundleTest(unittest.TestCase):
                 contract=judge_contract,
                 eval_contract=eval_contract,
             )
+
+    def test_acceptance_fact_only_bundle_is_rooted(self) -> None:
+        import yaml
+
+        judge_contract = yaml.safe_load(
+            ACCEPTANCE_JUDGE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        eval_contract = yaml.safe_load(
+            ACCEPTANCE_EVAL_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        facts: list[dict] = []
+        rows: list[dict] = []
+        for index in range(32):
+            fact = fact_record(
+                ["stable", "added", "removed", "changed"][index % 4]
+            )
+            fact["fact_id"] = f"fact:acceptance:{index:02d}"
+            fact["semantic_key"] = (
+                f"python-environment-variable:VLLM_ACCEPTANCE_{index:02d}"
+            )
+            item = build_fact_item(
+                fact,
+                split="eval",
+                eligibility_reason=(
+                    "stable_control"
+                    if fact["status"] == "stable"
+                    else "nonstable"
+                ),
+                contract=eval_contract,
+            )
+            facts.append(fact)
+            rows.append(audit_row(item, index + 1))
+
+        bundle = build_evidence_bundle(
+            audit_rows=rows,
+            fact_records=facts,
+            feature_records=[],
+            probe_results={},
+            contract=judge_contract,
+            eval_contract=eval_contract,
+        )
+
+        self.assertEqual(len(bundle), 32)
+        self.assertTrue(all(row["root_check"] == "pass" for row in bundle))
 
 
 class AttestationTest(unittest.TestCase):

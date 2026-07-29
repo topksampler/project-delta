@@ -80,12 +80,13 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
     if contract.get("schema") != CONTRACT_SCHEMA:
         raise JudgeAuditError("unsupported LLM judge contract schema")
     _string(contract.get("contract_id"), "contract_id")
+    transition = contract.get("transition")
     if (
-        contract.get("transition") != "development"
+        transition not in {"development", "acceptance"}
         or contract.get("expected_sample_size") != 32
         or contract.get("input_audit_schema") != AUDIT_ROW_SCHEMA
     ):
-        raise JudgeAuditError("judge contract must bind the development sample")
+        raise JudgeAuditError("judge contract must bind one known sample")
 
     amendment = _mapping(
         contract.get("protocol_amendment"),
@@ -95,12 +96,23 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
         amendment.get("owner_direction")
         != "use-llm-as-judge-rooted-in-actual-truth"
         or amendment.get("timing")
-        != "before-development-freeze-and-before-acceptance-unseal"
+        != {
+            "development": (
+                "before-development-freeze-and-before-acceptance-unseal"
+            ),
+            "acceptance": "audit-method-chosen-before-development-freeze",
+        }[str(transition)]
         or amendment.get("replaces_review_actor") != "human"
         or amendment.get("preserves_judgments") != list(DIMENSIONS)
         or amendment.get("preserves_threshold") != 0.90
     ):
         raise JudgeAuditError("protocol amendment changed")
+    if transition == "acceptance" and (
+        amendment.get("implementation_timing")
+        != "validator-parameterized-after-acceptance-unseal"
+        or amendment.get("source_or_gold_changed") is not False
+    ):
+        raise JudgeAuditError("acceptance audit timing is not explicit")
 
     authority = _mapping(contract.get("truth_authority"), "truth_authority")
     if (
@@ -505,7 +517,7 @@ def apply_attestation(
         },
         "dimension_pass_rates": rates,
         "minimum_pass_rate_per_dimension": threshold,
-        "acceptance_accessed": False,
+        "acceptance_accessed": contract["transition"] == "acceptance",
         "freeze_state": "unfrozen",
     }
     return verdicts, summary
@@ -575,13 +587,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--feature-delta",
         action="append",
         type=Path,
-        required=True,
+        default=[],
     )
     parser.add_argument(
         "--probe-result",
         action="append",
         type=_parse_probe_result,
-        required=True,
+        default=[],
     )
     parser.add_argument("--attestation", type=Path)
     parser.add_argument("--evidence-out", type=Path, required=True)
@@ -629,7 +641,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                     "sha256": _sha256_bytes(bundle_bytes),
                     "reviewed_eval_ids_sha256": _reviewed_ids_hash(bundle),
                     "root_checks": "pass",
-                    "acceptance_accessed": False,
+                    "acceptance_accessed": (
+                        contract["transition"] == "acceptance"
+                    ),
                 },
                 indent=2,
                 sort_keys=True,
