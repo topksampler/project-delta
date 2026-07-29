@@ -25,6 +25,9 @@ CONTRACT_PATH = Path(__file__).with_name("eval_item_contract.yaml")
 ACCEPTANCE_CONTRACT_PATH = Path(__file__).with_name(
     "acceptance_eval_item_contract_v2.yaml"
 )
+ACCEPTANCE_FEATURE_CONTRACT_PATH = Path(__file__).with_name(
+    "acceptance_eval_item_contract_v3.yaml"
+)
 
 
 def contract_record() -> dict:
@@ -131,6 +134,74 @@ def mechanics_result() -> dict:
     }
 
 
+def acceptance_feature_record() -> dict:
+    return {
+        "schema": "delta.feature_delta.v1",
+        "feature_id": "feature:vllm-endpoint-plugins",
+        "source_candidate_id": "feature-candidate:endpoint-plugins",
+        "repository": "owner/repo",
+        "transition": "acceptance",
+        "summary": "Endpoint plugins",
+        "status": "added",
+        "fact_policy": "no-post-unseal-fact-family-expansion",
+        "evidence_ids": [
+            "file:one",
+            "pull-request:owner/repo#1",
+        ],
+        "behavior_probe_ids": [
+            "behavior-probe:vllm-endpoint-plugins-framework-v1"
+        ],
+        "verification": {
+            "old_revision": "unavailable",
+            "new_revision": "pass",
+            "recipe": "test-v1",
+            "probe_results": {
+                "behavior-probe:vllm-endpoint-plugins-framework-v1": {
+                    "sha256": "a" * 64,
+                    "claim_scope": "complete-candidate",
+                }
+            },
+        },
+        "environment_status": "acceptance-feature-unfrozen",
+    }
+
+
+def endpoint_plugins_result() -> dict:
+    return {
+        "schema": "delta.behavior_probe_result.v1",
+        "probe_id": "behavior-probe:vllm-endpoint-plugins-framework-v1",
+        "claim_scope": "complete-candidate",
+        "status": "pass",
+        "cases": [
+            {
+                "case_id": "complete_endpoint_plugin_framework",
+                "status": "pass",
+                "observed_before": {
+                    "kind": "unavailable",
+                    "loader": False,
+                    "protocol": False,
+                    "route_phase": False,
+                    "state_phase": False,
+                },
+                "observed_after": {
+                    "kind": "endpoint_plugin_framework",
+                    "allowlisted_task_match_loads": True,
+                    "async_init_state_hook": True,
+                    "attach_router_hook": True,
+                    "default_off": True,
+                    "documentation_present": True,
+                    "factory_failure_isolated": True,
+                    "required_task_miss_skips": True,
+                    "route_phase_attaches": True,
+                    "runtime_checkable_protocol": True,
+                    "state_phase_initializes": True,
+                    "upstream_tests_present": True,
+                },
+            }
+        ],
+    }
+
+
 class ContractTest(unittest.TestCase):
     def test_real_contract_is_valid_and_unfrozen(self) -> None:
         contract = contract_record()
@@ -173,6 +244,23 @@ class ContractTest(unittest.TestCase):
                 "scope"
             ],
             "all-development-source-ids",
+        )
+
+    def test_acceptance_v3_adds_one_fact_frozen_feature_template(self) -> None:
+        import yaml
+
+        contract = yaml.safe_load(
+            ACCEPTANCE_FEATURE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+
+        validate_contract(contract)
+        self.assertEqual(
+            contract["eligibility"]["feature_delta"]["fact_policy"],
+            "no-post-unseal-fact-family-expansion",
+        )
+        self.assertEqual(
+            contract["templates"]["feature_behavior_matrix"]["feature_id"],
+            "feature:vllm-endpoint-plugins",
         )
 
 
@@ -361,6 +449,109 @@ class ItemGenerationTest(unittest.TestCase):
         self.assertIn("v0.25.1 to v0.26.0", items[0]["prompt"])
         self.assertEqual(audit["status"], "pass")
         self.assertTrue(audit["acceptance_accessed"])
+
+    def test_acceptance_v3_adds_probe_grounded_feature_on_eval(self) -> None:
+        import yaml
+
+        contract = yaml.safe_load(
+            ACCEPTANCE_FEATURE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        feature = acceptance_feature_record()
+        facts = [
+            fact_record("fact:added", status="added"),
+            fact_record("fact:stable", status="stable"),
+        ]
+        splits = [
+            split_record("fact:added", "eval"),
+            split_record("fact:stable", "eval"),
+            split_record(str(feature["feature_id"]), "eval"),
+        ]
+
+        items = build_items(
+            contract=contract,
+            fact_records=facts,
+            feature_records=[feature],
+            split_records=splits,
+            probe_results={
+                "behavior-probe:vllm-endpoint-plugins-framework-v1": (
+                    endpoint_plugins_result()
+                )
+            },
+            denied_source_ids=set(),
+        )
+        feature_item = next(
+            item for item in items if item["source_kind"] == "feature_delta"
+        )
+
+        self.assertEqual(len(items), 3)
+        self.assertEqual(feature_item["split"], "eval")
+        self.assertEqual(
+            feature_item["gold"],
+            {
+                "default_without_allowlist": "not_loaded",
+                "allowlisted_matching_task": "loaded",
+                "required_task_mismatch": "skipped",
+                "factory_exception": "isolated",
+                "route_phase": "attach_router",
+                "post_engine_state_phase": "await_init_state",
+            },
+        )
+        self.assertTrue(
+            score_response(feature_item, json.dumps(feature_item["gold"]))
+        )
+
+    def test_acceptance_v3_rejects_probe_truth_mismatch(self) -> None:
+        import yaml
+
+        contract = yaml.safe_load(
+            ACCEPTANCE_FEATURE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        feature = acceptance_feature_record()
+        result = endpoint_plugins_result()
+        result["cases"][0]["observed_after"]["default_off"] = False
+
+        with self.assertRaisesRegex(
+            EvalBuildError,
+            "observations do not support",
+        ):
+            build_items(
+                contract=contract,
+                fact_records=[],
+                feature_records=[feature],
+                split_records=[
+                    split_record(str(feature["feature_id"]), "eval")
+                ],
+                probe_results={
+                    "behavior-probe:vllm-endpoint-plugins-framework-v1": result
+                },
+                denied_source_ids=set(),
+            )
+
+    def test_acceptance_v3_keeps_v2_fact_item_bytes(self) -> None:
+        import yaml
+
+        v2 = yaml.safe_load(
+            ACCEPTANCE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        v3 = yaml.safe_load(
+            ACCEPTANCE_FEATURE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        fact = fact_record("fact:added", status="added")
+
+        v2_item = build_fact_item(
+            fact,
+            split="eval",
+            eligibility_reason="nonstable",
+            contract=v2,
+        )
+        v3_item = build_fact_item(
+            fact,
+            split="eval",
+            eligibility_reason="nonstable",
+            contract=v3,
+        )
+
+        self.assertEqual(v2_item, v3_item)
 
     def test_acceptance_excludes_every_development_source_before_selection(
         self,

@@ -91,7 +91,7 @@ def load_jsonl(path: Path) -> list[Mapping[str, Any]]:
 def validate_contract(contract: Mapping[str, Any]) -> None:
     if contract.get("schema") != CONTRACT_SCHEMA:
         raise EvalBuildError("unsupported EvalItem contract schema")
-    _string(contract.get("contract_id"), "contract_id")
+    contract_id = _string(contract.get("contract_id"), "contract_id")
     transition = contract.get("transition")
     if transition not in {"development", "acceptance"}:
         raise EvalBuildError("unsupported EvalItem transition")
@@ -128,8 +128,21 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
             or features.get("required_probe_scope") != "complete-candidate"
         ):
             raise EvalBuildError("only promoted features may be eligible")
-    elif features.get("include") != "none":
-        raise EvalBuildError("acceptance features remain excluded")
+    elif contract_id == "delta-v2-acceptance-eval-items-v2":
+        if features.get("include") != "none":
+            raise EvalBuildError("v2 acceptance remains fact-only")
+    elif contract_id == "delta-v2-acceptance-eval-items-v3":
+        if (
+            features.get("include") != "all-promoted"
+            or features.get("required_probe_scope") != "complete-candidate"
+            or features.get("fact_policy")
+            != "no-post-unseal-fact-family-expansion"
+        ):
+            raise EvalBuildError(
+                "v3 acceptance requires a promoted, fact-frozen feature"
+            )
+    else:
+        raise EvalBuildError("unsupported acceptance EvalItem contract")
 
     templates = _mapping(contract.get("templates"), "templates")
     fact_template = _mapping(
@@ -164,8 +177,38 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
         }
         if dict(response_schema) != expected_feature_gold:
             raise EvalBuildError("feature response schema changed")
-    elif FEATURE_TASK in templates:
-        raise EvalBuildError("acceptance has no frozen feature template")
+    elif contract_id == "delta-v2-acceptance-eval-items-v2":
+        if FEATURE_TASK in templates:
+            raise EvalBuildError("v2 acceptance has no feature template")
+    else:
+        feature_template = _mapping(
+            templates.get(FEATURE_TASK),
+            f"templates.{FEATURE_TASK}",
+        )
+        if feature_template.get("scorer") != "exact-structured-json-v1":
+            raise EvalBuildError("unsupported feature scorer")
+        if feature_template.get("feature_id") != (
+            "feature:vllm-endpoint-plugins"
+        ):
+            raise EvalBuildError("unexpected acceptance feature template")
+        if feature_template.get("probe_case_id") != (
+            "complete_endpoint_plugin_framework"
+        ):
+            raise EvalBuildError("unexpected acceptance feature probe case")
+        response_schema = _mapping(
+            feature_template.get("response_schema"),
+            "feature response_schema",
+        )
+        expected_feature_gold = {
+            "default_without_allowlist": "not_loaded",
+            "allowlisted_matching_task": "loaded",
+            "required_task_mismatch": "skipped",
+            "factory_exception": "isolated",
+            "route_phase": "attach_router",
+            "post_engine_state_phase": "await_init_state",
+        }
+        if dict(response_schema) != expected_feature_gold:
+            raise EvalBuildError("acceptance feature response schema changed")
 
     generator = _mapping(contract.get("generator"), "generator")
     if (
@@ -209,8 +252,11 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
             "split_policy.cross_transition_source_exclusion",
         )
         if (
-            contract.get("contract_id")
-            != "delta-v2-acceptance-eval-items-v2"
+            contract_id
+            not in {
+                "delta-v2-acceptance-eval-items-v2",
+                "delta-v2-acceptance-eval-items-v3",
+            }
             or split_policy.get("acceptance_eval_items") != "required"
             or split_policy.get("empty_eval_policy") != "fail-build"
             or exclusion.get("input") != "development_source_splits.jsonl"
@@ -442,6 +488,49 @@ def _feature_gold_from_probe(
         for case in result.get("cases", [])
         if isinstance(case, Mapping)
     }
+    feature_id = str(template["feature_id"])
+    if feature_id == "feature:vllm-endpoint-plugins":
+        required = {"complete_endpoint_plugin_framework"}
+        if set(cases) != required or any(
+            case.get("status") != "pass" for case in cases.values()
+        ):
+            raise EvalBuildError(
+                "endpoint-plugin probe case is incomplete or failed"
+            )
+        case = cases["complete_endpoint_plugin_framework"]
+        before = _mapping(case.get("observed_before"), "observed_before")
+        after = _mapping(case.get("observed_after"), "observed_after")
+        expected_before = {
+            "kind": "unavailable",
+            "loader": False,
+            "protocol": False,
+            "route_phase": False,
+            "state_phase": False,
+        }
+        required_after = {
+            "allowlisted_task_match_loads",
+            "async_init_state_hook",
+            "attach_router_hook",
+            "default_off",
+            "documentation_present",
+            "factory_failure_isolated",
+            "required_task_miss_skips",
+            "route_phase_attaches",
+            "runtime_checkable_protocol",
+            "state_phase_initializes",
+            "upstream_tests_present",
+        }
+        if (
+            dict(before) != expected_before
+            or after.get("kind") != "endpoint_plugin_framework"
+            or any(after.get(key) is not True for key in required_after)
+        ):
+            raise EvalBuildError(
+                "endpoint-plugin observations do not support template"
+            )
+        return dict(template["response_schema"])
+    if feature_id != "feature:vllm-prefix-cache-retention":
+        raise EvalBuildError(f"unsupported feature probe: {feature_id}")
     required = {
         "dense_default",
         "interval_64",
@@ -484,17 +573,31 @@ def build_feature_item(
     template = contract["templates"][FEATURE_TASK]
     if feature_id != template["feature_id"]:
         raise EvalBuildError(f"no feature template for {feature_id}")
+    if record.get("transition") != contract["transition"]:
+        raise EvalBuildError("feature and EvalItem transitions disagree")
     generator_version = str(contract["generator"]["version"])
     gold = _feature_gold_from_probe(probe_result, contract)
     after_revision = contract["generator"]["revisions"]["after"]
-    prompt = (
-        f"For vLLM {after_revision}, return a JSON object describing the verified "
-        "`VLLM_PREFIX_CACHE_RETENTION_INTERVAL` behavior. Use exactly these "
-        "keys: `unset`, `positive_aligned_interval`, `zero`, `negative`, and "
-        "`misaligned`. Use only the behavior labels `dense`, "
-        "`sparse_interval_plus_latest_boundary`, `latest_boundary_only`, or "
-        "`rejected`."
-    )
+    if feature_id == "feature:vllm-prefix-cache-retention":
+        prompt = (
+            f"For vLLM {after_revision}, return a JSON object describing the "
+            "verified `VLLM_PREFIX_CACHE_RETENTION_INTERVAL` behavior. Use "
+            "exactly these keys: `unset`, `positive_aligned_interval`, `zero`, "
+            "`negative`, and `misaligned`. Use only the behavior labels "
+            "`dense`, `sparse_interval_plus_latest_boundary`, "
+            "`latest_boundary_only`, or `rejected`."
+        )
+    else:
+        prompt = (
+            f"For vLLM {after_revision}, return a JSON object describing the "
+            "verified endpoint-plugin loading and lifecycle behavior. Use "
+            "exactly these keys: `default_without_allowlist`, "
+            "`allowlisted_matching_task`, `required_task_mismatch`, "
+            "`factory_exception`, `route_phase`, and "
+            "`post_engine_state_phase`. Use exactly the corresponding labels "
+            "`not_loaded`, `loaded`, `skipped`, `isolated`, `attach_router`, "
+            "and `await_init_state`."
+        )
     return {
         "schema": EVAL_SCHEMA,
         "eval_id": _eval_id(feature_id, FEATURE_TASK, generator_version),
