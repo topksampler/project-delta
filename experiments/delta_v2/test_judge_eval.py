@@ -21,11 +21,11 @@ from experiments.delta_v2.judge_eval import (
 
 JUDGE_CONTRACT_PATH = Path(__file__).with_name("llm_judge_contract.yaml")
 ACCEPTANCE_JUDGE_CONTRACT_PATH = Path(__file__).with_name(
-    "acceptance_llm_judge_contract.yaml"
+    "acceptance_llm_judge_contract_v2.yaml"
 )
 EVAL_CONTRACT_PATH = Path(__file__).with_name("eval_item_contract.yaml")
 ACCEPTANCE_EVAL_CONTRACT_PATH = Path(__file__).with_name(
-    "acceptance_eval_item_contract.yaml"
+    "acceptance_eval_item_contract_v2.yaml"
 )
 
 
@@ -237,6 +237,7 @@ class JudgeContractTest(unittest.TestCase):
             "validator-parameterized-after-acceptance-unseal",
         )
         self.assertFalse(amendment["source_or_gold_changed"])
+        self.assertTrue(amendment["selection_changed"])
 
 
 class EvidenceBundleTest(unittest.TestCase):

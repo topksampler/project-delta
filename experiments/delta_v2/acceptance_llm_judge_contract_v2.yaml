@@ -1,0 +1,49 @@
+schema: delta.llm_judge_contract.v1
+
+contract_id: delta-v2-acceptance-evidence-grounded-llm-judge-v2
+transition: acceptance
+input_audit_schema: delta.human_eval_audit_item.v1
+expected_sample_size: 32
+
+protocol_amendment:
+  owner_direction: use-llm-as-judge-rooted-in-actual-truth
+  timing: audit-method-chosen-before-development-freeze
+  implementation_timing: validator-parameterized-after-acceptance-unseal
+  source_or_gold_changed: false
+  selection_changed: true
+  selection_change_reason: cross-transition-source-leakage-corrected
+  replaces_review_actor: human
+  preserves_judgments: [truth, version_status, answerability]
+  preserves_threshold: 0.90
+
+truth_authority:
+  atomic_fact_delta: independently-extracted-pinned-source-record
+  feature_delta: not-present-in-acceptance-v2
+  behavior: not-present-in-acceptance-v2
+  llm_role: review-only
+  llm_may_change_gold: false
+  conflict_action: fail-and-return-to-build
+
+root_checks:
+  - audit-source-id-resolves-exactly-once
+  - proposed-gold-equals-verified-source
+  - prompt-identifies-the-verified-source
+  - before-after-evidence-matches-status
+
+judge_output:
+  allowed_verdicts: [pass, fail, abstain]
+  required_dimensions: [truth, version_status, answerability]
+  require_reason: true
+  bind_exact_evidence_bundle: true
+  abstention_counts_as_failure: true
+  minimum_pass_rate_per_dimension: 0.90
+
+judge_identity:
+  kind: llm
+  runtime: codex-desktop
+  model_family: GPT-5
+  target_model: false
+  generation_settings: platform-managed
+  reproducibility: exact-evidence-and-verdicts-recorded
+
+freeze_state: unfrozen
