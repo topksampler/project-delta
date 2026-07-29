@@ -1,7 +1,7 @@
 schema: delta.eval_item_contract.v1
 
-contract_id: delta-v2-eval-items-v1
-transition: development
+contract_id: delta-v2-acceptance-eval-items-v1
+transition: acceptance
 source_split_contract_id: delta-v2-development-source-split-v1
 
 eligibility:
@@ -13,8 +13,8 @@ eligibility:
       ranking_algorithm: sha256-source-id-v1
       salt: delta-v2-stable-control-v1
   feature_delta:
-    include: all-promoted
-    required_probe_scope: complete-candidate
+    include: none
+    reason: acceptance-feature-verification-not-yet-generalized
   exclude:
     - feature_candidate
     - file_delta
@@ -26,32 +26,20 @@ templates:
     version: delta-v2-fact-status-template-v1
     response_labels: [stable, added, removed, changed]
     scorer: exact-enum-v1
-  feature_behavior_matrix:
-    version: delta-v2-prefix-retention-matrix-v1
-    feature_id: feature:vllm-prefix-cache-retention
-    probe_id: behavior-probe:vllm-prefix-cache-retention-mechanics-v1
-    response_schema:
-      unset: dense
-      positive_aligned_interval: sparse_interval_plus_latest_boundary
-      zero: latest_boundary_only
-      negative: rejected
-      misaligned: rejected
-    scorer: exact-structured-json-v1
 
 generator:
-  version: delta-v2-eval-generator-v1
+  version: delta-v2-acceptance-eval-generator-v1
   method: deterministic-template-only
   teacher_role: forbidden
   revisions:
-    before: v0.22.0
-    after: v0.23.0
+    before: v0.25.0
+    after: v0.25.1
 
 split_policy:
-  source: development_source_splits.jsonl
+  source: acceptance_source_splits.jsonl
   invariant: every-item-inherits-source-split
-  allowed_splits: [train, dev]
-  development_eval_items: forbidden
-  acceptance_future_split: eval
+  allowed_splits: [eval]
+  acceptance_eval_items: required
 
 human_audit:
   algorithm: stratified-hash-sample-v1
@@ -61,7 +49,7 @@ human_audit:
     - one-atomic-item-per-nonempty-split-family-status-stratum
   fill_ranking:
     algorithm: sha256-eval-id-v1
-    salt: delta-v2-human-audit-v1
+    salt: delta-v2-acceptance-audit-v1
   judgments: [truth, version_status, answerability]
   pass_threshold_per_judgment: 0.90
 

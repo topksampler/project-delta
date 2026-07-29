@@ -53,13 +53,17 @@ class SnapshotExtraction:
 
 
 @dataclass(frozen=True)
-class DevelopmentFactBuild:
+class FactBuild:
     repository_id: str
     fact_manifest_sha256: str
+    transition: str
     before: SnapshotExtraction
     after: SnapshotExtraction
     deltas: tuple[AtomicFactDelta, ...]
     summary: Mapping[str, Any]
+
+
+DevelopmentFactBuild = FactBuild
 
 
 class GitBlobBatch:
@@ -218,11 +222,20 @@ def extract_snapshot(
     )
 
 
-def build_development_facts(
+def build_facts(
     *,
     repo: Path,
     fact_manifest_path: Path,
-) -> DevelopmentFactBuild:
+    transition: str,
+    allow_acceptance: bool = False,
+) -> FactBuild:
+    if transition not in {"development", "acceptance"}:
+        raise FactExtractionError(f"unsupported transition: {transition}")
+    if transition == "acceptance" and not allow_acceptance:
+        raise FactExtractionError(
+            "acceptance transition is sealed; pass allow_acceptance only "
+            "after the development recipe freezes"
+        )
     fact_manifest_bytes = fact_manifest_path.read_bytes()
     fact_manifest = load_fact_family_manifest(fact_manifest_path)
     _validate_extractor_contract(fact_manifest)
@@ -233,8 +246,8 @@ def build_development_facts(
     snapshot_manifest = load_snapshot_manifest(snapshot_manifest_path)
     before_snapshot, after_snapshot = select_transition(
         snapshot_manifest,
-        "development",
-        allow_acceptance=False,
+        transition,
+        allow_acceptance=allow_acceptance,
     )
 
     before = extract_snapshot(
@@ -287,7 +300,7 @@ def build_development_facts(
             "id": snapshot_manifest.repository_id,
             "url": snapshot_manifest.repository_url,
         },
-        "transition": "development",
+        "transition": transition,
         "fact_family_manifest_sha256": fact_manifest_sha256,
         "extractor_version": EXTRACTOR_VERSION,
         "source_before": before.snapshot.as_dict(),
@@ -304,9 +317,12 @@ def build_development_facts(
         "rejection_counts_after": _count_by_family(after.rejections),
         **audit,
     }
-    return DevelopmentFactBuild(
+    if transition == "acceptance":
+        summary["fact_families_preregistered_on"] = fact_manifest.transition
+    return FactBuild(
         repository_id=snapshot_manifest.repository_id,
         fact_manifest_sha256=fact_manifest_sha256,
+        transition=transition,
         before=before,
         after=after,
         deltas=deltas,
@@ -314,30 +330,44 @@ def build_development_facts(
     )
 
 
-def write_development_outputs(
-    build: DevelopmentFactBuild,
+def build_development_facts(
+    *,
+    repo: Path,
+    fact_manifest_path: Path,
+) -> DevelopmentFactBuild:
+    return build_facts(
+        repo=repo,
+        fact_manifest_path=fact_manifest_path,
+        transition="development",
+        allow_acceptance=False,
+    )
+
+
+def write_fact_outputs(
+    build: FactBuild,
     output_dir: Path,
 ) -> dict[str, Any]:
+    transition = build.transition
     output_dir.mkdir(parents=True, exist_ok=True)
     outputs = {
         "observations_before": (
-            "atomic_fact_observations_development_before.jsonl",
+            f"atomic_fact_observations_{transition}_before.jsonl",
             build.before.observations,
         ),
         "observations_after": (
-            "atomic_fact_observations_development_after.jsonl",
+            f"atomic_fact_observations_{transition}_after.jsonl",
             build.after.observations,
         ),
         "rejections_before": (
-            "atomic_fact_rejections_development_before.jsonl",
+            f"atomic_fact_rejections_{transition}_before.jsonl",
             build.before.rejections,
         ),
         "rejections_after": (
-            "atomic_fact_rejections_development_after.jsonl",
+            f"atomic_fact_rejections_{transition}_after.jsonl",
             build.after.rejections,
         ),
         "deltas": (
-            "atomic_fact_deltas_development.jsonl",
+            f"atomic_fact_deltas_{transition}.jsonl",
             build.deltas,
         ),
     }
@@ -356,9 +386,18 @@ def write_development_outputs(
     }
     write_json(
         summary,
-        output_dir / "atomic_fact_extraction_development.summary.json",
+        output_dir / f"atomic_fact_extraction_{transition}.summary.json",
     )
     return summary
+
+
+def write_development_outputs(
+    build: DevelopmentFactBuild,
+    output_dir: Path,
+) -> dict[str, Any]:
+    if build.transition != "development":
+        raise FactExtractionError("development writer received another transition")
+    return write_fact_outputs(build, output_dir)
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
@@ -366,7 +405,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         prog="python -m experiments.delta_v2.facts.build",
         description=(
             "Extract and compare preregistered delta_v2 atomic facts from "
-            "the development snapshots."
+            "one pinned snapshot transition."
         )
     )
     parser.add_argument("--repo", type=Path, required=True)
@@ -375,17 +414,29 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=Path,
         default=Path(__file__).parents[1] / "fact_families.yaml",
     )
+    parser.add_argument(
+        "--transition",
+        choices=("development", "acceptance"),
+        default="development",
+    )
+    parser.add_argument(
+        "--allow-acceptance",
+        action="store_true",
+        help="Unlock acceptance only after the development recipe freezes.",
+    )
     parser.add_argument("--output-dir", type=Path, required=True)
     return parser.parse_args(argv)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
-    build = build_development_facts(
+    build = build_facts(
         repo=args.repo,
         fact_manifest_path=args.fact_families,
+        transition=args.transition,
+        allow_acceptance=args.allow_acceptance,
     )
-    summary = write_development_outputs(build, args.output_dir)
+    summary = write_fact_outputs(build, args.output_dir)
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0
 

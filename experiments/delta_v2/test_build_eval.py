@@ -21,6 +21,9 @@ from experiments.delta_v2.build_eval import (
 
 
 CONTRACT_PATH = Path(__file__).with_name("eval_item_contract.yaml")
+ACCEPTANCE_CONTRACT_PATH = Path(__file__).with_name(
+    "acceptance_eval_item_contract.yaml"
+)
 
 
 def contract_record() -> dict:
@@ -147,6 +150,23 @@ class ContractTest(unittest.TestCase):
 
         with self.assertRaisesRegex(EvalBuildError, "teacher models"):
             validate_contract(contract)
+
+    def test_acceptance_contract_is_fact_only_and_eval_only(self) -> None:
+        import yaml
+
+        contract = yaml.safe_load(
+            ACCEPTANCE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+
+        validate_contract(contract)
+        self.assertEqual(
+            contract["eligibility"]["feature_delta"]["include"],
+            "none",
+        )
+        self.assertEqual(
+            contract["split_policy"]["allowed_splits"],
+            ["eval"],
+        )
 
 
 class EligibilityTest(unittest.TestCase):
@@ -303,6 +323,36 @@ class ItemGenerationTest(unittest.TestCase):
             audit_items(first, splits, contract_record())["status"],
             "pass",
         )
+
+    def test_acceptance_builds_fact_items_only_on_eval(self) -> None:
+        import yaml
+
+        contract = yaml.safe_load(
+            ACCEPTANCE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        facts = [
+            fact_record("fact:added", status="added"),
+            fact_record("fact:stable", status="stable"),
+        ]
+        splits = [
+            split_record("fact:added", "eval"),
+            split_record("fact:stable", "eval"),
+        ]
+
+        items = build_items(
+            contract=contract,
+            fact_records=facts,
+            feature_records=[],
+            split_records=splits,
+            probe_results={},
+        )
+        audit = audit_items(items, splits, contract)
+
+        self.assertEqual(len(items), 2)
+        self.assertEqual({item["split"] for item in items}, {"eval"})
+        self.assertIn("v0.25.0 to v0.25.1", items[0]["prompt"])
+        self.assertEqual(audit["status"], "pass")
+        self.assertTrue(audit["acceptance_accessed"])
 
 
 class HumanAuditPacketTest(unittest.TestCase):

@@ -77,6 +77,8 @@ class ContractTest(unittest.TestCase):
             contract["acceptance_assignment"],
             {
                 "state": "sealed",
+                "unlock_condition": "validated-development-recipe-freeze",
+                "algorithm": "all-sources-eval-v1",
                 "future_split": "eval",
                 "development_builder_behavior": "reject",
             },
@@ -210,6 +212,47 @@ class AssignmentTest(unittest.TestCase):
         self.assertEqual(first_audit["status"], "pass")
         self.assertEqual(first_audit["eval_sources"], 0)
         self.assertFalse(first_audit["acceptance_accessed"])
+
+    def test_acceptance_is_sealed_then_assigns_every_source_to_eval(
+        self,
+    ) -> None:
+        contract = load_yaml(CONTRACT_PATH)
+        sources = collect_sources(
+            [
+                fact_record("fact:one", status="added"),
+                fact_record("fact:two", status="stable"),
+            ],
+            [],
+        )
+
+        with self.assertRaisesRegex(SourceSplitError, "sealed"):
+            build_assignments(
+                contract,
+                sources,
+                transition="acceptance",
+            )
+
+        rows = build_assignments(
+            contract,
+            sources,
+            transition="acceptance",
+            allow_acceptance=True,
+        )
+        audit = audit_assignments(
+            contract,
+            sources,
+            rows,
+            transition="acceptance",
+            allow_acceptance=True,
+        )
+
+        self.assertEqual({row["split"] for row in rows}, {"eval"})
+        self.assertEqual(
+            {row["transition"] for row in rows},
+            {"acceptance"},
+        )
+        self.assertEqual(audit["status"], "pass")
+        self.assertTrue(audit["acceptance_accessed"])
 
     def test_audit_detects_cross_split_leakage(self) -> None:
         contract = load_yaml(CONTRACT_PATH)

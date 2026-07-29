@@ -37,6 +37,8 @@ development_assignment:
 
 acceptance_assignment:
   state: sealed
+  unlock_condition: validated-development-recipe-freeze
+  algorithm: all-sources-eval-v1
   future_split: eval
   development_builder_behavior: reject
 

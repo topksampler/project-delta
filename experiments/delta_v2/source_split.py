@@ -21,7 +21,7 @@ FACT_SCHEMA = "delta.atomic_fact_delta.v1"
 FEATURE_SCHEMA = "delta.feature_delta.v1"
 ROW_SCHEMA = "delta.source_split_assignment.v1"
 SUMMARY_SCHEMA = "delta.source_split_audit.v1"
-SPLITS = ("train", "dev")
+SPLITS = ("train", "dev", "eval")
 STATUSES = {"stable", "added", "removed", "changed"}
 UINT64_SPACE = 1 << 64
 TRAIN_UPPER_EXCLUSIVE = (UINT64_SPACE * 4) // 5
@@ -96,13 +96,25 @@ def load_yaml(path: Path) -> Mapping[str, Any]:
     return _mapping(payload, str(path))
 
 
-def validate_contract(contract: Mapping[str, Any]) -> None:
+def validate_contract(
+    contract: Mapping[str, Any],
+    *,
+    transition: str = "development",
+    allow_acceptance: bool = False,
+) -> None:
     if contract.get("schema") != CONTRACT_SCHEMA:
         raise SourceSplitError("unsupported source split contract schema")
     _string(contract.get("contract_id"), "contract_id")
     _string(contract.get("repository"), "repository")
     if contract.get("transition") != "development":
-        raise SourceSplitError("source split builder may only use development")
+        raise SourceSplitError("source split contract must originate on development")
+    if transition not in {"development", "acceptance"}:
+        raise SourceSplitError(f"unsupported split transition: {transition}")
+    if transition == "acceptance" and not allow_acceptance:
+        raise SourceSplitError(
+            "acceptance transition is sealed; pass allow_acceptance only "
+            "after the development recipe freezes"
+        )
 
     eligible = _mapping(contract.get("eligible_sources"), "eligible_sources")
     facts = _mapping(
@@ -161,6 +173,9 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
     )
     if (
         acceptance.get("state") != "sealed"
+        or acceptance.get("unlock_condition")
+        != "validated-development-recipe-freeze"
+        or acceptance.get("algorithm") != "all-sources-eval-v1"
         or acceptance.get("future_split") != "eval"
         or acceptance.get("development_builder_behavior") != "reject"
     ):
@@ -305,18 +320,33 @@ def assignment_for_anchor(anchor: str, salt: str) -> dict[str, str]:
 def build_assignments(
     contract: Mapping[str, Any],
     sources: Mapping[str, Source],
+    *,
+    transition: str = "development",
+    allow_acceptance: bool = False,
 ) -> list[dict[str, Any]]:
-    validate_contract(contract)
+    validate_contract(
+        contract,
+        transition=transition,
+        allow_acceptance=allow_acceptance,
+    )
     units = build_units(sources)
     salt = str(contract["development_assignment"]["salt"])
     rows: list[dict[str, Any]] = []
     for anchor, members in units.items():
-        assignment = assignment_for_anchor(anchor, salt)
+        assignment = (
+            assignment_for_anchor(anchor, salt)
+            if transition == "development"
+            else {
+                "split": "eval",
+                "assignment_hash": "policy:all-sources-eval-v1",
+                "hash_prefix_u64": "not-applicable",
+            }
+        )
         unit_identity = "\0".join(
             (
                 "delta.source_split_unit.v1",
                 str(contract["repository"]),
-                "development",
+                transition,
                 anchor,
             )
         )
@@ -333,7 +363,7 @@ def build_assignments(
                     "source_kind": source.source_kind,
                     "status": source.status,
                     "family": source.family,
-                    "transition": "development",
+                    "transition": transition,
                     "split_unit_id": unit_id,
                     "unit_anchor_id": anchor,
                     "unit_member_count": len(members),
@@ -347,17 +377,34 @@ def audit_assignments(
     contract: Mapping[str, Any],
     sources: Mapping[str, Source],
     rows: Sequence[Mapping[str, Any]],
+    *,
+    transition: str = "development",
+    allow_acceptance: bool = False,
 ) -> dict[str, Any]:
-    validate_contract(contract)
+    validate_contract(
+        contract,
+        transition=transition,
+        allow_acceptance=allow_acceptance,
+    )
     source_ids = [str(row.get("source_id")) for row in rows]
     duplicate_source_ids = len(source_ids) != len(set(source_ids))
     missing_sources = sorted(set(sources) - set(source_ids))
     extra_sources = sorted(set(source_ids) - set(sources))
+    allowed_splits = (
+        {"train", "dev"} if transition == "development" else {"eval"}
+    )
     invalid_splits = sorted(
         {
             str(row.get("split"))
             for row in rows
-            if row.get("split") not in SPLITS
+            if row.get("split") not in allowed_splits
+        }
+    )
+    wrong_transitions = sorted(
+        {
+            str(row.get("transition"))
+            for row in rows
+            if row.get("transition") != transition
         }
     )
 
@@ -390,12 +437,13 @@ def audit_assignments(
         or missing_sources
         or extra_sources
         or invalid_splits
+        or wrong_transitions
         or cross_split_units
     )
     return {
         "schema": SUMMARY_SCHEMA,
         "contract_id": contract["contract_id"],
-        "transition": "development",
+        "transition": transition,
         "status": "pass" if audit_ok else "fail",
         "sources": len(rows),
         "units": len(splits_by_unit),
@@ -419,9 +467,10 @@ def audit_assignments(
         "missing_sources": missing_sources,
         "extra_sources": extra_sources,
         "invalid_splits": invalid_splits,
+        "wrong_transitions": wrong_transitions,
         "cross_split_units": cross_split_units,
         "eval_sources": split_counts.get("eval", 0),
-        "acceptance_accessed": False,
+        "acceptance_accessed": transition == "acceptance",
         "deterministic_order": source_ids == sorted(source_ids),
     }
 
@@ -469,10 +518,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--contract", type=Path, required=True)
     parser.add_argument("--facts", type=Path, required=True)
     parser.add_argument(
+        "--transition",
+        choices=("development", "acceptance"),
+        default="development",
+    )
+    parser.add_argument(
+        "--allow-acceptance",
+        action="store_true",
+        help="Unlock acceptance only after the development recipe freezes.",
+    )
+    parser.add_argument(
         "--feature-delta",
         action="append",
         type=Path,
-        required=True,
+        default=[],
     )
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--summary", type=Path, required=True)
@@ -504,8 +563,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         load_jsonl(args.facts),
         (load_yaml(path) for path in feature_paths),
     )
-    rows = build_assignments(contract, sources)
-    audit = audit_assignments(contract, sources, rows)
+    rows = build_assignments(
+        contract,
+        sources,
+        transition=args.transition,
+        allow_acceptance=args.allow_acceptance,
+    )
+    audit = audit_assignments(
+        contract,
+        sources,
+        rows,
+        transition=args.transition,
+        allow_acceptance=args.allow_acceptance,
+    )
     summary = write_outputs(rows, audit, inputs, args.out, args.summary)
     print(json.dumps(summary, indent=2, sort_keys=True))
     return 0 if summary["status"] == "pass" else 1

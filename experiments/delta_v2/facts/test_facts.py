@@ -11,7 +11,9 @@ from pathlib import Path
 import yaml
 
 from experiments.delta_v2.facts.build import (
+    build_facts,
     build_development_facts,
+    write_fact_outputs,
     write_development_outputs,
 )
 from experiments.delta_v2.facts.model import (
@@ -496,6 +498,54 @@ class DevelopmentBuildIntegrationTest(unittest.TestCase):
                 for row in first.after.observations
             },
             {"development_after"},
+        )
+
+    def test_acceptance_reuses_frozen_family_recipe_only_after_unlock(
+        self,
+    ) -> None:
+        self.write_source(after=False)
+        before = self.commit("before")
+        self.write_source(after=True)
+        after = self.commit("after")
+        fact_manifest = self.write_manifests(before, after)
+
+        with self.assertRaisesRegex(FactExtractionError, "sealed"):
+            build_facts(
+                repo=self.repo,
+                fact_manifest_path=fact_manifest,
+                transition="acceptance",
+            )
+
+        build = build_facts(
+            repo=self.repo,
+            fact_manifest_path=fact_manifest,
+            transition="acceptance",
+            allow_acceptance=True,
+        )
+        summary = write_fact_outputs(build, self.root / "acceptance")
+
+        self.assertEqual(summary["transition"], "acceptance")
+        self.assertEqual(
+            summary["fact_families_preregistered_on"],
+            "development",
+        )
+        self.assertEqual(
+            {
+                row.evidence.snapshot_role
+                for row in build.before.observations
+            },
+            {"acceptance_before"},
+        )
+        self.assertEqual(
+            {
+                row.evidence.snapshot_role
+                for row in build.after.observations
+            },
+            {"acceptance_after"},
+        )
+        self.assertEqual(
+            summary["outputs"]["deltas"]["filename"],
+            "atomic_fact_deltas_acceptance.jsonl",
         )
 
 

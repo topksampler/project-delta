@@ -22,7 +22,8 @@ AUDIT_ROW_SCHEMA = "delta.human_eval_audit_item.v1"
 SUMMARY_SCHEMA = "delta.eval_item_build_audit.v1"
 FACT_STATUSES = ("stable", "added", "removed", "changed")
 NONSTABLE_STATUSES = {"added", "removed", "changed"}
-ALLOWED_SPLITS = {"train", "dev"}
+DEVELOPMENT_SPLITS = {"train", "dev"}
+ACCEPTANCE_SPLITS = {"eval"}
 FEATURE_TASK = "feature_behavior_matrix"
 FACT_TASK = "atomic_fact_change_status"
 
@@ -90,8 +91,9 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
     if contract.get("schema") != CONTRACT_SCHEMA:
         raise EvalBuildError("unsupported EvalItem contract schema")
     _string(contract.get("contract_id"), "contract_id")
-    if contract.get("transition") != "development":
-        raise EvalBuildError("EvalItem builder may only use development")
+    transition = contract.get("transition")
+    if transition not in {"development", "acceptance"}:
+        raise EvalBuildError("unsupported EvalItem transition")
     if contract.get("source_split_contract_id") != (
         "delta-v2-development-source-split-v1"
     ):
@@ -119,11 +121,14 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
     _string(controls.get("salt"), "stable_controls.salt")
 
     features = _mapping(eligibility.get("feature_delta"), "feature_delta")
-    if (
-        features.get("include") != "all-promoted"
-        or features.get("required_probe_scope") != "complete-candidate"
-    ):
-        raise EvalBuildError("only promoted features may be eligible")
+    if transition == "development":
+        if (
+            features.get("include") != "all-promoted"
+            or features.get("required_probe_scope") != "complete-candidate"
+        ):
+            raise EvalBuildError("only promoted features may be eligible")
+    elif features.get("include") != "none":
+        raise EvalBuildError("acceptance features remain excluded")
 
     templates = _mapping(contract.get("templates"), "templates")
     fact_template = _mapping(
@@ -134,29 +139,32 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
         raise EvalBuildError("fact response labels must be exact")
     if fact_template.get("scorer") != "exact-enum-v1":
         raise EvalBuildError("unsupported fact scorer")
-    feature_template = _mapping(
-        templates.get(FEATURE_TASK),
-        f"templates.{FEATURE_TASK}",
-    )
-    if feature_template.get("scorer") != "exact-structured-json-v1":
-        raise EvalBuildError("unsupported feature scorer")
-    if feature_template.get("feature_id") != (
-        "feature:vllm-prefix-cache-retention"
-    ):
-        raise EvalBuildError("unexpected feature template")
-    response_schema = _mapping(
-        feature_template.get("response_schema"),
-        "feature response_schema",
-    )
-    expected_feature_gold = {
-        "unset": "dense",
-        "positive_aligned_interval": "sparse_interval_plus_latest_boundary",
-        "zero": "latest_boundary_only",
-        "negative": "rejected",
-        "misaligned": "rejected",
-    }
-    if dict(response_schema) != expected_feature_gold:
-        raise EvalBuildError("feature response schema changed")
+    if transition == "development":
+        feature_template = _mapping(
+            templates.get(FEATURE_TASK),
+            f"templates.{FEATURE_TASK}",
+        )
+        if feature_template.get("scorer") != "exact-structured-json-v1":
+            raise EvalBuildError("unsupported feature scorer")
+        if feature_template.get("feature_id") != (
+            "feature:vllm-prefix-cache-retention"
+        ):
+            raise EvalBuildError("unexpected feature template")
+        response_schema = _mapping(
+            feature_template.get("response_schema"),
+            "feature response_schema",
+        )
+        expected_feature_gold = {
+            "unset": "dense",
+            "positive_aligned_interval": "sparse_interval_plus_latest_boundary",
+            "zero": "latest_boundary_only",
+            "negative": "rejected",
+            "misaligned": "rejected",
+        }
+        if dict(response_schema) != expected_feature_gold:
+            raise EvalBuildError("feature response schema changed")
+    elif FEATURE_TASK in templates:
+        raise EvalBuildError("acceptance has no frozen feature template")
 
     generator = _mapping(contract.get("generator"), "generator")
     if (
@@ -165,16 +173,39 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
     ):
         raise EvalBuildError("teacher models must not define EvalItems")
     revisions = _mapping(generator.get("revisions"), "generator.revisions")
-    if dict(revisions) != {"before": "v0.22.0", "after": "v0.23.0"}:
-        raise EvalBuildError("unexpected development revisions")
+    expected_revisions = {
+        "development": {"before": "v0.22.0", "after": "v0.23.0"},
+        "acceptance": {"before": "v0.25.0", "after": "v0.25.1"},
+    }
+    if dict(revisions) != expected_revisions[str(transition)]:
+        raise EvalBuildError(f"unexpected {transition} revisions")
 
     split_policy = _mapping(contract.get("split_policy"), "split_policy")
+    allowed_splits = (
+        DEVELOPMENT_SPLITS
+        if transition == "development"
+        else ACCEPTANCE_SPLITS
+    )
     if (
         split_policy.get("invariant") != "every-item-inherits-source-split"
-        or split_policy.get("development_eval_items") != "forbidden"
-        or split_policy.get("acceptance_future_split") != "eval"
+        or set(
+            _string_list(
+                split_policy.get("allowed_splits"),
+                "split_policy.allowed_splits",
+            )
+        )
+        != allowed_splits
     ):
         raise EvalBuildError("invalid EvalItem split policy")
+    if transition == "development" and (
+        split_policy.get("development_eval_items") != "forbidden"
+        or split_policy.get("acceptance_future_split") != "eval"
+    ):
+        raise EvalBuildError("invalid development split policy")
+    if transition == "acceptance" and (
+        split_policy.get("acceptance_eval_items") != "required"
+    ):
+        raise EvalBuildError("invalid acceptance split policy")
 
     human_audit = _mapping(contract.get("human_audit"), "human_audit")
     if (
@@ -192,7 +223,10 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
 def index_splits(
     records: Iterable[Mapping[str, Any]],
     expected_contract_id: str,
+    allowed_splits: set[str] | None = None,
 ) -> dict[str, str]:
+    if allowed_splits is None:
+        allowed_splits = DEVELOPMENT_SPLITS
     splits: dict[str, str] = {}
     for record in records:
         if record.get("schema") != SPLIT_SCHEMA:
@@ -201,8 +235,8 @@ def index_splits(
             raise EvalBuildError("source split contract mismatch")
         source_id = _string(record.get("source_id"), "split.source_id")
         split = _string(record.get("split"), "split")
-        if split not in ALLOWED_SPLITS:
-            raise EvalBuildError("development source cannot be assigned to eval")
+        if split not in allowed_splits:
+            raise EvalBuildError(f"source cannot be assigned to {split}")
         if source_id in splits:
             raise EvalBuildError(f"duplicate split source: {source_id}")
         splits[source_id] = split
@@ -313,8 +347,9 @@ def build_fact_item(
     family_label, display_name = _display_fact(record)
     generator_version = str(contract["generator"]["version"])
     template = contract["templates"][FACT_TASK]
+    revisions = contract["generator"]["revisions"]
     prompt = (
-        "Across vLLM v0.22.0 to v0.23.0, how did the "
+        f"Across vLLM {revisions['before']} to {revisions['after']}, how did the "
         f"{family_label} `{display_name}` change? Answer with exactly one "
         "label: stable, added, removed, or changed."
     )
@@ -406,8 +441,9 @@ def build_feature_item(
         raise EvalBuildError(f"no feature template for {feature_id}")
     generator_version = str(contract["generator"]["version"])
     gold = _feature_gold_from_probe(probe_result, contract)
+    after_revision = contract["generator"]["revisions"]["after"]
     prompt = (
-        "For vLLM v0.23.0, return a JSON object describing the verified "
+        f"For vLLM {after_revision}, return a JSON object describing the verified "
         "`VLLM_PREFIX_CACHE_RETENTION_INTERVAL` behavior. Use exactly these "
         "keys: `unset`, `positive_aligned_interval`, `zero`, `negative`, and "
         "`misaligned`. Use only the behavior labels `dense`, "
@@ -448,7 +484,12 @@ def build_items(
     probe_results: Mapping[str, Mapping[str, Any]],
 ) -> list[dict[str, Any]]:
     validate_contract(contract)
-    splits = index_splits(split_records, str(contract["source_split_contract_id"]))
+    allowed_splits = set(contract["split_policy"]["allowed_splits"])
+    splits = index_splits(
+        split_records,
+        str(contract["source_split_contract_id"]),
+        allowed_splits,
+    )
     items: list[dict[str, Any]] = []
     for fact, reason in select_fact_records(fact_records, splits, contract):
         items.append(
@@ -459,6 +500,12 @@ def build_items(
                 contract=contract,
             )
         )
+    feature_records = list(feature_records)
+    if (
+        contract["eligibility"]["feature_delta"]["include"] == "none"
+        and feature_records
+    ):
+        raise EvalBuildError("feature records supplied to fact-only acceptance")
     for feature in feature_records:
         validate_feature_delta(feature)
         feature_id = str(feature["feature_id"])
@@ -497,7 +544,12 @@ def audit_items(
     split_records: Iterable[Mapping[str, Any]],
     contract: Mapping[str, Any],
 ) -> dict[str, Any]:
-    splits = index_splits(split_records, str(contract["source_split_contract_id"]))
+    allowed_splits = set(contract["split_policy"]["allowed_splits"])
+    splits = index_splits(
+        split_records,
+        str(contract["source_split_contract_id"]),
+        allowed_splits,
+    )
     eval_ids = [str(item.get("eval_id")) for item in items]
     source_ids = [str(item.get("source_id")) for item in items]
     split_mismatches = sorted(
@@ -509,7 +561,7 @@ def audit_items(
         {
             str(item.get("split"))
             for item in items
-            if item.get("split") not in ALLOWED_SPLITS
+            if item.get("split") not in allowed_splits
         }
     )
     selected_counts = Counter(
@@ -554,7 +606,7 @@ def audit_items(
         "task_counts": dict(sorted(task_counts.items())),
         "fact_status_counts": dict(sorted(status_counts.items())),
         "eval_items": split_counts.get("eval", 0),
-        "acceptance_accessed": False,
+        "acceptance_accessed": contract["transition"] == "acceptance",
         "deterministic_order": eval_ids == sorted(eval_ids),
     }
 
@@ -717,14 +769,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--feature-delta",
         action="append",
         type=Path,
-        required=True,
+        default=[],
     )
     parser.add_argument("--splits", type=Path, required=True)
     parser.add_argument(
         "--probe-result",
         action="append",
         type=_parse_probe_result,
-        required=True,
+        default=[],
     )
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--summary", type=Path, required=True)
