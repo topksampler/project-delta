@@ -1,0 +1,220 @@
+schema: delta.eval_environment.v1
+
+environment_id: delta-v2-vllm-source-build-v1
+experiment_id: delta_v2
+repository: vllm-project/vllm
+code_commit: 399ee886566ade2cb40d4673cac2e0bf4e220c09
+freeze_state: frozen
+publication_state: local-reproducible-not-published
+
+module_status:
+  sense_source_change: implemented
+  sense_target_model_drift: deferred
+  build_fact_environment: implemented
+  build_development_feature_proof: implemented
+  build_acceptance_feature_eval: partial
+  decide: deferred
+  adapt: deferred
+  verify: deferred
+  memory: deferred
+
+truth_policy:
+  gold_authority: deterministic-source-and-executable-evidence
+  llm_role: review-only
+  llm_may_change_gold: false
+  conflict_action: fail-build
+
+dataset_contract:
+  development:
+    transition: v0.22.0-to-v0.23.0
+    train_items: 65
+    dev_items: 22
+    eval_items: 0
+    verified_feature_items: 1
+  acceptance:
+    transition: v0.25.1-to-v0.26.0
+    train_items: 0
+    dev_items: 0
+    eval_items: 42
+    added_items: 21
+    stable_control_items: 21
+    verified_feature_items: 0
+  scorers:
+    - exact-enum-v1
+    - exact-structured-json-v1
+  cross_transition_source_overlap: 0
+
+execution:
+  target_model_runs: 0
+  training_runs: 0
+  fine_tuning_runs: 0
+  forbidden_without_separate_authorization:
+    - target-model-run
+    - training
+    - fine-tuning
+    - modal-job
+    - lambda-job
+    - b2-write
+
+limitations:
+  - acceptance-facts-only
+  - acceptance-additions-and-stable-controls-only
+  - acceptance-feature-eval-not-generalized
+  - acceptance-selection-amended-after-unseal
+  - acceptance-endpoint-seen-in-prior-broad-e1-work
+  - no-target-model-result
+
+test_gate:
+  command:
+    - python
+    - -m
+    - unittest
+    - discover
+    - -s
+    - experiments/delta_v2
+    - -p
+    - test_*.py
+  expected_tests: 124
+
+bindings:
+  - id: environment_freeze_validator
+    path: experiments/delta_v2/freeze_environment.py
+    sha256: c7dbdfa6798c7a3d58017cba145f58495608d6a22abce6025a8deeb9dc0a7cb3
+  - id: snapshots
+    path: experiments/delta_v2/snapshots.yaml
+    sha256: 31787a2e6c2ce3b8b358b82e5f6e1fa301132befd30c6c316cbd68799b986a56
+  - id: fact_family_contract
+    path: experiments/delta_v2/fact_families.yaml
+    sha256: aaf99951fe7da6da4aa5bacb1b63187f4c46131703d30fab1666be4d02a3d210
+  - id: source_split_contract
+    path: experiments/delta_v2/source_split_contract.yaml
+    sha256: 67c4d8891f064e5b21adb0969dfdc46cd3ecb50797493618bbc2251036465cdf
+  - id: development_eval_contract
+    path: experiments/delta_v2/eval_item_contract.yaml
+    sha256: b5a2b26789816096afa2c98df1552e97c85d1439da9ba595750cd84461d27cce
+  - id: acceptance_eval_contract
+    path: experiments/delta_v2/acceptance_eval_item_contract_v2.yaml
+    sha256: ebc8556d2e816fdd7d40ba454c9656aac45b26633097e1a3499651ab549fb6f2
+  - id: development_judge_contract
+    path: experiments/delta_v2/llm_judge_contract.yaml
+    sha256: 38c1c4ea2c7fcf2c4af0622d4ed7b35b18e51ea4e0a238c6d25e2b5fa78ddb56
+  - id: acceptance_judge_contract
+    path: experiments/delta_v2/acceptance_llm_judge_contract_v2.yaml
+    sha256: fe56be6d26cbce20151a9a1d5635d91269456e36a8c6e29140316dab92761467
+  - id: inventory_builder
+    path: experiments/delta_v2/inventory.py
+    sha256: 9d06b83d2624b0102ce82e4c98d01cacbf854ca6414971658d00dc9d1b3a793e
+  - id: fact_builder
+    path: experiments/delta_v2/facts/build.py
+    sha256: e408b00168d68d76851030955ea03cf9a97a4f1ecf6ae7976b3c915e85d2d284
+  - id: eval_builder
+    path: experiments/delta_v2/build_eval.py
+    sha256: eb00db1c234ab38411556e57e047834cb975e46d019307ed0524299399869a49
+  - id: judge_validator
+    path: experiments/delta_v2/judge_eval.py
+    sha256: 9de1a153ea34e7619eb79bcfa73bb11dd929ff085ca03c840c7b1ee82751d0ae
+  - id: development_feature_candidate
+    path: experiments/delta_v2/features/prefix_cache_retention_candidate.yaml
+    sha256: 8944bd6379a23c08d03dc6cbe54a4afd2d52dea376a09e41c96411dc50798965
+  - id: development_feature_delta
+    path: experiments/delta_v2/features/prefix_cache_retention_feature_delta.yaml
+    sha256: 85852d298636f40ce9f947a87c2edf3c48440207890669d901b2373150711229
+  - id: development_probe_environment
+    path: experiments/delta_v2/probes/prefix_cache_retention_env.yaml
+    sha256: e059d041d4653440526ad84539a3810b0027fc0e575ef73f4653ab87aa6f677b
+  - id: development_probe_contract
+    path: experiments/delta_v2/probes/prefix_cache_retention_mechanics.yaml
+    sha256: cef4622d27fc236b1ce7f8ccf655d60da1bb5366489eb2375e6957b808dd5cc2
+  - id: development_pull_request_provenance
+    path: experiments/delta_v2/provenance/pull_requests/43447.yaml
+    sha256: 6874dbda00db4a3ddb0474c95f1336b91bceddb1f4d7d6fad8fbb3ed9bb0da70
+  - id: development_judge_attestation
+    path: artifacts/reports/delta_v2/development_llm_judge_attestation.yaml
+    sha256: 3a4d8c062958d885811e948d6e99ecd69df77bc2a7e38f1922390c7a6c84deea
+  - id: acceptance_judge_attestation
+    path: artifacts/reports/delta_v2/acceptance_llm_judge_attestation_v2.yaml
+    sha256: fa1b9a41148ace4bacf16691acbf7f57d1cf1ae0e5bea1c0ba8290b8ee0d62e9
+  - id: acceptance_leakage_report
+    path: artifacts/reports/delta_v2/acceptance_source_leakage_audit.md
+    sha256: b29997c069c6fb6f51aa1916983ee37e9d51964787bb833d73172147848acb3e
+  - id: development_file_deltas
+    path: data/experiments/delta_v2/file_deltas_development.jsonl
+    sha256: 129831f4b6fa4b0604fe2c1f31854947df66df3dd4bf9101700e2386cb95c6b9
+  - id: development_file_inventory_summary
+    path: data/experiments/delta_v2/file_deltas_development.summary.json
+    sha256: fd8e157130b5390f3873e16a09a6c31b324f950c263f6c0e79d9c6ed0cd1c097
+  - id: development_facts
+    path: data/experiments/delta_v2/facts/atomic_fact_deltas_development.jsonl
+    sha256: a5827d0a66289552bc707f75e20ce4ecd74a1e22dba6b3144a87ab8f27241017
+  - id: development_fact_summary
+    path: data/experiments/delta_v2/facts/atomic_fact_extraction_development.summary.json
+    sha256: ebf9b3a48c01da8db510651235b61bca26ea7983f795a13a834fabf996bc6364
+  - id: development_probe_environment_result
+    path: data/experiments/delta_v2/probes/prefix_cache_retention_env.result.json
+    sha256: 2838adddfc48ef334a948c9d9e2d55a34abf37a07be59cdf1cce270a1fcea884
+  - id: development_probe_mechanics_result
+    path: data/experiments/delta_v2/probes/prefix_cache_retention_mechanics.result.json
+    sha256: 0180c2e7a688a4a87c1a418c4ced09289f1d51c447337f56835f3d3d08d4587b
+  - id: development_source_splits
+    path: data/experiments/delta_v2/splits/development_source_splits.jsonl
+    sha256: 6961545f88805c962390b79ba44ebeee3613472113682940e83b42aae0839f53
+  - id: development_source_split_summary
+    path: data/experiments/delta_v2/splits/development_source_splits.summary.json
+    sha256: 986bf9497029f5d264bb9f8c7511f5b3ebfd1461278c2408fe2bc64cc4d67046
+  - id: development_eval_items
+    path: data/experiments/delta_v2/eval/development_eval_items.jsonl
+    sha256: db169943888ec2258d6b43638a07e5c4c85998a5a50524eec3709258096c3059
+  - id: development_eval_summary
+    path: data/experiments/delta_v2/eval/development_eval_items.summary.json
+    sha256: 2070adb6cb4d772126ceaf64956f99e9953109ae3449293543d31d9a6c491082
+  - id: development_audit_packet
+    path: data/experiments/delta_v2/eval/development_human_audit_packet.jsonl
+    sha256: 31b70ad2327b35a2531c2798ef065e3b6e1a5464fceec46bdcbc319384c495ea
+  - id: development_judge_evidence
+    path: data/experiments/delta_v2/eval/development_llm_judge_evidence.jsonl
+    sha256: 43712d6b7da6293b777b9536c995920e5fd3ebf0b548d46cf1aa675fcbf08ed0
+  - id: development_judge_verdicts
+    path: data/experiments/delta_v2/eval/development_llm_judge_verdicts.jsonl
+    sha256: 3a28ed44016acf6071be8f7ca4c3fcebe7bd99cc39407b620bb635a5a5a72d82
+  - id: development_judge_summary
+    path: data/experiments/delta_v2/eval/development_llm_judge.summary.json
+    sha256: 8ea4a31cffd46fabfe0fa80707229db8095a91b435e173343074437f92ce70b0
+  - id: acceptance_file_deltas
+    path: data/experiments/delta_v2/acceptance_attempt_2/file_deltas_acceptance.jsonl
+    sha256: c66545a969e614ba8c1292176f57482b5850253c2932f66f05decfd1144d11c2
+  - id: acceptance_file_inventory_summary
+    path: data/experiments/delta_v2/acceptance_attempt_2/file_deltas_acceptance.summary.json
+    sha256: 73bf1566cb4a511cc0151864dc5c60366157dcac012f9dfe1702fd6eb998ed61
+  - id: acceptance_facts
+    path: data/experiments/delta_v2/acceptance_attempt_2/facts/atomic_fact_deltas_acceptance.jsonl
+    sha256: 52f5f8bfa247550ef50277657900725db6ed8cc99bc3fe21d8a112629ffec75a
+  - id: acceptance_fact_summary
+    path: data/experiments/delta_v2/acceptance_attempt_2/facts/atomic_fact_extraction_acceptance.summary.json
+    sha256: 8b9b17bd7287592d057b3160672d76c138aaee0a1f78a3c07744df302011cc2a
+  - id: acceptance_source_splits
+    path: data/experiments/delta_v2/acceptance_attempt_2/splits/acceptance_source_splits.jsonl
+    sha256: 3b193da59d878d112494555dc28b794cc6fb5bc97af17dade46fa2f56fa70550
+  - id: acceptance_source_split_summary
+    path: data/experiments/delta_v2/acceptance_attempt_2/splits/acceptance_source_splits.summary.json
+    sha256: 60998bb1a06517e4be153ffa0200134037f56e3d6b7e3fcd4b345ebea96b16a3
+  - id: acceptance_eval_items
+    path: data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_eval_items_v2.jsonl
+    sha256: 38d3324a0cde106349394f9d6ebf55954aace3d3efc38ecd4b8f3379a73e2a08
+  - id: acceptance_eval_exclusions
+    path: data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_eval_exclusions_v2.jsonl
+    sha256: 806c6f3adc6107cb641322412db5f3e4f4d51129eaec92364e06c3547f2f343a
+  - id: acceptance_eval_summary
+    path: data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_eval_items_v2.summary.json
+    sha256: 517d6a7efe9ed190b538b42ca9905be9b00e5fad10e3538cd9d99fa626f2f8be
+  - id: acceptance_audit_packet
+    path: data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_audit_packet_v2.jsonl
+    sha256: 461cb4d11371d2c28333c47ad6ae1d57b7cac04ac1e88b9dfaba3927d329bcb8
+  - id: acceptance_judge_evidence
+    path: data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_llm_judge_evidence_v2.jsonl
+    sha256: a7cfc5525d93efb1e141c686317f8a6c58c42b29c35e58a28e9e1a886d5819e7
+  - id: acceptance_judge_verdicts
+    path: data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_llm_judge_verdicts_v2.jsonl
+    sha256: 1c5b96c796d727df2c84d1abeba663ff36c756d25886744fd4c5ea806524a66b
+  - id: acceptance_judge_summary
+    path: data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_llm_judge_v2.summary.json
+    sha256: f742d06e65faf8d8b059726c1a524f7197547601b21a2dbb0b7bd72ba7bfa539
