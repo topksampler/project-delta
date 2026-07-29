@@ -29,7 +29,7 @@ from experiments.delta_v2.baseline_protocol import (
 
 RUN_CONFIG_SCHEMA = "delta.target_model_run_config.v1"
 RUN_RECEIPT_SCHEMA = "delta.target_model_run_receipt.v1"
-EXPECTED_RUN_ID = "delta-v2-c0-base-qwen35-08b-modal-v1"
+EXPECTED_RUN_ID = "delta-v2-c0-base-qwen35-08b-modal-v2"
 EXPECTED_PROTOCOL_PATH = Path(
     "experiments/delta_v2/target_baseline_protocol.yaml"
 )
@@ -120,10 +120,18 @@ def validate_run_config(
 
     runtime = _mapping(config.get("runtime"), "runtime")
     if dict(runtime) != {
-        "profile": "delta-v2-baseline-modal-v1",
+        "profile": "delta-v2-baseline-modal-v2",
         "python": "3.11.9",
-        "torch": "2.10.0",
-        "transformers": "5.14.1",
+        "packages": {
+            "torch": "2.10.0",
+            "torchvision": "0.25.0",
+            "transformers": "5.14.1",
+            "pillow": "12.1.0",
+            "sentencepiece": "0.2.1",
+            "protobuf": "6.33.4",
+            "pyyaml": "6.0.3",
+            "safetensors": "0.8.0",
+        },
         "device": "cuda",
         "dtype": "bfloat16",
         "attention_implementation": "eager",
@@ -187,16 +195,18 @@ def validate_runtime(config: Mapping[str, Any]) -> dict[str, Any]:
     """Check the real worker before any model repository access."""
 
     runtime = _mapping(config.get("runtime"), "runtime")
-    observed = {
-        "python": platform.python_version(),
-        "torch": _installed_version("torch"),
-        "transformers": _installed_version("transformers"),
-    }
-    expected = {
-        "python": str(runtime["python"]),
-        "torch": str(runtime["torch"]),
-        "transformers": str(runtime["transformers"]),
-    }
+    packages = _mapping(runtime.get("packages"), "runtime.packages")
+    observed = {"python": platform.python_version()}
+    observed.update(
+        {
+            package: _installed_version(package)
+            for package in packages
+        }
+    )
+    expected = {"python": str(runtime["python"])}
+    expected.update(
+        {package: str(package_version) for package, package_version in packages.items()}
+    )
     normalized = {
         key: value.split("+", 1)[0] for key, value in observed.items()
     }

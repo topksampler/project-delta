@@ -39,7 +39,7 @@ image = (
         "pillow==12.1.0",
         "sentencepiece==0.2.1",
         "protobuf==6.33.4",
-        "safetensors==0.7.0",
+        "safetensors==0.8.0",
     )
     .env(
         {
