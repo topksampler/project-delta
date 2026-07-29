@@ -1,0 +1,136 @@
+{
+  "affected_claim_ids": [
+    "vllm:cli_flag:--bfcl-categories",
+    "vllm:cli_flag:--dataset-name",
+    "vllm:cli_flag:--diffusion-config",
+    "vllm:cli_flag:--enable-bf16x3-router-gemm",
+    "vllm:cli_flag:--enable-moe-shared-loras",
+    "vllm:cli_flag:--enable-multimodal-chat",
+    "vllm:cli_flag:--enable-ssl-refresh",
+    "vllm:cli_flag:--host",
+    "vllm:cli_flag:--jit-monitor-mode",
+    "vllm:cli_flag:--model-class-overrides",
+    "vllm:cli_flag:--prefix-match-unit",
+    "vllm:cli_flag:--root-path",
+    "vllm:cli_flag:--self-timed",
+    "vllm:cli_flag:--ssl-keyfile",
+    "vllm:cli_flag:--timed-trace-label-hash-ids",
+    "vllm:config_field:vllm.config.cache.CacheConfig.hash_block_size",
+    "vllm:config_field:vllm.config.cache.CacheConfig.kv_cache_size_tokens",
+    "vllm:config_field:vllm.config.cache.CacheConfig.skip_page_size_padded",
+    "vllm:config_field:vllm.config.diffusion.DiffusionConfig.max_denoising_steps",
+    "vllm:config_field:vllm.config.kernel.KernelConfig.enable_bf16x3_router_gemm",
+    "vllm:config_field:vllm.config.model.ModelConfig.max_logprobs",
+    "vllm:config_field:vllm.config.model.ModelConfig.sleep_mode_backend",
+    "vllm:config_field:vllm.config.multimodal.MultiModalConfig.mm_ipc_gpu_memory_gb",
+    "vllm:config_field:vllm.config.observability.ObservabilityConfig.jit_monitor_verbose",
+    "vllm:config_field:vllm.config.parallel.ParallelConfig.data_parallel_size",
+    "vllm:config_field:vllm.config.parallel.ParallelConfig.data_parallel_size_local",
+    "vllm:config_field:vllm.config.parallel.ParallelConfig.dbo_prefill_token_threshold",
+    "vllm:config_field:vllm.config.parallel.ParallelConfig.nnodes",
+    "vllm:config_field:vllm.config.parallel.ParallelConfig.node_rank",
+    "vllm:config_field:vllm.config.parallel.ParallelConfig.pipeline_parallel_size",
+    "vllm:config_field:vllm.config.parallel.ParallelConfig.tensor_parallel_size",
+    "vllm:config_field:vllm.config.profiler.ProfilerConfig.capture_torch_profiler",
+    "vllm:config_field:vllm.config.scheduler.SchedulerConfig.watermark",
+    "vllm:config_field:vllm.config.speculative.SpeculativeConfig.kv_cache_dtype",
+    "vllm:config_field:vllm.config.speculative.SpeculativeConfig.use_heterogeneous_vocab",
+    "vllm:env_var:VLLM_BUILD_PIPELINE",
+    "vllm:env_var:VLLM_BUILD_URL",
+    "vllm:env_var:VLLM_CI_USE_S3",
+    "vllm:env_var:VLLM_DEEPEP_V2_ALLOW_HYBRID_MODE",
+    "vllm:env_var:VLLM_DEEPEP_V2_ALLOW_MULTIPLE_REDUCTION",
+    "vllm:env_var:VLLM_EC_SIDE_CHANNEL_HOST",
+    "vllm:env_var:VLLM_EC_SIDE_CHANNEL_PORT",
+    "vllm:env_var:VLLM_FLASHINFER_AUTOTUNE_SKIP_OPS",
+    "vllm:env_var:VLLM_IMAGE_TAG",
+    "vllm:env_var:VLLM_MORIIO_CONNECTOR_READ_MODE",
+    "vllm:env_var:VLLM_P2P_SIDE_CHANNEL_PORT",
+    "vllm:env_var:VLLM_ROCM_AITER_MOE_DISPATCH_POLICY",
+    "vllm:env_var:VLLM_RPC_TIMEOUT",
+    "vllm:env_var:VLLM_TPU_MOST_MODEL_LEN",
+    "vllm:env_var:VLLM_TRITON_ATTN_USE_TD",
+    "vllm:env_var:VLLM_TRITON_USE_TD",
+    "vllm:env_var:VLLM_WORKER_SHUTDOWN_TIMEOUT_SECONDS",
+    "vllm:env_var:VLLM_WSL2_ENABLE_PIN_MEMORY"
+  ],
+  "behavioral_failures": {
+    "failure_mass": {
+      "added": 0.4116,
+      "changed": 0.9306,
+      "removed": 0.3333,
+      "stable": 0.7915
+    },
+    "n_samples": 756,
+    "scoreboard": "eval_factory",
+    "scores": {
+      "added": 0.5884,
+      "changed": 0.0694,
+      "removed": 0.6667,
+      "stable": 0.2085
+    }
+  },
+  "drift_event_id": "3bbd871b1025913c1c6bb328787ad63b0fa86c7386cf100fc845f4674c5a7b2a",
+  "drift_score": 0.9306,
+  "drift_types": [
+    "added",
+    "changed",
+    "removed"
+  ],
+  "metadata": {
+    "eval_environment_schema": "delta.eval_environment.v1",
+    "summary_schema": "delta.eval_factory.run_summary.v1"
+  },
+  "paths": {
+    "manifest": "data/experiments/e1_vllm/eval_factory/v0.22.0_to_v0.26.0/e1_eval_factory_v1/manifest.json",
+    "probes": "data/experiments/e1_vllm/eval_factory/v0.22.0_to_v0.26.0/e1_eval_factory_v1/probes_eval.jsonl",
+    "summary": "artifacts/reports/e1-vllm-eval-factory-v022-v026-base-qwen35-08b-modal_summary.json"
+  },
+  "schema_id": "delta.drift_event.v2",
+  "source_after": {
+    "alias": "doc_11",
+    "commit_sha": "568afb3a13806beb53bb2e6bd518269357b237c0",
+    "content_sha": "043cdecaf835293aaf45ef8b3745ba536f27c51e92ed7b10517363953847418d",
+    "git_tag": "v0.26.0",
+    "version": "0.26.0"
+  },
+  "source_before": {
+    "alias": "doc_0",
+    "commit_sha": "0b3ba88f165976e77ca5e6a7a3f5bba4562b80af",
+    "content_sha": "ce26077d691e4797d052ee707c5083806d1d5f8fdccbaa560435c695f5af6ac3",
+    "git_tag": "v0.22.0",
+    "version": "0.22.0"
+  },
+  "structural_census": {
+    "by_family_status": {
+      "cli_flag": {
+        "added": 23,
+        "changed": 7,
+        "removed": 7,
+        "stable": 355
+      },
+      "config_field": {
+        "added": 28,
+        "changed": 20,
+        "removed": 4,
+        "stable": 418
+      },
+      "env_var": {
+        "added": 34,
+        "changed": 2,
+        "removed": 10,
+        "stable": 209
+      },
+      "public_export": {
+        "stable": 22
+      }
+    },
+    "by_status": {
+      "added": 85,
+      "changed": 29,
+      "removed": 21,
+      "stable": 1004
+    },
+    "claims": 1139
+  }
+}

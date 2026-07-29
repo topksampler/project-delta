@@ -1,0 +1,120 @@
+{
+  "c0_nohint": {
+    "run_id": "e1-vllm-eval-factory-v1-base-qwen35-08b-modal",
+    "avg": 0.577,
+    "exact": 0.512,
+    "by_drift": {
+      "added": 0.725,
+      "changed": 0.0,
+      "removed": 0.75,
+      "stable": 0.5814
+    },
+    "failure_mode": {
+      "correct": 319,
+      "wrong": 139,
+      "stale_version": 117,
+      "abstain_wrong": 48
+    },
+    "retrieval": null,
+    "cost_usd": 0.0432,
+    "billable_s": 141.26
+  },
+  "c0_boolhint": {
+    "run_id": "e1-vllm-eval-factory-v1-base-boolhint-qwen35-08b-modal",
+    "avg": 0.3303,
+    "exact": 0.2648,
+    "by_drift": {
+      "added": 0.7,
+      "changed": 0.0,
+      "removed": 0.75,
+      "stable": 0.3264
+    },
+    "failure_mode": {
+      "correct": 165,
+      "wrong": 319,
+      "stale_version": 88,
+      "abstain_wrong": 51
+    },
+    "retrieval": null,
+    "cost_usd": 0.071,
+    "billable_s": 232.43
+  },
+  "c1_fresh": {
+    "run_id": "e1-vllm-eval-factory-v1-c1-rag-fresh-qwen35-08b-modal",
+    "avg": 0.2111,
+    "exact": 0.0803,
+    "by_drift": {
+      "added": 0.675,
+      "changed": 0.0,
+      "removed": 0.75,
+      "stable": 0.2035
+    },
+    "failure_mode": {
+      "stale_version": 108,
+      "wrong": 394,
+      "abstain_wrong": 71,
+      "correct": 50
+    },
+    "retrieval": {
+      "enabled": true,
+      "mode": "bm25",
+      "top_k": 4,
+      "seed": null,
+      "hit_rate_nonempty": 1.0
+    },
+    "cost_usd": 0.0981,
+    "billable_s": 321.08
+  },
+  "c2_stale": {
+    "run_id": "e1-vllm-eval-factory-v1-c2-rag-stale-qwen35-08b-modal",
+    "avg": 0.2051,
+    "exact": 0.0722,
+    "by_drift": {
+      "added": 0.65,
+      "changed": 0.0,
+      "removed": 0.75,
+      "stable": 0.1977
+    },
+    "failure_mode": {
+      "stale_version": 109,
+      "wrong": 402,
+      "abstain_wrong": 67,
+      "correct": 45
+    },
+    "retrieval": {
+      "enabled": true,
+      "mode": "bm25",
+      "top_k": 4,
+      "seed": null,
+      "hit_rate_nonempty": 1.0
+    },
+    "cost_usd": 0.0904,
+    "billable_s": 295.81
+  },
+  "c6_shuffle": {
+    "run_id": "e1-vllm-eval-factory-v1-c6-shuffle-qwen35-08b-modal",
+    "avg": 0.1826,
+    "exact": 0.0273,
+    "by_drift": {
+      "added": 0.65,
+      "changed": 0.0,
+      "removed": 0.75,
+      "stable": 0.1744
+    },
+    "failure_mode": {
+      "wrong": 407,
+      "stale_version": 117,
+      "correct": 17,
+      "abstain_wrong": 82
+    },
+    "retrieval": {
+      "enabled": true,
+      "mode": "shuffle",
+      "top_k": 4,
+      "seed": 1337,
+      "hit_rate_nonempty": 1.0
+    },
+    "cost_usd": 0.1144,
+    "billable_s": 374.41
+  }
+}

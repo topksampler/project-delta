@@ -1,0 +1,24 @@
+{
+  "adapter_revision": null,
+  "artifact_hashes": {
+    "summary": "954ebf7f27ad25a6f208dd65daacc16897884526e0259be7a8e20f477b17565a"
+  },
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "candidate_id": "632c11e135f226a7e14b7e38a0c0ca294bffea95b6194d10d1175e61e27365f6",
+  "eval_environment_id": "ed96cc8891a661b4fdbd2c687e77ab6d6fb07be0edfcba8e9868e812d369a1ef",
+  "index_revision": "954ebf7f27ad25a6f208dd65daacc16897884526e0259be7a8e20f477b17565a",
+  "metadata": {
+    "metrics": {
+      "added": 0.7247,
+      "changed": 0.3472,
+      "removed": 0.5729,
+      "stable": 0.4062
+    }
+  },
+  "paths": {
+    "summary": "artifacts/reports/e1-vllm-eval-factory-v022-v026-c1-hybrid-qwen35-08b-modal_summary.json"
+  },
+  "schema_id": "delta.active_state.v1",
+  "source_revision": "v0.26.0",
+  "state_id": "c0a31dd5d11a1283555a2af9f9e1bc4db5515c001732622fceb96e9da959247a"
+}

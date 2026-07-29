@@ -1,0 +1,29 @@
+{
+  "schema": "delta.eval_factory.collapse_audit.v1",
+  "n_paired": 623,
+  "n_collapse_08_correct_4b_fail": 265,
+  "n_both_correct": 54,
+  "n_4b_only_correct": 38,
+  "taxonomy": {
+    "delta_invents_change": 106,
+    "bool_wrong_polarity": 31,
+    "bool_no_yesno_token": 80,
+    "delta_says_stable_but_miss_needles": 12,
+    "bool_abstain": 27,
+    "delta_abstain": 5,
+    "delta_other": 1,
+    "bool_doc_abstain_style": 3
+  },
+  "verdict": {
+    "primary": "knowledge_and_calibration",
+    "not_primary": "boolean_format_missing_yes_no_token",
+    "format_share_of_collapse": 0.302,
+    "invents_change_share": 0.4,
+    "wrong_polarity_share": 0.117,
+    "abstain_style_share": 0.132,
+    "format_only_recoverable_of_collapse": 0.068,
+    "format_only_recoverable_n": 18,
+    "soft_rescore_exact_4b": 0.178
+  },
+  "note": "Boolean scorer requires explicit yes/no token. That explains a minority of collapses. Dominant patterns: 4B invents churn on stable deltas; wrong yes/no; doc-absent abstain theater on closed-book."
+}

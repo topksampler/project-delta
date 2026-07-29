@@ -1,0 +1,28 @@
+{
+  "schema": "delta.eval_factory.retrieval_path_hit.v1",
+  "label": "diff_hunk_bm25_t2122",
+  "mode": "bm25",
+  "corpus": "data/experiments/e1_vllm/corpus_diff_hunk_021_022.jsonl",
+  "index": "data/experiments/e1_vllm/indexes/diff_hunk_021_022_bm25.json",
+  "top_k": 4,
+  "n_probes_with_gold_paths": 649,
+  "path_hit_rate": 0.1572,
+  "path_hit_rate_by_drift": {
+    "added": 0.5,
+    "changed": 0.4444,
+    "removed": 0.6667,
+    "stable": 0.1242
+  },
+  "counts_by_drift": {
+    "stable": 596,
+    "added": 32,
+    "changed": 9,
+    "removed": 12
+  },
+  "hits_by_drift": {
+    "stable": 74,
+    "added": 16,
+    "changed": 4,
+    "removed": 8
+  }
+}

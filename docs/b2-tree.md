@@ -25,11 +25,13 @@ runs/{run_id}/
   ledger.yaml
   adapter/                  # training runs
 artifacts/reports/{experiment_id}/...
+states/{state_id}/state.json
+states/active.json          # only mutable DELTA object
 ```
 
-Project DELTA will add `states/{state_id}/` and an active-state pointer only when
-promotion/rollback semantics are implemented. Do not create an aspirational tree
-and call it a registry.
+DELTA promotion/rollback semantics are implemented locally in
+`src/lab/delta/memory.py`; `src/lab/dispatch/b2.py` maps immutable states and
+the active pointer to these B2 keys.
 
 ## lambda scratch
 
@@ -55,11 +57,12 @@ Worker-local datasets, model caches, logs already uploaded, and failed smoke run
 
 ## what must survive
 
-Frozen datasets, manifests, run configs, metrics, accepted adapters, and—when
-implemented—promotion decisions and active-state lineage.
+Frozen datasets, manifests, run configs, metrics, accepted adapters, promotion
+decisions, immutable states, and active-state lineage.
 
 ## command
 
 ```bash
 ./scripts/lab status --run-id <run_id>
+./scripts/delta status <reconcile_id>
 ```

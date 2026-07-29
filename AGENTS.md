@@ -44,7 +44,10 @@ compares interventions. A number from one never substitutes for the other.
   promote as the honesty adapter; its hand bank mixes v0.23 facts into a
   v0.22-tagged train set on purpose (Phase C intervention, not a knowledge pin).
 - `v7` = frozen checkpoint — sequential from v5; ~41% eval_v3, ~97% false-reject.
-- FT (LoRA and full-weight) is **paused**. Do not restart without an explicit go.
+- FT (LoRA and full-weight) is **paused** — profile wheel past v7 **and**
+  factory-v1 LoRA (stopped 2026-07-28 after symbol-SFT closeout;
+  `artifacts/reports/eval_factory_ft_stop_freeze.md`). Do not restart without
+  an explicit go.
 
 **Traps a fresh agent will fall into:**
 

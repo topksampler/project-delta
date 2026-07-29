@@ -1,0 +1,119 @@
+{
+  "schema": "delta.eval_factory.remember_forget_arm.v1",
+  "arm": "D",
+  "method": "world_revision_adapter_attach_vs_merge",
+  "model": "Qwen/Qwen3.5-0.8B",
+  "ft_reopened": true,
+  "date": "2026-07-29",
+  "reused_adapter_run_id": "e1-vllm-remember-forget-a-dpo-qwen35-08b-modal",
+  "configs": [
+    "configs/experiments/e1_vllm/remember_forget_d1_attach_eval_qwen35_08b_modal.yaml",
+    "configs/experiments/e1_vllm/remember_forget_d1_attach_t2122_eval_qwen35_08b_modal.yaml",
+    "configs/experiments/e1_vllm/remember_forget_d2_merge_eval_qwen35_08b_modal.yaml",
+    "configs/experiments/e1_vllm/remember_forget_d2_merge_t2122_eval_qwen35_08b_modal.yaml"
+  ],
+  "run_ids": {
+    "adapter": "e1-vllm-remember-forget-a-dpo-qwen35-08b-modal",
+    "d1_primary": "e1-vllm-remember-forget-d1-attach-eval-qwen35-08b-modal",
+    "d1_transfer": "e1-vllm-remember-forget-d1-attach-t2122-eval-qwen35-08b-modal",
+    "d2_primary": "e1-vllm-remember-forget-d2-merge-eval-qwen35-08b-modal",
+    "d2_transfer": "e1-vllm-remember-forget-d2-merge-t2122-eval-qwen35-08b-modal",
+    "eval_batch": "e1-vllm-remember-forget-d-eval-batch-qwen35-08b-modal"
+  },
+  "detach_sanity": {
+    "definition": "frozen base CB (no adapter_run_id)",
+    "primary_base": {
+      "source": "artifacts/reports/eval_factory_v1_base_08b_summary.json",
+      "exact_accuracy": 0.512,
+      "by_drift_type": {
+        "added": 0.725,
+        "changed": 0.0,
+        "removed": 0.75,
+        "stable": 0.5814
+      }
+    },
+    "transfer_base": {
+      "source": "artifacts/reports/e1-vllm-eval-factory-t2122-base-qwen35-08b-modal_summary.json",
+      "exact_accuracy": 0.245,
+      "by_drift_type": {
+        "added": 0.5885,
+        "changed": 0.2778,
+        "removed": 0.5357,
+        "stable": 0.3054
+      }
+    },
+    "returns_old_world": true
+  },
+  "d1_attach": {
+    "merge_adapter": false,
+    "primary": {
+      "bank": "v0.22.0_to_v0.23.0",
+      "summary": "artifacts/reports/eval_factory_remember_forget_d1_attach_primary_summary.json",
+      "exact_accuracy": 0.6693,
+      "avg_content_score": 0.8046,
+      "by_drift_type": {
+        "added": 0.75,
+        "changed": 0.0,
+        "removed": 0.75,
+        "stable": 0.8164
+      },
+      "forget_rate": 0.5455,
+      "remember_rate": 0.0
+    },
+    "transfer": {
+      "bank": "v0.21.0_to_v0.22.0",
+      "summary": "artifacts/reports/eval_factory_remember_forget_d1_attach_t2122_summary.json",
+      "exact_accuracy": 0.6662,
+      "avg_content_score": 0.7978,
+      "by_drift_type": {
+        "added": 0.6354,
+        "changed": 0.7222,
+        "removed": 0.5833,
+        "stable": 0.8196
+      },
+      "forget_rate": 0.5294,
+      "remember_rate": 0.2353
+    }
+  },
+  "d2_merge": {
+    "merge_adapter": true,
+    "primary": {
+      "bank": "v0.22.0_to_v0.23.0",
+      "summary": "artifacts/reports/eval_factory_remember_forget_d2_merge_primary_summary.json",
+      "exact_accuracy": 0.6726,
+      "avg_content_score": 0.8038,
+      "by_drift_type": {
+        "added": 0.75,
+        "changed": 0.0,
+        "removed": 0.75,
+        "stable": 0.8156
+      },
+      "forget_rate": 0.4545,
+      "remember_rate": 0.0
+    },
+    "transfer": {
+      "bank": "v0.21.0_to_v0.22.0",
+      "summary": "artifacts/reports/eval_factory_remember_forget_d2_merge_t2122_summary.json",
+      "exact_accuracy": 0.6632,
+      "avg_content_score": 0.7967,
+      "by_drift_type": {
+        "added": 0.6146,
+        "changed": 0.7222,
+        "removed": 0.5714,
+        "stable": 0.8205
+      },
+      "forget_rate": 0.5294,
+      "remember_rate": 0.1765
+    }
+  },
+  "pass_bar": {
+    "d1_primary_changed_ge_0_50": false,
+    "d2_primary_changed_ge_0_50": false,
+    "forget_le_0_25": false,
+    "stable_loss_le_0_02": true,
+    "transfer_changed_not_collapsed": true,
+    "merge_preserves_attach": true
+  },
+  "verdict": "swap_works_merge_preserves_but_remember_forget_bar_fails",
+  "note": "artifacts/reports/eval_factory_remember_forget_d.md"
+}

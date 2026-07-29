@@ -1,0 +1,77 @@
+{
+  "candidate_id": "632c11e135f226a7e14b7e38a0c0ca294bffea95b6194d10d1175e61e27365f6",
+  "decision_id": "f0f5d8e85d7665102f780c25af0a3ab30b2a86a7c13e3bd2bb56123d4efe6987",
+  "expected_active_state_id": "c12573d6ec2aee11c71d454d250dd829bced240459121785a7ccaea863eae99c",
+  "gates": [
+    {
+      "actual": 0.3472,
+      "details": {
+        "rationale_code": "RECOVERY_FAILED"
+      },
+      "evidence_path": "artifacts/reports/e1-vllm-eval-factory-v022-v026-c1-hybrid-qwen35-08b-modal_summary.json",
+      "hard": true,
+      "name": "recovery",
+      "passed": false,
+      "threshold": {
+        "floor": 0.35,
+        "minimum_improvement": 0.05
+      }
+    },
+    {
+      "actual": -0.19770000000000001,
+      "details": {
+        "rationale_code": "STABLE_REGRESSION_PASS"
+      },
+      "evidence_path": "artifacts/reports/e1-vllm-eval-factory-v022-v026-c1-hybrid-qwen35-08b-modal_summary.json",
+      "hard": true,
+      "name": "stable_regression",
+      "passed": true,
+      "threshold": 0.05
+    },
+    {
+      "actual": 1.0,
+      "details": {
+        "rationale_code": "COVERAGE_PASS"
+      },
+      "evidence_path": "artifacts/reports/e1-vllm-eval-factory-v022-v026-c1-hybrid-qwen35-08b-modal_summary.json",
+      "hard": true,
+      "name": "coverage",
+      "passed": true,
+      "threshold": 0.99
+    },
+    {
+      "actual": 0.0,
+      "details": {
+        "rationale_code": "COST_PASS"
+      },
+      "evidence_path": "artifacts/reports/e1-vllm-eval-factory-v022-v026-c1-hybrid-qwen35-08b-modal_summary.json",
+      "hard": true,
+      "name": "cost",
+      "passed": true,
+      "threshold": 5.0
+    },
+    {
+      "actual": true,
+      "details": {
+        "rationale_code": "PROVENANCE_PASS"
+      },
+      "evidence_path": "artifacts/reports/e1-vllm-eval-factory-v022-v026-c1-hybrid-qwen35-08b-modal_summary.json",
+      "hard": true,
+      "name": "provenance",
+      "passed": true,
+      "threshold": true
+    }
+  ],
+  "metadata": {
+    "measured_cost": 0.0
+  },
+  "outcome_id": "a153f8f8f1183446e19aa823c84d43096753a1890c954c4cb0c7dfab53c92cc2",
+  "paths": {
+    "evidence": "artifacts/reports/e1-vllm-eval-factory-v022-v026-c1-hybrid-qwen35-08b-modal_summary.json"
+  },
+  "rationale_codes": [
+    "RECOVERY_FAILED"
+  ],
+  "schema_id": "delta.promotion_decision.v1",
+  "status": "rejected"
+}

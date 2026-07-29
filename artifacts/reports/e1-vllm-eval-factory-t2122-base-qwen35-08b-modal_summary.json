@@ -1,0 +1,86 @@
+{
+  "avg_content_score": 0.3323,
+  "by_drift_type": {
+    "added": 0.5885,
+    "changed": 0.2778,
+    "removed": 0.5357,
+    "stable": 0.3054
+  },
+  "by_entity_type": {
+    "cli_flag": 0.2875,
+    "config_field": 0.3588,
+    "env_var": 0.381,
+    "public_export": 0.2619
+  },
+  "by_family_drift": {
+    "cli_flag:added": {
+      "accuracy": 0.5833,
+      "n": 15
+    },
+    "cli_flag:changed": {
+      "accuracy": 0.0,
+      "n": 3
+    },
+    "cli_flag:stable": {
+      "accuracy": 0.2731,
+      "n": 249
+    },
+    "config_field:added": {
+      "accuracy": 0.5833,
+      "n": 18
+    },
+    "config_field:changed": {
+      "accuracy": 0.6667,
+      "n": 3
+    },
+    "config_field:removed": {
+      "accuracy": 0.4722,
+      "n": 9
+    },
+    "config_field:stable": {
+      "accuracy": 0.3301,
+      "n": 209
+    },
+    "env_var:added": {
+      "accuracy": 0.6,
+      "n": 15
+    },
+    "env_var:changed": {
+      "accuracy": 0.1667,
+      "n": 3
+    },
+    "env_var:removed": {
+      "accuracy": 0.5833,
+      "n": 12
+    },
+    "env_var:stable": {
+      "accuracy": 0.3376,
+      "n": 117
+    },
+    "public_export:stable": {
+      "accuracy": 0.2619,
+      "n": 21
+    }
+  },
+  "by_probe_form": {
+    "version_delta": 0.7378,
+    "versioned_existence": 0.1292
+  },
+  "counts": {
+    "by_drift_type": {
+      "added": 48,
+      "changed": 9,
+      "removed": 21,
+      "stable": 596
+    },
+    "by_entity_type": {
+      "cli_flag": 267,
+      "config_field": 239,
+      "env_var": 147,
+      "public_export": 21
+    }
+  },
+  "exact_accuracy": 0.2448,
+  "n_samples": 674,
+  "schema": "delta.eval_factory.run_summary.v1"
+}

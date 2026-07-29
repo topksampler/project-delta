@@ -5,7 +5,7 @@
 ```text
 DriftEvent compares the same eval_v3 probes under two conditions.
 Stable knowledge = class A. Changed knowledge = classes B and D.
-A file diff alone is not drift; this v1 artifact is behavioral (+ deferred corpus).
+Behavioral scoreboard + structural corpus_signal (eval-factory census).
 ```
 
 ## what goes where
@@ -13,6 +13,7 @@ A file diff alone is not drift; this v1 artifact is behavioral (+ deferred corpu
 - DriftEvent JSON: `artifacts/reports/drift_events/`
 - this report: `artifacts/reports/e1_vllm_drift_baseline.md`
 - generator: `experiments/e1_vllm/sense_drift.py`
+- corpus census: sealed `e1_eval_factory_v1` manifest
 
 ## what can die
 
@@ -22,18 +23,9 @@ A file diff alone is not drift; this v1 artifact is behavioral (+ deferred corpu
 
 - frozen eval_v3 + cited run_ids
 - DriftEvent JSON + this baseline report
+- attached corpus_signal provenance (protocol_id + b2_prefix)
 
 ## events
-
-### `c0_base` → `c3_ft`
-
-- baseline run: `e1-vllm-c0-base-eval-v3-qwen35-08b-modal`
-- probe run: `e1-vllm-c3-ft-mill-v3-eval-v3-qwen35-08b-modal`
-- accuracy_delta: **0.0869**
-- class deltas A/B/C/D: {'A': 0.225, 'B': 0.0, 'C': 0.0625, 'D': 0.0}
-- stable (A) delta: 0.225 (regression if negative)
-- changed B/D deltas: 0.0 / 0.0
-- probe_failures listed: 30
 
 ### `c0_base` → `c1_rag_fresh`
 
@@ -44,6 +36,18 @@ A file diff alone is not drift; this v1 artifact is behavioral (+ deferred corpu
 - stable (A) delta: 0.25 (regression if negative)
 - changed B/D deltas: 0.2 / -0.125
 - probe_failures listed: 25
+- corpus_signal: attached (1070 claims / 42 deltas; `e1_eval_factory_v1`)
+
+### `c0_base` → `c3_ft`
+
+- baseline run: `e1-vllm-c0-base-eval-v3-qwen35-08b-modal`
+- probe run: `e1-vllm-c3-ft-mill-v3-eval-v3-qwen35-08b-modal`
+- accuracy_delta: **0.0869**
+- class deltas A/B/C/D: {'A': 0.225, 'B': 0.0, 'C': 0.0625, 'D': 0.0}
+- stable (A) delta: 0.225 (regression if negative)
+- changed B/D deltas: 0.0 / 0.0
+- probe_failures listed: 30
+- corpus_signal: attached (1070 claims / 42 deltas; `e1_eval_factory_v1`)
 
 ## reading
 

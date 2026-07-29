@@ -1,0 +1,32 @@
+{
+  "schema": "delta.eval_factory.retrieval_path_hit.v1",
+  "label": "hybrid_t2122",
+  "mode": "hybrid_diff",
+  "corpus": "data/experiments/e1_vllm/corpus_code_0.jsonl",
+  "index": "data/experiments/e1_vllm/indexes/code_0_bm25.json",
+  "top_k": 4,
+  "n_probes_with_gold_paths": 649,
+  "path_hit_rate": 0.6071,
+  "path_hit_rate_by_drift": {
+    "added": 0.5,
+    "changed": 0.7778,
+    "removed": 0.5,
+    "stable": 0.6124
+  },
+  "counts_by_drift": {
+    "stable": 596,
+    "added": 32,
+    "changed": 9,
+    "removed": 12
+  },
+  "hits_by_drift": {
+    "stable": 365,
+    "added": 16,
+    "changed": 7,
+    "removed": 6
+  },
+  "routes": {
+    "stable": 453,
+    "diff": 196
+  }
+}

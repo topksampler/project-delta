@@ -1,0 +1,31 @@
+{
+  "config_inputs": {
+    "affected_pass": 0.8,
+    "expected_active_state_id": "c12573d6ec2aee11c71d454d250dd829bced240459121785a7ccaea863eae99c",
+    "transition_failure_mass": 0.2
+  },
+  "cost_bound": 1.0,
+  "drift_event_id": "3bbd871b1025913c1c6bb328787ad63b0fa86c7386cf100fc845f4674c5a7b2a",
+  "expected_gates": {
+    "cost": 1.0,
+    "coverage": "required",
+    "provenance": "required",
+    "recovery": 0.8,
+    "stable_regression": "non_regression"
+  },
+  "ft_eligible": false,
+  "metadata": {
+    "debug_only": false,
+    "requires_approval": false
+  },
+  "paths": {},
+  "plan_id": "59a8f5142ee9758573ddeb4f97953e380a1edf56c914a57296255e7e1d690fa5",
+  "policy_version": "deterministic-v1",
+  "rationale_codes": [
+    "CHANGED_OR_REMOVED_FAILURE_MASS",
+    "FT_FROZEN"
+  ],
+  "recipe": "hybrid_diff",
+  "schema_id": "delta.intervention_plan.v1",
+  "selected_level": "L1"
+}

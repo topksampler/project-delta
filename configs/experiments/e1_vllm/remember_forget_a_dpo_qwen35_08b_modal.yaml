@@ -1,0 +1,42 @@
+run_id: e1-vllm-remember-forget-a-dpo-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: remember_forget_a_dpo
+ft_reopened: true
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+
+data:
+  train_path: data/experiments/e1_vllm/train_factory_v1_dpo_remember_forget.jsonl
+  eval_path: data/experiments/e1_vllm/eval_factory_v1_dpo_dev.jsonl
+
+output:
+  dir: runs/e1-vllm-remember-forget-a-dpo-qwen35-08b-modal
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  module: lab.train_dpo_lora
+  max_steps: 300
+  learning_rate: 0.0002
+  per_device_train_batch_size: 8
+  gradient_accumulation_steps: 1
+  logging_steps: 10
+  save_strategy: "steps"
+  bf16: true
+  fp16: false
+  beta: 0.1
+  max_length: 1024

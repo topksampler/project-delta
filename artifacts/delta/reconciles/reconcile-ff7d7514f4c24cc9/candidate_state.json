@@ -1,0 +1,24 @@
+{
+  "adapter_revision": null,
+  "artifact_hashes": {
+    "summary": "954ebf7f27ad25a6f208dd65daacc16897884526e0259be7a8e20f477b17565a"
+  },
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "candidate_id": "632c11e135f226a7e14b7e38a0c0ca294bffea95b6194d10d1175e61e27365f6",
+  "drift_event_id": "3bbd871b1025913c1c6bb328787ad63b0fa86c7386cf100fc845f4674c5a7b2a",
+  "eval_environment_id": "ed96cc8891a661b4fdbd2c687e77ab6d6fb07be0edfcba8e9868e812d369a1ef",
+  "index_revision": "954ebf7f27ad25a6f208dd65daacc16897884526e0259be7a8e20f477b17565a",
+  "metadata": {
+    "recipe": "hybrid_diff"
+  },
+  "paths": {
+    "summary": "artifacts/reports/e1-vllm-eval-factory-v022-v026-c1-hybrid-qwen35-08b-modal_summary.json"
+  },
+  "plan_id": "59a8f5142ee9758573ddeb4f97953e380a1edf56c914a57296255e7e1d690fa5",
+  "run_ids": [
+    "e1-vllm-eval-factory-v022-v026-c1-hybrid-qwen35-08b-modal"
+  ],
+  "schema_id": "delta.candidate_state.v1",
+  "source_revision": "v0.26.0",
+  "status": "succeeded"
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "delta.eval_factory.symbol_evidence_bridge.v1",
+  "n_probes_with_gold_paths": 621,
+  "path_hit_rate": {
+    "symbol": 0.6844,
+    "symbol_expand": 0.6844
+  },
+  "path_hit_rate_by_drift": {
+    "symbol": {
+      "added": 1.0,
+      "changed": 0.375,
+      "removed": 0.0,
+      "stable": 0.6877
+    },
+    "symbol_expand": {
+      "added": 1.0,
+      "changed": 0.375,
+      "removed": 0.0,
+      "stable": 0.6877
+    }
+  },
+  "counts_by_drift": {
+    "symbol": {
+      "stable": 602,
+      "added": 8,
+      "changed": 8,
+      "removed": 3
+    },
+    "symbol_expand": {
+      "stable": 602,
+      "added": 8,
+      "changed": 8,
+      "removed": 3
+    }
+  }
+}

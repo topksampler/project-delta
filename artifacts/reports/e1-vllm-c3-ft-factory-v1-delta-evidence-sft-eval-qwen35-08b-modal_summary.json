@@ -1,0 +1,78 @@
+{
+  "avg_content_score": 0.4671,
+  "by_drift_type": {
+    "added": 0.4,
+    "changed": 0.0,
+    "removed": 0.5,
+    "stable": 0.4743
+  },
+  "by_entity_type": {
+    "cli_flag": 0.1333,
+    "config_field": 0.926,
+    "env_var": 0.3589,
+    "public_export": 0.2857
+  },
+  "by_family_drift": {
+    "cli_flag:added": {
+      "accuracy": 0.3,
+      "n": 5
+    },
+    "cli_flag:changed": {
+      "accuracy": 0.0,
+      "n": 1
+    },
+    "cli_flag:stable": {
+      "accuracy": 0.1305,
+      "n": 249
+    },
+    "config_field:changed": {
+      "accuracy": 0.0,
+      "n": 7
+    },
+    "config_field:removed": {
+      "accuracy": 0.5,
+      "n": 1
+    },
+    "config_field:stable": {
+      "accuracy": 0.9581,
+      "n": 215
+    },
+    "env_var:added": {
+      "accuracy": 0.5,
+      "n": 5
+    },
+    "env_var:removed": {
+      "accuracy": 0.5,
+      "n": 2
+    },
+    "env_var:stable": {
+      "accuracy": 0.3504,
+      "n": 117
+    },
+    "public_export:stable": {
+      "accuracy": 0.2857,
+      "n": 21
+    }
+  },
+  "by_probe_form": {
+    "version_delta": 0.6621,
+    "versioned_existence": 0.3614
+  },
+  "counts": {
+    "by_drift_type": {
+      "added": 10,
+      "changed": 8,
+      "removed": 3,
+      "stable": 602
+    },
+    "by_entity_type": {
+      "cli_flag": 255,
+      "config_field": 223,
+      "env_var": 124,
+      "public_export": 21
+    }
+  },
+  "exact_accuracy": 0.4607,
+  "n_samples": 623,
+  "schema": "delta.eval_factory.run_summary.v1"
+}

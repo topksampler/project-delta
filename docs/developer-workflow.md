@@ -61,6 +61,7 @@ Do not fork `dispatch/` per experiment. Do not put experiment logic inside `moda
 |------|-------|-----------------|--------|
 | `src/lab/dispatch/` | platform | yes | cockpit CLI, B2, Modal, Lambda, manifest, timing, costs |
 | `src/lab/train_sft_lora.py` | shared entrypoint | yes | generic LoRA SFT (`--config`) — usable by any experiment until you replace it |
+| `src/lab/train_dpo_lora.py` | shared entrypoint | yes | generic LoRA DPO (`--config`); set `training.module: lab.train_dpo_lora` |
 | `src/lab/eval_*.py` | shared entrypoint | yes | generic eval runners — same |
 | `scripts/lab` | platform | yes | cockpit shell wrapper (`PYTHONPATH`, `set -a` `.env`) |
 | `infra/lambda/` | platform | yes | Lambda worker bootstrap + `run_job.sh` |
@@ -248,7 +249,7 @@ Every run config must have:
 run_id: <unique>
 ```
 
-Train configs also need what `train_sft_lora.py` expects (`model`, `data`, `output`, `lora`, `training`).
+Train configs also need what `train_sft_lora.py` / `train_dpo_lora.py` expect (`model`, `data`, `output`, `lora`, `training`). For DPO, set `training.module: lab.train_dpo_lora` and point `data.train_path` at preference JSONL (`prompt`/`chosen`/`rejected`).
 
 Eval configs need what your eval module expects (`model`, `eval`, …).
 
@@ -305,7 +306,7 @@ bash scripts/check_storage.sh
 | storage and manifests | implemented | preserve datasets, evidence, and lineage |
 | train → B2 → reload | implemented for LoRA | execute adaptation candidates |
 | eval dispatch | partial for experiment-specific harnesses | execute BUILD environments |
-| state promotion/rollback | absent | required by VERIFY/MEMORY |
+| state promotion/rollback | implemented for DELTA local registry; B2 key sync available | explicit approval, CAS, immutable history |
 
 The module roadmap and phase completion gates live only in
 [delta-roadmap.md](./delta-roadmap.md).

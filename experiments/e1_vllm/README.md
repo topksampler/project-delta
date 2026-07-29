@@ -29,6 +29,45 @@ python experiments/e1_vllm/build_index.py \
   --out data/experiments/e1_vllm/indexes/doc_8_bm25.json
 ```
 
+## DELTA reconcile
+
+**Invariant:** deterministic code owns truth, policy, gates, and state. The
+small-model worker may rewrite probe wording or explain a frozen decision; it
+cannot choose an intervention or update the active pointer.
+
+**What goes where:** typed control-plane code lives in `src/lab/delta/`; vLLM
+BUILD/SENSE binding lives in `reconcile_plugin.py`; immutable receipts and
+states live under `artifacts/delta/`; GPU run evidence remains under
+`runs/`/B2 and summarized in `artifacts/reports/`.
+
+**What can die:** worker-local caches, rejected surface proposals, and local
+copies of already-durable child-run outputs.
+
+**What must survive:** EvalEnvironment manifests, child run IDs, candidate and
+outcome lineage, promotion decisions, immutable states, and
+`states/active.json`.
+
+**Command:**
+
+```bash
+./scripts/delta reconcile \
+  --repo https://github.com/vllm-project/vllm.git \
+  --from v0.22.0 \
+  --to v0.23.0 \
+  --target replay
+
+./scripts/delta status <reconcile_id>
+# Only for a decision whose VERIFY status is pending_approval:
+./scripts/delta approve <reconcile_id>
+./scripts/delta rollback --state-id <state_id> --reason "<operator reason>"
+```
+
+`replay` consumes existing sealed factory/GPU evidence and does not launch new
+compute. An unsupported, unbuilt, or unsealed transition fails closed.
+`--target seed-replay` is available only for diagnostic research over an
+unsealed seed bank; VERIFY records a failing `environment_sealed` gate, so the
+candidate cannot be promoted.
+
 ## implemented
 
 ```text
@@ -61,7 +100,6 @@ See `knowledge_profile/README.md`. Pilot run:
 ## missing
 
 ```text
-corpus structural signal on DriftEvent
 trusted / executable verifier
 boundary-pass semantic entropy on profile unknowns
 ```

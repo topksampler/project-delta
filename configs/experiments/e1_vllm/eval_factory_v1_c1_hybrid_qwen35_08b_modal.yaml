@@ -1,0 +1,28 @@
+run_id: e1-vllm-eval-factory-v1-c1-hybrid-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: eval_factory_v1_c1_hybrid
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+
+eval:
+  path: data/experiments/e1_vllm/eval_factory/v0.22.0_to_v0.23.0/e1_eval_factory_v1/probes_eval.jsonl
+  output_dir: runs/e1-vllm-eval-factory-v1-c1-hybrid-qwen35-08b-modal
+  max_new_tokens: 96
+  batch_size: 8
+  temperature: 0.0
+  top_p: 1.0
+  enable_thinking: false
+
+retrieval:
+  enabled: true
+  mode: hybrid_diff
+  corpus_path: data/experiments/e1_vllm/corpus_code_8.jsonl
+  index_path: data/experiments/e1_vllm/indexes/code_8_bm25.json
+  symbol_index_path: data/experiments/e1_vllm/indexes/symbol_code_8_v022_v023.json
+  diff_corpus_path: data/experiments/e1_vllm/corpus_diff_hunk_022_023.jsonl
+  diff_index_path: data/experiments/e1_vllm/indexes/diff_hunk_022_023_bm25.json
+  top_k: 4
+  max_chars: 3500

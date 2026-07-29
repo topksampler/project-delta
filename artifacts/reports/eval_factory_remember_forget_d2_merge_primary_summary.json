@@ -1,0 +1,97 @@
+{
+  "avg_content_score": 0.8038,
+  "by_drift_type": {
+    "added": 0.75,
+    "changed": 0.0,
+    "removed": 0.75,
+    "stable": 0.8156
+  },
+  "by_entity_type": {
+    "cli_flag": 0.8431,
+    "config_field": 0.75,
+    "env_var": 0.8306,
+    "public_export": 0.7381
+  },
+  "by_family_drift": {
+    "cli_flag:added": {
+      "accuracy": 0.8,
+      "n": 5
+    },
+    "cli_flag:changed": {
+      "accuracy": 0.0,
+      "n": 1
+    },
+    "cli_flag:stable": {
+      "accuracy": 0.8474,
+      "n": 249
+    },
+    "config_field:changed": {
+      "accuracy": 0.0,
+      "n": 7
+    },
+    "config_field:removed": {
+      "accuracy": 0.75,
+      "n": 1
+    },
+    "config_field:stable": {
+      "accuracy": 0.7744,
+      "n": 215
+    },
+    "env_var:added": {
+      "accuracy": 0.7,
+      "n": 5
+    },
+    "env_var:removed": {
+      "accuracy": 0.75,
+      "n": 2
+    },
+    "env_var:stable": {
+      "accuracy": 0.8376,
+      "n": 117
+    },
+    "public_export:stable": {
+      "accuracy": 0.7381,
+      "n": 21
+    }
+  },
+  "by_probe_form": {
+    "version_delta": 0.4509,
+    "versioned_existence": 0.995
+  },
+  "counts": {
+    "by_drift_type": {
+      "added": 10,
+      "changed": 8,
+      "removed": 3,
+      "stable": 602
+    },
+    "by_entity_type": {
+      "cli_flag": 255,
+      "config_field": 223,
+      "env_var": 124,
+      "public_export": 21
+    }
+  },
+  "exact_accuracy": 0.6726,
+  "forget": {
+    "by_drift_type": {
+      "changed": {
+        "forget_rate": 0.5,
+        "n": 8,
+        "remember_rate": 0.0
+      },
+      "removed": {
+        "forget_rate": 0.3333,
+        "n": 3,
+        "remember_rate": 0.0
+      }
+    },
+    "forget_rate": 0.4545,
+    "n_scored": 11,
+    "remember_rate": 0.0,
+    "schema": "delta.eval_factory.forget_summary.v1",
+    "threshold": 1.0
+  },
+  "n_samples": 623,
+  "schema": "delta.eval_factory.run_summary.v2"
+}

@@ -1,0 +1,105 @@
+{
+  "avg_content_score": 0.7978,
+  "by_drift_type": {
+    "added": 0.6354,
+    "changed": 0.7222,
+    "removed": 0.5833,
+    "stable": 0.8196
+  },
+  "by_entity_type": {
+    "cli_flag": 0.8296,
+    "config_field": 0.7657,
+    "env_var": 0.801,
+    "public_export": 0.7381
+  },
+  "by_family_drift": {
+    "cli_flag:added": {
+      "accuracy": 0.6333,
+      "n": 15
+    },
+    "cli_flag:changed": {
+      "accuracy": 0.6667,
+      "n": 3
+    },
+    "cli_flag:stable": {
+      "accuracy": 0.8434,
+      "n": 249
+    },
+    "config_field:added": {
+      "accuracy": 0.6389,
+      "n": 18
+    },
+    "config_field:changed": {
+      "accuracy": 0.6667,
+      "n": 3
+    },
+    "config_field:removed": {
+      "accuracy": 0.5,
+      "n": 9
+    },
+    "config_field:stable": {
+      "accuracy": 0.7895,
+      "n": 209
+    },
+    "env_var:added": {
+      "accuracy": 0.6333,
+      "n": 15
+    },
+    "env_var:changed": {
+      "accuracy": 0.8333,
+      "n": 3
+    },
+    "env_var:removed": {
+      "accuracy": 0.6458,
+      "n": 12
+    },
+    "env_var:stable": {
+      "accuracy": 0.8376,
+      "n": 117
+    },
+    "public_export:stable": {
+      "accuracy": 0.7381,
+      "n": 21
+    }
+  },
+  "by_probe_form": {
+    "version_delta": 0.4967,
+    "versioned_existence": 0.9488
+  },
+  "counts": {
+    "by_drift_type": {
+      "added": 48,
+      "changed": 9,
+      "removed": 21,
+      "stable": 596
+    },
+    "by_entity_type": {
+      "cli_flag": 267,
+      "config_field": 239,
+      "env_var": 147,
+      "public_export": 21
+    }
+  },
+  "exact_accuracy": 0.6662,
+  "forget": {
+    "by_drift_type": {
+      "changed": {
+        "forget_rate": 0.6667,
+        "n": 3,
+        "remember_rate": 0.0
+      },
+      "removed": {
+        "forget_rate": 0.5,
+        "n": 14,
+        "remember_rate": 0.2857
+      }
+    },
+    "forget_rate": 0.5294,
+    "n_scored": 17,
+    "remember_rate": 0.2353,
+    "schema": "delta.eval_factory.forget_summary.v1",
+    "threshold": 1.0
+  },
+  "n_samples": 674,
+  "schema": "delta.eval_factory.run_summary.v2"
+}

@@ -1,0 +1,71 @@
+{
+  "c0_nohint": {
+    "run_id": "e1-vllm-eval-factory-v1-base-qwen35-08b-modal",
+    "exact": 0.512,
+    "avg": 0.577,
+    "by_drift": {
+      "added": 0.725,
+      "changed": 0.0,
+      "removed": 0.75,
+      "stable": 0.5814
+    },
+    "failure_mode": {
+      "correct": 319,
+      "wrong": 139,
+      "stale_version": 117,
+      "abstain_wrong": 48
+    },
+    "retrieval": null,
+    "cost_usd": 0.0432
+  },
+  "c1_fresh_nohint": {
+    "run_id": "e1-vllm-eval-factory-v1-c1-rag-fresh-nohint-qwen35-08b-modal",
+    "exact": 0.0803,
+    "avg": 0.2119,
+    "by_drift": {
+      "added": 0.675,
+      "changed": 0.0,
+      "removed": 0.75,
+      "stable": 0.2043
+    },
+    "failure_mode": {
+      "stale_version": 114,
+      "wrong": 383,
+      "abstain_wrong": 76,
+      "correct": 50
+    },
+    "retrieval": {
+      "enabled": true,
+      "mode": "bm25",
+      "top_k": 4,
+      "seed": null,
+      "hit_rate_nonempty": 1.0
+    },
+    "cost_usd": 0.0884
+  },
+  "c2_stale_nohint": {
+    "run_id": "e1-vllm-eval-factory-v1-c2-rag-stale-nohint-qwen35-08b-modal",
+    "exact": 0.0835,
+    "avg": 0.2139,
+    "by_drift": {
+      "added": 0.55,
+      "changed": 0.0,
+      "removed": 0.75,
+      "stable": 0.2085
+    },
+    "failure_mode": {
+      "stale_version": 109,
+      "wrong": 382,
+      "abstain_wrong": 80,
+      "correct": 52
+    },
+    "retrieval": {
+      "enabled": true,
+      "mode": "bm25",
+      "top_k": 4,
+      "seed": null,
+      "hit_rate_nonempty": 1.0
+    },
+    "cost_usd": 0.0987
+  }
+}

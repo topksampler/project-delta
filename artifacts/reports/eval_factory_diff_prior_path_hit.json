@@ -1,0 +1,23 @@
+{
+  "symbol": {
+    "changed": 0.375,
+    "removed": 0.0,
+    "added": 1.0,
+    "stable": 0.6877,
+    "overall": 0.6844
+  },
+  "symbol_diff": {
+    "changed": 0.375,
+    "removed": 0.0,
+    "added": 1.0,
+    "stable": 0.6894,
+    "overall": 0.686
+  },
+  "diff_bm25": {
+    "changed": 0.5,
+    "removed": 0.3333,
+    "added": 0.625,
+    "stable": 0.3322,
+    "overall": 0.3382
+  }
+}

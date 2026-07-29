@@ -67,3 +67,19 @@ def sync_dataset_if_needed(local_path: Path, dataset_key: str) -> None:
 
 def pull_run_manifest(run_id: str, local_path: Path) -> None:
     download_file(f"runs/{run_id}/manifest.yaml", local_path)
+
+
+def upload_state(local_state_dir: Path, state_id: str) -> None:
+    """Persist an immutable DELTA state payload."""
+
+    upload_dir(local_state_dir, f"states/{state_id}")
+
+
+def upload_active_pointer(local_path: Path) -> None:
+    """Publish the sole mutable DELTA state pointer."""
+
+    upload_file(local_path, "states/active.json")
+
+
+def download_active_pointer(local_path: Path) -> None:
+    download_file("states/active.json", local_path)

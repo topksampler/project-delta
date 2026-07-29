@@ -1,0 +1,24 @@
+run_id: e1-vllm-c3-ft-factory-v1-delta-evidence-sft-evidence-eval-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: c3_ft_factory_v1_delta_evidence_sft_evidence_eval
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+  adapter_run_id: e1-vllm-c3-ft-factory-v1-delta-evidence-sft-qwen35-08b-modal
+
+eval:
+  path: data/experiments/e1_vllm/eval_factory/v0.22.0_to_v0.23.0/e1_eval_factory_v1/probes_eval.jsonl
+  output_dir: runs/e1-vllm-c3-ft-factory-v1-delta-evidence-sft-evidence-eval-qwen35-08b-modal
+  max_new_tokens: 96
+  batch_size: 8
+  temperature: 0.0
+  top_p: 1.0
+  enable_thinking: false
+
+retrieval:
+  enabled: true
+  mode: evidence
+  evidence_map_path: data/experiments/e1_vllm/indexes/factory_v1_evidence_map_v022_v023.json
+  max_chars: 3500

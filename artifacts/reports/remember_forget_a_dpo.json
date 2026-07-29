@@ -1,0 +1,64 @@
+{
+  "schema": "delta.eval_factory.remember_forget_arm.v1",
+  "arm": "A",
+  "method": "dpo_lora",
+  "model": "Qwen/Qwen3.5-0.8B",
+  "ft_reopened": true,
+  "date": "2026-07-29",
+  "train_data": {
+    "path": "data/experiments/e1_vllm/train_factory_v1_dpo_remember_forget.jsonl",
+    "n": 2240,
+    "delta_copies": 40,
+    "stable_cap": 200,
+    "seed": 20260728
+  },
+  "configs": [
+    "configs/experiments/e1_vllm/remember_forget_a_dpo_qwen35_08b_modal.yaml",
+    "configs/experiments/e1_vllm/remember_forget_a_dpo_eval_qwen35_08b_modal.yaml",
+    "configs/experiments/e1_vllm/remember_forget_a_dpo_t2122_eval_qwen35_08b_modal.yaml"
+  ],
+  "run_ids": {
+    "train": "e1-vllm-remember-forget-a-dpo-qwen35-08b-modal",
+    "primary_eval": "e1-vllm-remember-forget-a-dpo-eval-qwen35-08b-modal",
+    "transfer_eval": "e1-vllm-remember-forget-a-dpo-t2122-eval-qwen35-08b-modal"
+  },
+  "primary": {
+    "bank": "v0.22.0_to_v0.23.0",
+    "summary": "artifacts/reports/remember_forget_a_primary_summary.json",
+    "exact_accuracy": 0.6693,
+    "avg_content_score": 0.8046,
+    "by_drift_type": {
+      "added": 0.75,
+      "changed": 0.0,
+      "removed": 0.75,
+      "stable": 0.8164
+    },
+    "forget_rate": 0.5455,
+    "remember_rate": 0.0,
+    "stable_delta_vs_base": 0.235
+  },
+  "transfer": {
+    "bank": "v0.21.0_to_v0.22.0",
+    "summary": "artifacts/reports/remember_forget_a_t2122_summary.json",
+    "exact_accuracy": 0.6662,
+    "avg_content_score": 0.7978,
+    "by_drift_type": {
+      "added": 0.6354,
+      "changed": 0.7222,
+      "removed": 0.5833,
+      "stable": 0.8196
+    },
+    "forget_rate": 0.5294,
+    "remember_rate": 0.2353,
+    "stable_delta_vs_base": 0.5142
+  },
+  "pass_bar": {
+    "changed_ge_0_50": false,
+    "removed_ge_0_50": true,
+    "forget_le_0_25": false,
+    "stable_loss_le_0_02": true,
+    "transfer_changed_not_collapsed": true
+  },
+  "verdict": "primary_falsified_remember_flat_forget_high",
+  "note": "artifacts/reports/remember_forget_a_dpo.md"
+}

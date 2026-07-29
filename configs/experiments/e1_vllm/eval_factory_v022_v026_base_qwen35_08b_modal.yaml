@@ -1,0 +1,17 @@
+run_id: e1-vllm-eval-factory-v022-v026-base-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: eval_factory_v022_v026_base
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+
+eval:
+  path: data/experiments/e1_vllm/eval_factory/v0.22.0_to_v0.26.0/e1_eval_factory_v1/probes_eval.jsonl
+  output_dir: runs/e1-vllm-eval-factory-v022-v026-base-qwen35-08b-modal
+  max_new_tokens: 96
+  batch_size: 8
+  temperature: 0.0
+  top_p: 1.0
+  enable_thinking: false

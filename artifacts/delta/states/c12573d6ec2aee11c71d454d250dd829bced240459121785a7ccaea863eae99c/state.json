@@ -1,0 +1,22 @@
+{
+  "adapter_revision": null,
+  "artifact_hashes": {},
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "candidate_id": null,
+  "eval_environment_id": "ed96cc8891a661b4fdbd2c687e77ab6d6fb07be0edfcba8e9868e812d369a1ef",
+  "index_revision": null,
+  "metadata": {
+    "metrics": {
+      "added": 0.5884,
+      "changed": 0.0694,
+      "removed": 0.6667,
+      "stable": 0.2085
+    }
+  },
+  "paths": {
+    "summary": "artifacts/reports/e1-vllm-eval-factory-v022-v026-base-qwen35-08b-modal_summary.json"
+  },
+  "schema_id": "delta.active_state.v1",
+  "source_revision": "v0.22.0",
+  "state_id": "c12573d6ec2aee11c71d454d250dd829bced240459121785a7ccaea863eae99c"
+}

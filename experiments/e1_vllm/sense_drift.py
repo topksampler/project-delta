@@ -25,6 +25,21 @@ from lab.qa_score import (  # noqa: E402
 
 VLLM_REPO = "https://github.com/vllm-project/vllm.git"
 SCHEMA = "delta.drift_event.v1"
+CORPUS_SIGNAL_SCHEMA = "delta.corpus_signal.eval_factory.v1"
+DEFAULT_CORPUS_MANIFEST = (
+    REPO
+    / "data"
+    / "experiments"
+    / "e1_vllm"
+    / "eval_factory"
+    / "v0.22.0_to_v0.23.0"
+    / "e1_eval_factory_v1"
+    / "manifest.json"
+)
+DEFAULT_CORPUS_B2 = (
+    "datasets/experiments/e1_vllm/eval_factory/"
+    "v0.22.0_to_v0.23.0/e1_eval_factory_v1/"
+)
 
 DEFAULT_PAIRS = [
     (
@@ -84,6 +99,47 @@ def _failure_counts(rows: list[dict]) -> dict[str, int]:
     return dict(out)
 
 
+def build_corpus_signal(manifest_path: Path) -> dict:
+    """Attach sealed eval-factory claim census as structural corpus_signal."""
+    if not manifest_path.is_file():
+        return {
+            "status": "deferred",
+            "note": f"corpus manifest missing: {manifest_path}",
+        }
+    manifest = _load_json(manifest_path)
+    counts = manifest.get("counts") or {}
+    by_status = counts.get("by_status") or {}
+    deltas = int(
+        by_status.get("added", 0)
+        + by_status.get("changed", 0)
+        + by_status.get("removed", 0)
+    )
+    try:
+        local = str(manifest_path.resolve().relative_to(REPO))
+    except ValueError:
+        local = str(manifest_path)
+    return {
+        "status": "attached",
+        "schema": CORPUS_SIGNAL_SCHEMA,
+        "protocol_id": manifest.get("protocol_id"),
+        "transition": manifest.get("transition"),
+        "source_before": manifest.get("source_before"),
+        "source_after": manifest.get("source_after"),
+        "local_manifest": local,
+        "b2_prefix": DEFAULT_CORPUS_B2,
+        "claims": counts.get("claims"),
+        "deltas": deltas,
+        "by_status": by_status,
+        "by_family": counts.get("by_family") or {},
+        "by_family_status": counts.get("by_family_status") or {},
+        "by_split": counts.get("by_split") or {},
+        "note": (
+            "Executable claim census from sealed EvalEnvironment; "
+            "structural signal, not a behavioral score."
+        ),
+    }
+
+
 def rescore_samples(rows: list[dict]) -> list[dict]:
     """Apply current classifier; keep content_score from the run."""
     out = []
@@ -135,6 +191,7 @@ def build_event(
     probe_rows: list[dict],
     baseline_metrics: dict,
     probe_metrics: dict,
+    corpus_signal: dict | None = None,
 ) -> dict:
     b_sum = summarize(baseline_rows) if baseline_rows else {
         "n": baseline_metrics.get("num_examples"),
@@ -246,9 +303,10 @@ def build_event(
             )
         },
         "probe_failures": probe_failures,
-        "corpus_signal": {
+        "corpus_signal": corpus_signal
+        or {
             "status": "deferred",
-            "note": "behavioral probe only in v1; structural doc_0↔doc_8 diff not yet attached",
+            "note": "behavioral probe only; pass --corpus-manifest to attach",
         },
         "drift_type": "changed",
         "affected_zones": ["eval_class:B", "eval_class:D", "eval_class:A", "eval_class:C"],
@@ -264,7 +322,7 @@ def render_baseline_report(events: list[dict]) -> str:
         "```text",
         "DriftEvent compares the same eval_v3 probes under two conditions.",
         "Stable knowledge = class A. Changed knowledge = classes B and D.",
-        "A file diff alone is not drift; this v1 artifact is behavioral (+ deferred corpus).",
+        "Behavioral scoreboard + structural corpus_signal (eval-factory census).",
         "```",
         "",
         "## what goes where",
@@ -272,6 +330,7 @@ def render_baseline_report(events: list[dict]) -> str:
         "- DriftEvent JSON: `artifacts/reports/drift_events/`",
         "- this report: `artifacts/reports/e1_vllm_drift_baseline.md`",
         "- generator: `experiments/e1_vllm/sense_drift.py`",
+        "- corpus census: sealed `e1_eval_factory_v1` manifest",
         "",
         "## what can die",
         "",
@@ -281,12 +340,14 @@ def render_baseline_report(events: list[dict]) -> str:
         "",
         "- frozen eval_v3 + cited run_ids",
         "- DriftEvent JSON + this baseline report",
+        "- attached corpus_signal provenance (protocol_id + b2_prefix)",
         "",
         "## events",
         "",
     ]
     for ev in events:
         d = ev["drift_score"]
+        cs = ev.get("corpus_signal") or {}
         lines.append(f"### `{ev['baseline']['condition_id']}` → `{ev['probe']['condition_id']}`")
         lines.append("")
         lines.append(f"- baseline run: `{ev['baseline']['run_id']}`")
@@ -306,6 +367,14 @@ def render_baseline_report(events: list[dict]) -> str:
             f"{ev['changed_knowledge']['D']['delta']}"
         )
         lines.append(f"- probe_failures listed: {len(ev.get('probe_failures') or [])}")
+        if cs.get("status") == "attached":
+            lines.append(
+                f"- corpus_signal: attached "
+                f"({cs.get('claims')} claims / {cs.get('deltas')} deltas; "
+                f"`{cs.get('protocol_id')}`)"
+            )
+        else:
+            lines.append(f"- corpus_signal: {cs.get('status', 'missing')}")
         lines.append("")
 
     lines.extend(
@@ -331,9 +400,36 @@ def render_baseline_report(events: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def attach_corpus_to_events(
+    *,
+    out_dir: Path,
+    corpus_manifest: Path,
+    report: Path,
+) -> list[dict]:
+    """Patch existing DriftEvent JSONs with factory census; rewrite baseline report."""
+    signal = build_corpus_signal(corpus_manifest)
+    events: list[dict] = []
+    for path in sorted(out_dir.glob("drift_*.json")):
+        ev = _load_json(path)
+        ev["corpus_signal"] = signal
+        path.write_text(json.dumps(ev, indent=2) + "\n", encoding="utf-8")
+        print(f"attached corpus_signal → {path}")
+        events.append(ev)
+    if not events:
+        raise FileNotFoundError(f"no drift_*.json under {out_dir}")
+    report.parent.mkdir(parents=True, exist_ok=True)
+    report.write_text(render_baseline_report(events), encoding="utf-8")
+    print(f"wrote {report}")
+    return events
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--metrics-dir", type=Path, required=True)
+    p.add_argument(
+        "--metrics-dir",
+        type=Path,
+        help="Required unless --attach-corpus-only",
+    )
     p.add_argument(
         "--out-dir",
         type=Path,
@@ -344,9 +440,32 @@ def main() -> None:
         type=Path,
         default=REPO / "artifacts" / "reports" / "e1_vllm_drift_baseline.md",
     )
+    p.add_argument(
+        "--corpus-manifest",
+        type=Path,
+        default=DEFAULT_CORPUS_MANIFEST,
+        help="Sealed eval-factory manifest for corpus_signal",
+    )
+    p.add_argument(
+        "--attach-corpus-only",
+        action="store_true",
+        help="Only attach corpus_signal to existing DriftEvent JSON files",
+    )
     args = p.parse_args()
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
+    if args.attach_corpus_only:
+        attach_corpus_to_events(
+            out_dir=args.out_dir,
+            corpus_manifest=args.corpus_manifest,
+            report=args.report,
+        )
+        return
+
+    if args.metrics_dir is None:
+        p.error("--metrics-dir is required unless --attach-corpus-only")
+
+    corpus_signal = build_corpus_signal(args.corpus_manifest)
     events: list[dict] = []
     for base_id, probe_id, base_cond, probe_cond in DEFAULT_PAIRS:
         b_metrics = _load_json(_find_metrics(args.metrics_dir, base_id))
@@ -364,6 +483,7 @@ def main() -> None:
             probe_rows=p_rows,
             baseline_metrics=b_metrics,
             probe_metrics=p_metrics,
+            corpus_signal=corpus_signal,
         )
         out = args.out_dir / f"drift_{base_cond}_to_{probe_cond}.json"
         out.write_text(json.dumps(ev, indent=2) + "\n", encoding="utf-8")

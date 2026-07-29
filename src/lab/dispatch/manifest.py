@@ -48,7 +48,7 @@ def build_manifest(
     with open(config_path, "r", encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
 
-    return {
+    manifest = {
         "run_id": run_id,
         "task": task,
         "target": target,
@@ -58,6 +58,20 @@ def build_manifest(
         "created_at": datetime.now(timezone.utc).isoformat(),
         "config": cfg,
     }
+    lineage = {
+        key: cfg[key]
+        for key in (
+            "reconcile_id",
+            "drift_event_id",
+            "plan_id",
+            "eval_environment_id",
+            "candidate_id",
+        )
+        if cfg.get(key)
+    }
+    if lineage:
+        manifest["delta_lineage"] = lineage
+    return manifest
 
 
 def write_manifest(manifest: dict, path: Path) -> None:

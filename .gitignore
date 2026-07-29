@@ -22,6 +22,9 @@ outputs/
 checkpoints/
 wandb/
 
+# Local publication drafts
+docs/blog/
+
 # Local data/model files
 data/
 models/

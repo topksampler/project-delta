@@ -1,0 +1,7 @@
+version = 1
+requires-python = ">=3.11"
+
+[[package]]
+name = "lalith-ai-lab"
+version = "0.1.0"
+source = { virtual = "." }

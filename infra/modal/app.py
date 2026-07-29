@@ -45,6 +45,11 @@ image = (
     .add_local_dir("src", remote_path="/root/lalith-ai-lab/src")
     .add_local_dir("configs", remote_path="/root/lalith-ai-lab/configs")
     .add_local_dir("experiments", remote_path="/root/lalith-ai-lab/experiments")
+    # Local data mount: skip B2 Class-B pulls when cockpit already has corpora/indexes.
+    .add_local_dir(
+        "data/experiments/e1_vllm",
+        remote_path="/root/lalith-ai-lab/data/experiments/e1_vllm",
+    )
 )
 
 secrets = [modal.Secret.from_name("lalith-lab")]
@@ -81,7 +86,15 @@ def _sync_inputs(run_id: str, config_rel: str) -> Path:
 
     retrieval = cfg.get("retrieval") or {}
     if retrieval.get("enabled"):
-        for field in ("corpus_path", "index_path"):
+        for field in (
+            "corpus_path",
+            "index_path",
+            "evidence_map_path",
+            "symbol_index_path",
+            "diff_paths_path",
+            "diff_corpus_path",
+            "diff_index_path",
+        ):
             value = retrieval.get(field)
             if value:
                 paths.append(value)
@@ -108,19 +121,34 @@ def _sync_inputs(run_id: str, config_rel: str) -> Path:
     adapter_run = cfg.get("model", {}).get("adapter_run_id")
     if adapter_run:
         local_adapter = REPO_ROOT / "runs" / adapter_run / "adapter"
-        local_adapter.mkdir(parents=True, exist_ok=True)
-        _s5cmd(["cp", f"{_s3(f'runs/{adapter_run}/adapter')}/*", f"{local_adapter}/"])
+        marker = local_adapter / "adapter_model.safetensors"
+        if marker.exists():
+            print(f"adapter already local at {local_adapter}, skipping B2 pull")
+        else:
+            local_adapter.mkdir(parents=True, exist_ok=True)
+            _s5cmd(["cp", f"{_s3(f'runs/{adapter_run}/adapter')}/*", f"{local_adapter}/"])
 
     return config_path
 
 
 def _eval_module(cfg: dict) -> str:
-    if cfg.get("experiment_id") == "e1_vllm":
-        return "lab.eval_vllm_qa"
     module = cfg.get("eval", {}).get("module")
     if module:
         return module
+    if cfg.get("experiment_id") == "e1_vllm":
+        return "lab.eval_vllm_qa"
     return "lab.eval_run_spec"
+
+
+def _train_module(cfg: dict) -> str:
+    """Select train entrypoint; default remains SFT LoRA."""
+    module = (
+        (cfg.get("training") or {}).get("module")
+        or (cfg.get("train") or {}).get("module")
+    )
+    if module:
+        return module
+    return "lab.train_sft_lora"
 
 
 def _sync_outputs(run_id: str, cfg: dict) -> None:
@@ -202,14 +230,157 @@ def eval_run(run_id: str, config: str) -> None:
 def train(run_id: str, config: str) -> None:
     _timed("env_receipts", lambda: _write_receipts(run_id))
     config_path = _timed("b2_pull_inputs", lambda: _sync_inputs(run_id, config))
-    cfg = _timed("compute", lambda: _run_module("lab.train_sft_lora", config_path))
+    def _compute_train() -> dict:
+        with open(config_path, "r", encoding="utf-8") as f:
+            cfg = yaml.safe_load(f)
+        return _run_module(_train_module(cfg), config_path)
+
+    cfg = _timed("compute", _compute_train)
     _timed("b2_push_outputs", lambda: _sync_outputs(run_id, cfg))
     print(f"train complete: {run_id}")
 
 
+def _run_train_stage(config_rel: str) -> dict:
+    """Train one config; prefer local adapter continue (Class-B resilient)."""
+    with open(REPO_ROOT / config_rel, "r", encoding="utf-8") as f:
+        stage_cfg = yaml.safe_load(f)
+    stage_run_id = str(stage_cfg["run_id"])
+    _timed(f"env_receipts:{stage_run_id}", lambda rid=stage_run_id: _write_receipts(rid))
+    config_path = _timed(
+        f"b2_pull_inputs:{stage_run_id}",
+        lambda rid=stage_run_id, rel=config_rel: _sync_inputs(rid, rel),
+    )
+    with open(config_path, "r", encoding="utf-8") as f:
+        cfg = yaml.safe_load(f)
+    cfg = _timed(
+        f"compute_train:{stage_run_id}",
+        lambda p=config_path, c=cfg: _run_module(_train_module(c), p),
+    )
+    try:
+        _timed(
+            f"b2_push_train:{stage_run_id}",
+            lambda rid=stage_run_id, c=cfg: _sync_outputs(rid, c),
+        )
+    except Exception as exc:  # noqa: BLE001 — uploads may hit caps; keep local chain
+        print(f"[warn] train upload skipped for {stage_run_id}: {exc}")
+    return cfg
+
+
+def _run_eval_stage(eval_rel: str) -> None:
+    """Eval one config; reuse local adapter after first pull (Class-B resilient)."""
+    eval_path = REPO_ROOT / eval_rel
+    with open(eval_path, "r", encoding="utf-8") as f:
+        eval_cfg = yaml.safe_load(f)
+    eval_run_id = str(eval_cfg["run_id"])
+    _timed(f"env_receipts:{eval_run_id}", lambda rid=eval_run_id: _write_receipts(rid))
+    eval_path = _timed(
+        f"b2_pull_inputs:{eval_run_id}",
+        lambda rid=eval_run_id, rel=eval_rel: _sync_inputs(rid, rel),
+    )
+    with open(eval_path, "r", encoding="utf-8") as f:
+        eval_cfg = yaml.safe_load(f)
+    _timed(
+        f"compute_eval:{eval_run_id}",
+        lambda p=eval_path, c=eval_cfg: _run_module(_eval_module(c), p),
+    )
+    probes = eval_cfg.get("eval", {}).get("path")
+    samples = Path(eval_cfg["eval"]["output_dir"]) / "samples.jsonl"
+    if not samples.is_absolute():
+        samples = REPO_ROOT / samples
+    if probes and samples.exists():
+        summary_cmd = [
+            "python",
+            str(REPO_ROOT / "experiments/e1_vllm/eval_factory/summarize_run.py"),
+            "--samples",
+            str(samples),
+            "--probes",
+            str(REPO_ROOT / probes),
+            "--out",
+            str(samples.with_name("summary.json")),
+        ]
+        print("+", " ".join(summary_cmd))
+        subprocess.run(summary_cmd, check=False, cwd=str(REPO_ROOT))
+    try:
+        _timed(
+            f"b2_push_eval:{eval_run_id}",
+            lambda rid=eval_run_id, c=eval_cfg: _sync_outputs(rid, c),
+        )
+    except Exception as exc:  # noqa: BLE001
+        print(f"[warn] eval upload skipped for {eval_run_id}: {exc}")
+
+
+@app.function(
+    image=image,
+    gpu="H100",
+    secrets=secrets,
+    timeout=60 * 60 * 6,
+)
+def train_then_eval(
+    run_id: str,
+    config: str,
+    eval_configs: list[str],
+    train_chain: list[str] | None = None,
+) -> None:
+    """Train (optionally a chain), then eval against the local final adapter."""
+    chain = [c.strip() for c in (train_chain or []) if c and c.strip()]
+    # Prior stages first (e.g. teacher), then the primary config (e.g. consolidate).
+    stages = chain + [config]
+    for stage_rel in stages:
+        _run_train_stage(stage_rel)
+    print(f"train stages complete: {[s for s in stages]} → eval run_id={run_id}")
+    for eval_rel in eval_configs:
+        _run_eval_stage(eval_rel)
+    print(f"train_then_eval complete: {run_id}")
+
+
+@app.function(
+    image=image,
+    gpu="H100",
+    secrets=secrets,
+    timeout=60 * 60 * 6,
+)
+def eval_batch(run_id: str, eval_configs: list[str]) -> None:
+    """Eval-only chain (e.g. attach vs merge) without retraining."""
+    print(f"eval_batch start: run_id={run_id} n={len(eval_configs)}")
+    for eval_rel in eval_configs:
+        _run_eval_stage(eval_rel)
+    print(f"eval_batch complete: {run_id}")
+
+
 @app.local_entrypoint()
-def main(run_id: str, config: str, task: str = "train", gpu: str = "") -> None:
+def main(
+    run_id: str,
+    config: str,
+    task: str = "train",
+    gpu: str = "",
+    eval_configs: str = "",
+    train_chain: str = "",
+) -> None:
     """Dispatch train/eval with an optional GPU override (e.g. H100, A100, A10G)."""
+    if task == "train_then_eval":
+        chosen = gpu or "H100"
+        evals = [x.strip() for x in eval_configs.split(",") if x.strip()]
+        chain = [x.strip() for x in train_chain.split(",") if x.strip()]
+        print(
+            f"modal: task={task} gpu={chosen} run_id={run_id} "
+            f"chain={len(chain)} evals={len(evals)}"
+        )
+        train_then_eval.with_options(gpu=chosen).remote(
+            run_id=run_id,
+            config=config,
+            eval_configs=evals,
+            train_chain=chain,
+        )
+        return
+    if task == "eval_batch":
+        chosen = gpu or "H100"
+        evals = [x.strip() for x in eval_configs.split(",") if x.strip()]
+        print(f"modal: task={task} gpu={chosen} run_id={run_id} evals={len(evals)}")
+        eval_batch.with_options(gpu=chosen).remote(
+            run_id=run_id,
+            eval_configs=evals,
+        )
+        return
     fn = train if task == "train" else eval_run
     default_gpu = "H100" if task == "train" else "A10G"
     chosen = gpu or default_gpu

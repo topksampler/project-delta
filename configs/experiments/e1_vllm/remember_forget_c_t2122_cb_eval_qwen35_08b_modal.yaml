@@ -1,0 +1,20 @@
+run_id: e1-vllm-remember-forget-c-t2122-cb-eval-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: remember_forget_c_t2122_cb_eval
+ft_reopened: true
+
+# Transfer: closed-book on sealed v0.21→v0.22 (same consolidate adapter).
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+  adapter_run_id: e1-vllm-remember-forget-c-consolidate-qwen35-08b-modal
+
+eval:
+  path: data/experiments/e1_vllm/eval_factory/v0.21.0_to_v0.22.0/e1_eval_factory_v1/probes_eval.jsonl
+  output_dir: runs/e1-vllm-remember-forget-c-t2122-cb-eval-qwen35-08b-modal
+  max_new_tokens: 96
+  batch_size: 16
+  temperature: 0.0
+  top_p: 1.0
+  enable_thinking: false

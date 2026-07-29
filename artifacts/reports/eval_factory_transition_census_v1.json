@@ -1,0 +1,143 @@
+{
+  "schema": "delta.eval_factory.transition_census.v1",
+  "transitions": [
+    {
+      "transition": "v0.20.0\u2192v0.21.0",
+      "source": "census_build",
+      "claims": 1034,
+      "deltas": 36,
+      "by_status": {
+        "added": 25,
+        "changed": 10,
+        "removed": 1,
+        "stable": 998
+      },
+      "by_family_status": {
+        "cli_flag": {
+          "added": 6,
+          "changed": 3,
+          "stable": 349
+        },
+        "config_field": {
+          "added": 15,
+          "changed": 2,
+          "removed": 1,
+          "stable": 417
+        },
+        "env_var": {
+          "added": 4,
+          "changed": 5,
+          "stable": 210
+        },
+        "public_export": {
+          "stable": 22
+        }
+      },
+      "gate_ge_40_deltas": false
+    },
+    {
+      "transition": "v0.21.0\u2192v0.22.0",
+      "source": "census_build",
+      "claims": 1071,
+      "deltas": 62,
+      "by_status": {
+        "added": 38,
+        "changed": 7,
+        "removed": 17,
+        "stable": 1009
+      },
+      "by_family_status": {
+        "cli_flag": {
+          "added": 11,
+          "changed": 3,
+          "stable": 355
+        },
+        "config_field": {
+          "added": 15,
+          "changed": 3,
+          "removed": 7,
+          "stable": 424
+        },
+        "env_var": {
+          "added": 12,
+          "changed": 1,
+          "removed": 10,
+          "stable": 208
+        },
+        "public_export": {
+          "stable": 22
+        }
+      },
+      "gate_ge_40_deltas": true
+    },
+    {
+      "transition": "v0.22.0\u2192v0.23.0",
+      "source": "sealed_e1_eval_factory_v1",
+      "claims": 1070,
+      "deltas": 42,
+      "by_status": {
+        "added": 16,
+        "changed": 19,
+        "removed": 7,
+        "stable": 1028
+      },
+      "by_family_status": {
+        "cli_flag": {
+          "added": 9,
+          "changed": 1,
+          "stable": 368
+        },
+        "config_field": {
+          "changed": 18,
+          "removed": 2,
+          "stable": 422
+        },
+        "env_var": {
+          "added": 7,
+          "removed": 5,
+          "stable": 216
+        },
+        "public_export": {
+          "stable": 22
+        }
+      },
+      "gate_ge_40_deltas": true
+    },
+    {
+      "transition": "v0.23.0\u2192v0.24.0",
+      "source": "census_build",
+      "claims": 1091,
+      "deltas": 37,
+      "by_status": {
+        "added": 28,
+        "changed": 8,
+        "removed": 1,
+        "stable": 1054
+      },
+      "by_family_status": {
+        "cli_flag": {
+          "added": 6,
+          "changed": 5,
+          "stable": 373
+        },
+        "config_field": {
+          "added": 11,
+          "changed": 2,
+          "removed": 1,
+          "stable": 437
+        },
+        "env_var": {
+          "added": 11,
+          "changed": 1,
+          "stable": 222
+        },
+        "public_export": {
+          "stable": 22
+        }
+      },
+      "gate_ge_40_deltas": false
+    }
+  ],
+  "delta_sum": 177,
+  "note": "Structural claim census only for non-sealed transitions. Surfaces/audit/seal not run except on sealed v0.22\u2192v0.23."
+}

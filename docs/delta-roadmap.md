@@ -19,6 +19,8 @@ Phase C — intervention matrix:         complete (e1_vllm, manual selection)
 Phase B — trustworthy drift measurement: partial (DriftEvent v1 + baseline)
 TopicKnowledgeProfile — dense v1 locked (meanings+honesty; docs-grounded)
 Profile→adapt LoRA — frozen at seq v7; further FT paused
+Phase D — deterministic closed loop: partial (control plane + replay implemented;
+                                           sealed end-to-end exit still open)
 ```
 
 Phase C ran ahead of Phase B on purpose for `e1_vllm`: the intervention matrix
@@ -85,19 +87,20 @@ JSONL, mill `gated/rejected.jsonl`, frozen `eval_v3.jsonl` on B2.
 **Goal:** quantify and localize model drift using corpus changes plus behavioral
 evidence.
 
-**Status:** partial — DriftEvent v1 + baseline report exist; corpus structural
-signal and executable probes still open.
+**Status:** partial — DriftEvent v1 + baseline report exist and the factory
+corpus signal is attached; executable probes and schema freeze remain open.
 
 **Have:**
 
 - c0 vs c3 and c0 vs c1 typed `DriftEvent` JSON (behavioral, rescored labels);
 - baseline report separating stable (A) vs changed (B/D) deltas;
+- structural doc_0↔doc_8 `corpus_signal` from the sealed
+  `e1_eval_factory_v1` claim census;
 - hardened failure modes: `confident_hallucination` for unknown-gold misses;
   shared scorer in `src/lab/qa_score.py`.
 
 **Still required for full exit:**
 
-- attach structural doc_0↔doc_8 corpus signal to `DriftEvent.corpus_signal`;
 - executable tests for procedural/API behavior where possible;
 - freeze DriftEvent schema beyond `delta.drift_event.v1` after one more iteration.
 
@@ -109,7 +112,14 @@ signal and executable probes still open.
 - TruthSource v2: docs-only sufficient for shared bridge meanings (code arms
   deferred);
 - frozen adapt checkpoint: seq v7 LoRA from profile v5 + eval-hole paraphrases
-  (`manifest_v0.22.0_v7.json`); reports under `artifacts/reports/topic_knowledge_profile_*`.
+  (`manifest_v0.22.0_v7.json`); reports under `artifacts/reports/topic_knowledge_profile_*`;
+- frozen `delta.eval_environment.v1` for v0.22.0→v0.23.0:
+  `datasets/experiments/e1_vllm/eval_factory/v0.22.0_to_v0.23.0/e1_eval_factory_v1/`
+  (1,070 executable claims, 42 deltas, 623 eval probes);
+  base 0.8B / 4B instrument checks:
+  `artifacts/reports/eval_factory_v1_base_08b.md`,
+  `artifacts/reports/eval_factory_v1_base_4b.md`
+  (changed-contract score = 0 on both; 4B lower overall than 0.8B).
 
 **Exit artifact:**
 
@@ -158,22 +168,44 @@ not a reason to reopen Phase C for `e1_vllm`.
 **Goal:** execute SENSE → BUILD → DECIDE → VERIFY without human construction of
 evidence.
 
-**Status:** not started.
+**Status:** **partial**. The deterministic controller and replay path are
+implemented. The first recorded multi-release run used an unsealed seed bank,
+so it is diagnostic evidence and does not satisfy the Phase D exit.
 
-**Required work:**
+**Implemented:**
 
-- upstream revision trigger;
-- threshold-based least-cost policy;
-- candidate-state registry;
-- quality and regression promotion gates;
-- immutable decision record;
-- active-state pointer and rollback.
+- `./scripts/delta reconcile --repo ... --from ... --to ...`;
+- versioned `DriftEvent`, `InterventionPlan`, `CandidateState`,
+  `InterventionOutcome`, `PromotionDecision`, and `ActiveState` contracts;
+- deterministic least-cost policy with FT frozen by default;
+- quality, regression, coverage, cost, and provenance gates;
+- immutable local state/decision registry, explicit approval, active pointer,
+  and rollback;
+- bounded worker envelopes for surface wording and decision explanations.
+
+**Boundary:** promotion-capable reconcile requires a sealed factory environment
+and complete child-run evidence. `--target seed-replay` is an explicit
+diagnostic override; VERIFY adds a failing `environment_sealed` gate so that
+seed evidence can never promote. Extending plugin coverage does not change the
+deterministic contracts, policy, gates, approval, or rollback semantics.
 
 **Exit artifact:**
 
 ```text
 one end-to-end reconcile run that promotes or rejects automatically
 ```
+
+Diagnostic evidence (does **not** satisfy exit):
+`artifacts/delta/reconciles/reconcile-ff7d7514f4c24cc9/receipt.json`
+replays the unsealed v0.22.0→v0.26.0 seed bank and rejects the hybrid candidate
+on the recovery gate while preserving the active pointer.
+
+**Still required for full exit:**
+
+- one non-dry reconcile over a sealed transition;
+- automatic promotion or rejection with the seal, recovery, stable-regression,
+  coverage, cost, and provenance gates recorded;
+- active-pointer preservation on rejection or explicit approval on promotion.
 
 ## Phase E — learned policy and post-training
 

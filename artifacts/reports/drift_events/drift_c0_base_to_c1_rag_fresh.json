@@ -326,8 +326,66 @@
     }
   ],
   "corpus_signal": {
-    "status": "deferred",
-    "note": "behavioral probe only in v1; structural doc_0\u2194doc_8 diff not yet attached"
+    "status": "attached",
+    "schema": "delta.corpus_signal.eval_factory.v1",
+    "protocol_id": "e1_eval_factory_v1",
+    "transition": "v0.22.0_to_v0.23.0",
+    "source_before": {
+      "alias": "doc_0",
+      "commit_sha": "0b3ba88f165976e77ca5e6a7a3f5bba4562b80af",
+      "content_sha": "ce26077d691e4797d052ee707c5083806d1d5f8fdccbaa560435c695f5af6ac3",
+      "git_tag": "v0.22.0",
+      "version": "0.22.0"
+    },
+    "source_after": {
+      "alias": "doc_8",
+      "commit_sha": "0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665",
+      "content_sha": "4eca30b0427173921b0402719dea7d403145137f3c42f1482fbd74f83622c616",
+      "git_tag": "v0.23.0",
+      "version": "0.23.0"
+    },
+    "local_manifest": "data/experiments/e1_vllm/eval_factory/v0.22.0_to_v0.23.0/e1_eval_factory_v1/manifest.json",
+    "b2_prefix": "datasets/experiments/e1_vllm/eval_factory/v0.22.0_to_v0.23.0/e1_eval_factory_v1/",
+    "claims": 1070,
+    "deltas": 42,
+    "by_status": {
+      "added": 16,
+      "changed": 19,
+      "removed": 7,
+      "stable": 1028
+    },
+    "by_family": {
+      "cli_flag": 378,
+      "config_field": 442,
+      "env_var": 228,
+      "public_export": 22
+    },
+    "by_family_status": {
+      "cli_flag": {
+        "added": 9,
+        "changed": 1,
+        "stable": 368
+      },
+      "config_field": {
+        "changed": 18,
+        "removed": 2,
+        "stable": 422
+      },
+      "env_var": {
+        "added": 7,
+        "removed": 5,
+        "stable": 216
+      },
+      "public_export": {
+        "stable": 22
+      }
+    },
+    "by_split": {
+      "dev": 212,
+      "eval": 219,
+      "train": 639
+    },
+    "note": "Executable claim census from sealed EvalEnvironment; structural signal, not a behavioral score."
   },
   "drift_type": "changed",
   "affected_zones": [

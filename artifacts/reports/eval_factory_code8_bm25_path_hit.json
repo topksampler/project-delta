@@ -1,0 +1,27 @@
+{
+  "schema": "delta.eval_factory.retrieval_path_hit.v1",
+  "label": "code_8_bm25",
+  "mode": "bm25",
+  "corpus": "data/experiments/e1_vllm/corpus_code_8.jsonl",
+  "index": "data/experiments/e1_vllm/indexes/code_8_bm25.json",
+  "top_k": 4,
+  "n_probes_with_gold_paths": 621,
+  "path_hit_rate": 0.3108,
+  "path_hit_rate_by_drift": {
+    "added": 0.5,
+    "changed": 0.375,
+    "removed": 0.0,
+    "stable": 0.309
+  },
+  "counts_by_drift": {
+    "stable": 602,
+    "added": 8,
+    "changed": 8,
+    "removed": 3
+  },
+  "hits_by_drift": {
+    "stable": 186,
+    "added": 4,
+    "changed": 3
+  }
+}

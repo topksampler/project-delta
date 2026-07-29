@@ -1,0 +1,136 @@
+{
+  "c0_closed": {
+    "run_id": "e1-vllm-eval-factory-v1-base-qwen35-08b-modal",
+    "exact": 0.512,
+    "avg": 0.577,
+    "by_drift": {
+      "added": 0.725,
+      "changed": 0.0,
+      "removed": 0.75,
+      "stable": 0.5814
+    },
+    "retrieval": null,
+    "cost_usd": 0.0432,
+    "n": 623
+  },
+  "docs_bm25": {
+    "run_id": "e1-vllm-eval-factory-v1-c1-rag-fresh-nohint-qwen35-08b-modal",
+    "exact": 0.0803,
+    "avg": 0.2119,
+    "by_drift": {
+      "added": 0.675,
+      "changed": 0.0,
+      "removed": 0.75,
+      "stable": 0.2043
+    },
+    "retrieval": {
+      "enabled": true,
+      "mode": "bm25",
+      "top_k": 4,
+      "seed": null,
+      "hit_rate_nonempty": 1.0
+    },
+    "cost_usd": 0.0884,
+    "n": 623
+  },
+  "evidence_fresh": {
+    "run_id": "e1-vllm-eval-factory-v1-c1-evidence-qwen35-08b-modal",
+    "exact": 0.7239,
+    "avg": 0.8254,
+    "by_drift": {
+      "added": 0.775,
+      "changed": 0.375,
+      "removed": 0.6667,
+      "stable": 0.8331
+    },
+    "retrieval": {
+      "enabled": true,
+      "mode": "evidence",
+      "top_k": 4,
+      "seed": null,
+      "hit_rate_nonempty": 0.9968
+    },
+    "cost_usd": 0.0937,
+    "n": 623
+  },
+  "evidence_stale": {
+    "run_id": "e1-vllm-eval-factory-v1-c2-evidence-stale-qwen35-08b-modal",
+    "exact": 0.244,
+    "avg": 0.3608,
+    "by_drift": {
+      "added": 0.7,
+      "changed": 0.0,
+      "removed": 0.5833,
+      "stable": 0.3588
+    },
+    "retrieval": {
+      "enabled": true,
+      "mode": "evidence",
+      "top_k": 4,
+      "seed": null,
+      "hit_rate_nonempty": 0.9856
+    },
+    "cost_usd": 0.0723,
+    "n": 623
+  },
+  "code_bm25_fresh": {
+    "run_id": "e1-vllm-eval-factory-v1-c1-code-bm25-qwen35-08b-modal",
+    "exact": 0.0963,
+    "avg": 0.2303,
+    "by_drift": {
+      "added": 0.65,
+      "changed": 0.125,
+      "removed": 0.6667,
+      "stable": 0.2226
+    },
+    "retrieval": {
+      "enabled": true,
+      "mode": "bm25",
+      "top_k": 4,
+      "seed": null,
+      "hit_rate_nonempty": 1.0
+    },
+    "cost_usd": 0.1364,
+    "n": 623
+  },
+  "code_bm25_stale": {
+    "run_id": "e1-vllm-eval-factory-v1-c2-code-bm25-stale-qwen35-08b-modal",
+    "exact": 0.1027,
+    "avg": 0.2348,
+    "by_drift": {
+      "added": 0.7,
+      "changed": 0.0,
+      "removed": 0.5833,
+      "stable": 0.2284
+    },
+    "retrieval": {
+      "enabled": true,
+      "mode": "bm25",
+      "top_k": 4,
+      "seed": null,
+      "hit_rate_nonempty": 1.0
+    },
+    "cost_usd": 0.1188,
+    "n": 623
+  },
+  "t2122_evidence": {
+    "run_id": "e1-vllm-eval-factory-t2122-evidence-qwen35-08b-modal",
+    "exact": 0.6424,
+    "avg": 0.7463,
+    "by_drift": {
+      "added": 0.7292,
+      "changed": 0.6667,
+      "removed": 0.7143,
+      "stable": 0.75
+    },
+    "retrieval": {
+      "enabled": true,
+      "mode": "evidence",
+      "top_k": 4,
+      "seed": null,
+      "hit_rate_nonempty": 0.9629
+    },
+    "cost_usd": 0.0755,
+    "n": 674
+  }
+}

@@ -215,19 +215,22 @@ system architecture.
 
 ## command
 
-The current implemented entrypoint is the platform dispatcher:
+The platform dispatcher executes individual experiment runs:
 
 ```bash
 ./scripts/lab run --target modal \
   --config configs/experiments/e1_vllm/c0_base_eval_qwen35_08b_modal.yaml
 ```
 
-The target DELTA entrypoint is not implemented yet:
+The DELTA control surface reconciles a source transition:
 
-```text
-delta reconcile --repo <url> --from <tag> --to <tag>
+```bash
+./scripts/delta reconcile \
+  --repo https://github.com/vllm-project/vllm.git \
+  --from <tag> \
+  --to <tag> \
+  --target replay
 ```
 
-That command is complete only when it can emit a drift event, build an eval
-environment, choose and execute an intervention, verify it, and record a promotion
-decision.
+Capability status, supported experiment plugins, and the sealed-transition
+completion gate live only in the [DELTA roadmap](./delta-roadmap.md).

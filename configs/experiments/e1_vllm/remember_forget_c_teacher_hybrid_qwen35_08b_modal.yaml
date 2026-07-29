@@ -1,0 +1,41 @@
+run_id: e1-vllm-remember-forget-c-teacher-hybrid-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: remember_forget_c_teacher_hybrid
+ft_reopened: true
+
+# Phase 1: hybrid_diff is train-time teacher only (with bare paraphrase mix).
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+
+data:
+  train_path: data/experiments/e1_vllm/train_factory_v1_teacher_hybrid_sft.jsonl
+  eval_path: data/experiments/e1_vllm/eval_factory_v1_sft_dev.jsonl
+
+output:
+  dir: runs/e1-vllm-remember-forget-c-teacher-hybrid-qwen35-08b-modal
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  module: lab.train_sft_lora
+  max_steps: 300
+  learning_rate: 0.0002
+  per_device_train_batch_size: 4
+  gradient_accumulation_steps: 2
+  logging_steps: 10
+  save_strategy: "steps"
+  bf16: true
+  fp16: false

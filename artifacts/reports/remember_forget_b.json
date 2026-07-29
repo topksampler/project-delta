@@ -1,0 +1,79 @@
+{
+  "schema": "delta.eval_factory.remember_forget_arm.v1",
+  "arm": "B",
+  "method": "claim_local_sequential_dpo",
+  "model": "Qwen/Qwen3.5-0.8B",
+  "ft_reopened": true,
+  "date": "2026-07-29",
+  "caps": {
+    "max_claims": 10,
+    "n_delta_claims_available": 17,
+    "included_drifts": ["changed", "removed"],
+    "deferred_added_claims": 7,
+    "claim_copies": 8,
+    "stable_replay_n": 12,
+    "canary_n": 24,
+    "micro_steps": 20,
+    "canary_budget": 0.02
+  },
+  "train_data": {
+    "manifest": "data/experiments/e1_vllm/claim_local_edits_v1/manifest.json",
+    "n_edits": 10
+  },
+  "configs": [
+    "configs/experiments/e1_vllm/remember_forget_b_claim_local_qwen35_08b_modal.yaml",
+    "configs/experiments/e1_vllm/remember_forget_b_cb_eval_qwen35_08b_modal.yaml",
+    "configs/experiments/e1_vllm/remember_forget_b_t2122_cb_eval_qwen35_08b_modal.yaml"
+  ],
+  "run_ids": {
+    "train": "e1-vllm-remember-forget-b-claim-local-qwen35-08b-modal",
+    "primary_eval": "e1-vllm-remember-forget-b-cb-eval-qwen35-08b-modal",
+    "transfer_eval": "e1-vllm-remember-forget-b-t2122-cb-eval-qwen35-08b-modal"
+  },
+  "interference": {
+    "path": "artifacts/reports/remember_forget_b_interference_curve.json",
+    "n_accepted": 10,
+    "n_aborted": 0,
+    "baseline_canary_exact": 0.0417,
+    "final_canary_exact": 0.625,
+    "final_drop_vs_baseline": -0.5833
+  },
+  "primary": {
+    "bank": "v0.22.0_to_v0.23.0",
+    "summary": "artifacts/reports/remember_forget_b_primary_summary.json",
+    "exact_accuracy": 0.504,
+    "avg_content_score": 0.559,
+    "by_drift_type": {
+      "added": 0.425,
+      "changed": 0.0,
+      "removed": 0.5,
+      "stable": 0.5689
+    },
+    "forget_rate": 0.1818,
+    "remember_rate": 0.0,
+    "stable_delta_vs_base": -0.0125
+  },
+  "transfer": {
+    "bank": "v0.21.0_to_v0.22.0",
+    "summary": "artifacts/reports/remember_forget_b_t2122_summary.json",
+    "exact_accuracy": 0.632,
+    "avg_content_score": 0.6914,
+    "by_drift_type": {
+      "added": 0.4062,
+      "changed": 0.7222,
+      "removed": 0.4762,
+      "stable": 0.7215
+    },
+    "forget_rate": 0.4706,
+    "remember_rate": 0.0
+  },
+  "pass_bar": {
+    "changed_ge_0_50": false,
+    "removed_ge_0_50": true,
+    "forget_le_0_25": true,
+    "stable_loss_le_0_02": true,
+    "transfer_changed_not_collapsed": true
+  },
+  "verdict": "primary_falsified_changed_flat_despite_low_forget",
+  "note": "artifacts/reports/eval_factory_remember_forget_b.md"
+}

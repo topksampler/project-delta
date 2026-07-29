@@ -1,0 +1,120 @@
+{
+  "baseline_canary_exact": 0.0417,
+  "canary_budget": 0.02,
+  "caps": {
+    "canary_n": 24,
+    "cap_reason": "capped at 10/17 delta claims; order=changed\u2192removed\u2192added; deferred mostly added when max_claims covers all changed+removed first",
+    "max_claims": 10,
+    "micro_steps": 20,
+    "n_delta_claims_available": 17,
+    "stable_replay_n": 12
+  },
+  "curve": [
+    {
+      "accepted": true,
+      "canary_exact": 0.0417,
+      "claim_id": null,
+      "drop_vs_baseline": 0.0,
+      "edit_index": -1,
+      "status": "baseline"
+    },
+    {
+      "accepted": true,
+      "canary_exact": 0.625,
+      "claim_id": "vllm:config_field:vllm.config.cache.CacheConfig.block_size",
+      "drop_vs_baseline": -0.5833,
+      "edit_index": 0,
+      "primary_drift": "changed",
+      "status": "accepted"
+    },
+    {
+      "accepted": true,
+      "canary_exact": 0.625,
+      "claim_id": "vllm:config_field:vllm.config.parallel.ParallelConfig.dbo_decode_token_threshold",
+      "drop_vs_baseline": -0.5833,
+      "edit_index": 1,
+      "primary_drift": "changed",
+      "status": "accepted"
+    },
+    {
+      "accepted": true,
+      "canary_exact": 0.9167,
+      "claim_id": "vllm:config_field:vllm.config.parallel.ParallelConfig.decode_context_parallel_size",
+      "drop_vs_baseline": -0.875,
+      "edit_index": 2,
+      "primary_drift": "changed",
+      "status": "accepted"
+    },
+    {
+      "accepted": true,
+      "canary_exact": 0.625,
+      "claim_id": "vllm:config_field:vllm.config.parallel.ParallelConfig.max_parallel_loading_workers",
+      "drop_vs_baseline": -0.5833,
+      "edit_index": 3,
+      "primary_drift": "changed",
+      "status": "accepted"
+    },
+    {
+      "accepted": true,
+      "canary_exact": 0.625,
+      "claim_id": "vllm:config_field:vllm.config.parallel.ParallelConfig.ubatch_size",
+      "drop_vs_baseline": -0.5833,
+      "edit_index": 4,
+      "primary_drift": "changed",
+      "status": "accepted"
+    },
+    {
+      "accepted": true,
+      "canary_exact": 0.9583,
+      "claim_id": "vllm:config_field:vllm.config.scheduler.SchedulerConfig.max_num_scheduled_tokens",
+      "drop_vs_baseline": -0.9167,
+      "edit_index": 5,
+      "primary_drift": "changed",
+      "status": "accepted"
+    },
+    {
+      "accepted": true,
+      "canary_exact": 0.9583,
+      "claim_id": "vllm:config_field:vllm.config.weight_transfer.WeightTransferConfig.backend",
+      "drop_vs_baseline": -0.9167,
+      "edit_index": 6,
+      "primary_drift": "changed",
+      "status": "accepted"
+    },
+    {
+      "accepted": true,
+      "canary_exact": 0.625,
+      "claim_id": "vllm:config_field:vllm.config.pooler.PoolerConfig.logit_scale",
+      "drop_vs_baseline": -0.5833,
+      "edit_index": 7,
+      "primary_drift": "removed",
+      "status": "accepted"
+    },
+    {
+      "accepted": true,
+      "canary_exact": 0.625,
+      "claim_id": "vllm:env_var:VLLM_MORIIO_NUM_WORKERS",
+      "drop_vs_baseline": -0.5833,
+      "edit_index": 8,
+      "primary_drift": "removed",
+      "status": "accepted"
+    },
+    {
+      "accepted": true,
+      "canary_exact": 0.625,
+      "claim_id": "vllm:env_var:VLLM_MORIIO_POST_BATCH_SIZE",
+      "drop_vs_baseline": -0.5833,
+      "edit_index": 9,
+      "primary_drift": "removed",
+      "status": "accepted"
+    }
+  ],
+  "final_canary_exact": 0.625,
+  "final_drop_vs_baseline": -0.5833,
+  "manifest": "/root/lalith-ai-lab/data/experiments/e1_vllm/claim_local_edits_v1/manifest.json",
+  "n_aborted": 0,
+  "n_accepted": 10,
+  "n_edits_attempted": 10,
+  "run_id": "e1-vllm-remember-forget-b-claim-local-qwen35-08b-modal",
+  "schema": "delta.eval_factory.claim_local_interference.v1"
+}

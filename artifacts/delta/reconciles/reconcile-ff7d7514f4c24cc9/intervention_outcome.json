@@ -1,0 +1,25 @@
+{
+  "candidate_id": "632c11e135f226a7e14b7e38a0c0ca294bffea95b6194d10d1175e61e27365f6",
+  "cost": 0.0,
+  "metadata": {
+    "evidence_replay": true
+  },
+  "metrics": {
+    "coverage": 1.0,
+    "pooled_exact": 0.3347,
+    "stable": 0.4062
+  },
+  "outcome_id": "a153f8f8f1183446e19aa823c84d43096753a1890c954c4cb0c7dfab53c92cc2",
+  "paths": {
+    "metrics": "artifacts/reports/e1-vllm-eval-factory-v022-v026-c1-hybrid-qwen35-08b-modal_summary.json"
+  },
+  "per_drift_metrics": {
+    "added": 0.7247,
+    "changed": 0.3472,
+    "removed": 0.5729,
+    "stable": 0.4062
+  },
+  "schema_id": "delta.intervention_outcome.v1",
+  "status": "succeeded",
+  "timing": {}
+}

@@ -1,0 +1,45 @@
+run_id: e1-vllm-remember-forget-b-claim-local-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: remember_forget_b_claim_local
+ft_reopened: true
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+
+data:
+  manifest_path: data/experiments/e1_vllm/claim_local_edits_v1/manifest.json
+
+output:
+  dir: runs/e1-vllm-remember-forget-b-claim-local-qwen35-08b-modal
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  module: lab.train_claim_local_edits
+  # max_steps kept for schema parity; micro_steps is the per-claim budget.
+  max_steps: 20
+  micro_steps: 20
+  learning_rate: 0.0002
+  per_device_train_batch_size: 4
+  gradient_accumulation_steps: 1
+  logging_steps: 5
+  save_strategy: "no"
+  bf16: true
+  fp16: false
+  beta: 0.1
+  max_length: 1024
+  canary_budget: 0.02
+  canary_max_new_tokens: 64

@@ -72,11 +72,23 @@ python experiments/e1_vllm/inspect_data.py validate-eval eval_v2.jsonl
 implemented  snapshots, corpora, inspect/validate tooling, eval_v2, eval_v3,
              c0–c6 Modal configs, BM25 index builder, LoRA train/reload path,
              mill (T1–T7), comparison report,
-             dense TopicKnowledgeProfile + profile wheel (v5) + seq v7 LoRA
-partial      short-answer evaluator; Phase B DriftEvent v1 (behavioral only)
-planned      Phase B structural/executable signal; next version-delta sense
-deferred     full-weight FT; further LoRA FT past v7; executable verifier;
-             corpus structural DriftEvent signal; RL reward
+             dense TopicKnowledgeProfile + profile wheel (v5) + seq v7 LoRA,
+             base 0.8B + 4B instrument checks on factory eval,
+             factory condition matrix @ 0.8B; fair RAG ladder (no hint);
+             four-transition structural census (v0.20…v0.24);
+             frozen EvalEnvironment v0.21→v0.22 (62 deltas / 674 probes);
+             evidence-span RAG on factory eval (exact 0.724; changed 0.375);
+             code-BM25 A/B + evidence era ladder; evidence RAG on v0.21→v0.22;
+             symbol and hybrid-diff retrievers; factory LoRA/delta-diet arc;
+             remember/forget A–D negative result; deterministic reconcile
+partial      short-answer evaluator; Phase B DriftEvent v1
+             (behavioral + attached factory corpus_signal);
+             Phase D sealed-transition exit
+planned      executable procedural probes; sealed unseen-transition reconcile;
+             better within-file evidence-span ranking
+deferred     full-weight FT; LoRA past v7 profile wheel (still paused);
+             factory LoRA after remember/forget closeout;
+             docs-BM25 / naive code-BM25; boolean_answer_hint default
 ```
 
 This work completed the Phase A exit and Phase C intervention matrix for the

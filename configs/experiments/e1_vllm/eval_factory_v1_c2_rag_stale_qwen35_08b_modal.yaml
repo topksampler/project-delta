@@ -1,0 +1,25 @@
+run_id: e1-vllm-eval-factory-v1-c2-rag-stale-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: eval_factory_v1_c2_rag_stale
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+
+eval:
+  path: data/experiments/e1_vllm/eval_factory/v0.22.0_to_v0.23.0/e1_eval_factory_v1/probes_eval.jsonl
+  output_dir: runs/e1-vllm-eval-factory-v1-c2-rag-stale-qwen35-08b-modal
+  max_new_tokens: 96
+  batch_size: 8
+  temperature: 0.0
+  top_p: 1.0
+  enable_thinking: false
+  boolean_answer_hint: true
+
+retrieval:
+  enabled: true
+  corpus_path: data/experiments/e1_vllm/corpus_doc_0.jsonl
+  index_path: data/experiments/e1_vllm/indexes/doc_0_bm25.json
+  top_k: 4
+  max_chars: 3500

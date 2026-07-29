@@ -1,0 +1,20 @@
+{
+  "schema": "delta.eval_factory.boolhint_autopsy.v1",
+  "n_boolean": 404,
+  "yes_to_no_flips": 154,
+  "flip_share_of_boolean": 0.3812,
+  "flip_when_expected_yes": 154,
+  "token_transitions": {
+    "no->no": 212,
+    "yes->no": 154,
+    "yes->yes": 37,
+    "no->yes": 1
+  },
+  "expected_yes_exact_nohint": 0.4751,
+  "expected_yes_exact_hint": 0.0945,
+  "expected_yes_says_yes_nohint": 0.4751,
+  "expected_yes_says_yes_hint": 0.0945,
+  "expected_yes_says_no_hint": 0.9055,
+  "helped_n": 1,
+  "mechanism": "Appending \"Answer yes or no.\" systematically flips first token Yes\u2192No on Qwen3.5-0.8B for this bank (154/404 boolean). Not a scorer bug: model output itself changes polarity. Compatible with last-option / negation-priming bias when the instruction ends with the word \"no\"."
+}

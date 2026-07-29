@@ -1,0 +1,28 @@
+run_id: e1-vllm-c3-ft-factory-v1-delta-diet-symbol-diff-eval-qwen35-08b-modal
+
+experiment_id: e1_vllm
+condition_id: c3_ft_factory_v1_delta_diet_symbol_diff_eval
+
+model:
+  name: Qwen/Qwen3.5-0.8B
+  trust_remote_code: true
+  adapter_run_id: e1-vllm-c3-ft-factory-v1-delta-diet-qwen35-08b-modal
+
+eval:
+  path: data/experiments/e1_vllm/eval_factory/v0.22.0_to_v0.23.0/e1_eval_factory_v1/probes_eval.jsonl
+  output_dir: runs/e1-vllm-c3-ft-factory-v1-delta-diet-symbol-diff-eval-qwen35-08b-modal
+  max_new_tokens: 96
+  batch_size: 8
+  temperature: 0.0
+  top_p: 1.0
+  enable_thinking: false
+
+retrieval:
+  enabled: true
+  mode: symbol_diff
+  corpus_path: data/experiments/e1_vllm/corpus_code_8.jsonl
+  index_path: data/experiments/e1_vllm/indexes/code_8_bm25.json
+  symbol_index_path: data/experiments/e1_vllm/indexes/symbol_code_8_v022_v023_train.json
+  diff_paths_path: data/experiments/e1_vllm/indexes/version_diff_paths_v022_v023.json
+  top_k: 4
+  max_chars: 3500

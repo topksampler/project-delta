@@ -16,8 +16,20 @@ inference:
   engine: vllm
   pip_pin: "vllm==0.23.0"
 
-# Moving target: two doc snapshots (not lalith-ai-lab git)
+# Moving target: doc snapshots (not lalith-ai-lab git)
+# Core pair for e1_vllm interventions: doc_0 / doc_8.
+# Extra pins for eval-factory multi-transition census: doc_m2 / doc_m1 / doc_9.
 vllm_docs:
+  doc_m2:
+    version: "0.20.0"
+    git_tag: v0.20.0
+    docs_base: https://docs.vllm.ai/en/v0.20.0/
+    use: eval_factory_transition_matrix
+  doc_m1:
+    version: "0.21.0"
+    git_tag: v0.21.0
+    docs_base: https://docs.vllm.ai/en/v0.21.0/
+    use: eval_factory_transition_matrix
   doc_0:
     version: "0.22.0"
     git_tag: v0.22.0
@@ -28,6 +40,16 @@ vllm_docs:
     git_tag: v0.23.0
     docs_base: https://docs.vllm.ai/en/v0.23.0/
     use: eval_primary, rag_index_fresh
+  doc_9:
+    version: "0.24.0"
+    git_tag: v0.24.0
+    docs_base: https://docs.vllm.ai/en/v0.24.0/
+    use: eval_factory_transition_matrix
+  doc_11:
+    version: "0.26.0"
+    git_tag: v0.26.0
+    docs_base: https://docs.vllm.ai/en/v0.26.0/
+    use: eval_factory_decide_demo_v022_v026
 
 frozen_at: "2026-06-27"
 

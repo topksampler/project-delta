@@ -1,0 +1,19 @@
+run_id: e1-vllm-eval-factory-v1-surface-gen-v3-multifamily-qwen35-4b-modal
+
+experiment_id: e1_vllm
+condition_id: eval_factory_v1_multifamily_surface_generation_v3
+
+model:
+  id: Qwen/Qwen3.5-4B
+  trust_remote_code: true
+
+eval:
+  module: experiments.e1_vllm.eval_factory.generate_surfaces
+  path: data/experiments/e1_vllm/eval_factory/v0.22.0_to_v0.23.0/e1_eval_factory_v1/probes_eval_seed.jsonl
+  output_dir: runs/e1-vllm-eval-factory-v1-surface-gen-v3-multifamily-qwen35-4b-modal
+
+generation:
+  id: teacher_paraphrase_v3_multifamily
+  batch_size: 16
+  max_new_tokens: 96
+  max_seed_jaccard: 0.70

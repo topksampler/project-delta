@@ -97,7 +97,18 @@ PY
 lab_timing "b2_pull_inputs"
 
 if [ "$TASK" = "train" ]; then
-  .venv/bin/python -m lab.train_sft_lora --config "$CONFIG_LOCAL"
+  TRAIN_MODULE="$(python - <<'PY'
+import os, yaml
+with open(f"/tmp/lab-{os.environ['LAB_RUN_ID']}-config.yaml") as f:
+    cfg = yaml.safe_load(f)
+print(
+    (cfg.get("training") or {}).get("module")
+    or (cfg.get("train") or {}).get("module")
+    or "lab.train_sft_lora"
+)
+PY
+)"
+  .venv/bin/python -m "$TRAIN_MODULE" --config "$CONFIG_LOCAL"
 else
   .venv/bin/python -m lab.eval_run_spec --config "$CONFIG_LOCAL"
 fi
