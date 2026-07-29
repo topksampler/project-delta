@@ -32,14 +32,15 @@ generator:
   method: deterministic-template-only
   teacher_role: forbidden
   revisions:
-    before: v0.25.0
-    after: v0.25.1
+    before: v0.25.1
+    after: v0.26.0
 
 split_policy:
   source: acceptance_source_splits.jsonl
   invariant: every-item-inherits-source-split
   allowed_splits: [eval]
   acceptance_eval_items: required
+  empty_eval_policy: fail-build
 
 human_audit:
   algorithm: stratified-hash-sample-v1

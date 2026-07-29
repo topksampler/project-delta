@@ -350,9 +350,22 @@ class ItemGenerationTest(unittest.TestCase):
 
         self.assertEqual(len(items), 2)
         self.assertEqual({item["split"] for item in items}, {"eval"})
-        self.assertIn("v0.25.0 to v0.25.1", items[0]["prompt"])
+        self.assertIn("v0.25.1 to v0.26.0", items[0]["prompt"])
         self.assertEqual(audit["status"], "pass")
         self.assertTrue(audit["acceptance_accessed"])
+
+    def test_acceptance_fails_closed_on_empty_eval(self) -> None:
+        import yaml
+
+        contract = yaml.safe_load(
+            ACCEPTANCE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+
+        audit = audit_items([], [], contract)
+
+        self.assertEqual(audit["status"], "fail")
+        self.assertTrue(audit["nonempty_required"])
+        self.assertFalse(audit["nonempty"])
 
 
 class HumanAuditPacketTest(unittest.TestCase):

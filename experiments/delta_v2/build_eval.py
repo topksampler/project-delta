@@ -175,7 +175,7 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
     revisions = _mapping(generator.get("revisions"), "generator.revisions")
     expected_revisions = {
         "development": {"before": "v0.22.0", "after": "v0.23.0"},
-        "acceptance": {"before": "v0.25.0", "after": "v0.25.1"},
+        "acceptance": {"before": "v0.25.1", "after": "v0.26.0"},
     }
     if dict(revisions) != expected_revisions[str(transition)]:
         raise EvalBuildError(f"unexpected {transition} revisions")
@@ -204,6 +204,7 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
         raise EvalBuildError("invalid development split policy")
     if transition == "acceptance" and (
         split_policy.get("acceptance_eval_items") != "required"
+        or split_policy.get("empty_eval_policy") != "fail-build"
     ):
         raise EvalBuildError("invalid acceptance split policy")
 
@@ -584,6 +585,10 @@ def audit_items(
         and not invalid_splits
         and control_balance_matches
         and eval_ids == sorted(eval_ids)
+        and (
+            contract["transition"] != "acceptance"
+            or len(items) > 0
+        )
     )
     split_counts = Counter(str(item["split"]) for item in items)
     task_counts = Counter(str(item["task_kind"]) for item in items)
@@ -606,6 +611,8 @@ def audit_items(
         "task_counts": dict(sorted(task_counts.items())),
         "fact_status_counts": dict(sorted(status_counts.items())),
         "eval_items": split_counts.get("eval", 0),
+        "nonempty_required": contract["transition"] == "acceptance",
+        "nonempty": len(items) > 0,
         "acceptance_accessed": contract["transition"] == "acceptance",
         "deterministic_order": eval_ids == sorted(eval_ids),
     }
