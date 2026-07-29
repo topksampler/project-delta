@@ -1,0 +1,51 @@
+schema: delta.pull_request_evidence.v1
+
+evidence_id: pull-request:vllm-project/vllm#43447
+repository: vllm-project/vllm
+number: 43447
+url: https://github.com/vllm-project/vllm/pull/43447
+title: >-
+  [Prefix Caching] DeepSeekv4 - Support selective prefix-cache retention for
+  sliding-window KV cache
+state: merged
+author: wzhao18
+merged_at: "2026-06-04T07:48:32Z"
+merge_commit_sha: a6183563b6f604ef7b481ce8ce7af359c6dc1b74
+
+base:
+  ref: main
+  sha: 969aec4bc845794581fcfa5f3c0bad42023b8358
+head:
+  ref: wzhao/dsv4-prefix-caching-retention
+  sha: 6c529f3001ab8bf44b1657e779dc54b622397045
+
+counts:
+  commits: 13
+  changed_files: 7
+  additions: 792
+  deletions: 45
+
+changed_paths:
+  - tests/v1/core/test_kv_cache_utils.py
+  - tests/v1/core/test_prefix_caching.py
+  - vllm/envs.py
+  - vllm/v1/core/block_pool.py
+  - vllm/v1/core/kv_cache_coordinator.py
+  - vllm/v1/core/kv_cache_utils.py
+  - vllm/v1/core/single_type_kv_cache_manager.py
+
+development_transition_membership:
+  development_before_contains_merge: false
+  development_after_contains_merge: true
+  verifier: git-merge-base-is-ancestor-v1
+
+provenance_role: candidate-discovery-and-grouping-only
+truth_policy: >-
+  The PR title, description, and author claims are not ground truth. File
+  changes route to the pinned Git trees; code contracts route to static
+  verification; runtime claims route to BehaviorProbe results.
+
+retrieval:
+  provider: github
+  retrieved_on: "2026-07-29"
+

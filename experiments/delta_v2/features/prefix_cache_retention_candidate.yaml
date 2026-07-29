@@ -1,0 +1,31 @@
+schema: delta.feature_candidate.v1
+
+candidate_id: feature-candidate:vllm-prefix-cache-retention
+repository: vllm-project/vllm
+transition: development
+
+summary: >-
+  vLLM can selectively retain prefix-cache checkpoints for sliding-window KV
+  caches through a configurable retention interval.
+proposed_status: added
+proposal_method: human
+verification_status: pending
+
+evidence_ids:
+  - fact:717e42584616457338dae6cae10686391a1ae66e37bbb96a467e93dbb97ed440
+  - file:1c563eba687c12bbadecbd66ab44ec1b7d7294ceb2149c7c16c3cf3b91c8b6af
+  - file:b985624ae98911d18d3569c9a600d2c9238b01beaa132ac33270b6c39cfd40fb
+  - file:5304f7a2ea75a5ff171d5a85a8646bc1378e0d766d80ba62456bc4ca53aedd42
+  - file:bf66deb3e83e45ef21d9fe7988ea15e5576754c9a4fb1288accc74eb2a0e3fd8
+  - file:33a5b2764a3936e95999bc8063bd34e74fe162c4db8567090edd2bc2b255a0c3
+  - file:80e4e38251884239a737b2b9f1a88afaa8e26d4d0355f5fddbf5461f5f1a9c7a
+  - file:8a7d2e10cd5d4e3b55e8c58191dab9ad3217b82bfb3cd85afb505fd713a11609
+  - pull-request:vllm-project/vllm#43447
+
+behavior_probe_ids: []
+
+claim_boundary: >-
+  This is an unverified grouping. The added environment-variable interface is
+  independently checkable, but the broader cache-retention behavior requires
+  an executable old/new probe before this candidate can become a FeatureDelta.
+
