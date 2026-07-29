@@ -38,13 +38,18 @@ def fact_record(fact_id: str, *, status: str = "added") -> dict:
     }
 
 
-def feature_record(feature_id: str, fact_ids: list[str]) -> dict:
-    return {
+def feature_record(
+    feature_id: str,
+    fact_ids: list[str],
+    *,
+    transition: str = "development",
+) -> dict:
+    record = {
         "schema": "delta.feature_delta.v1",
         "feature_id": feature_id,
         "source_candidate_id": "feature-candidate:example",
         "repository": "owner/repo",
-        "transition": "development",
+        "transition": transition,
         "summary": "Example feature",
         "status": "added",
         "evidence_ids": [
@@ -64,8 +69,15 @@ def feature_record(feature_id: str, fact_ids: list[str]) -> dict:
                 }
             },
         },
-        "environment_status": "development-only-unfrozen",
+        "environment_status": (
+            "development-only-unfrozen"
+            if transition == "development"
+            else "acceptance-feature-unfrozen"
+        ),
     }
+    if transition == "acceptance":
+        record["fact_policy"] = "no-post-unseal-fact-family-expansion"
+    return record
 
 
 class ContractTest(unittest.TestCase):
@@ -124,6 +136,32 @@ class SourceEligibilityTest(unittest.TestCase):
         with self.assertRaisesRegex(SourceSplitError, "verifier must be a mapping"):
             collect_sources([fact], [])
 
+    def test_acceptance_feature_can_preserve_frozen_fact_boundary(self) -> None:
+        sources = collect_sources(
+            [fact_record("fact:one")],
+            [
+                feature_record(
+                    "feature:acceptance",
+                    [],
+                    transition="acceptance",
+                )
+            ],
+        )
+
+        self.assertEqual(
+            sources["feature:acceptance"].referenced_fact_ids,
+            (),
+        )
+
+    def test_development_feature_still_requires_atomic_fact(self) -> None:
+        feature = feature_record("feature:development", [])
+
+        with self.assertRaisesRegex(
+            SourceSplitError,
+            "requires atomic-fact evidence",
+        ):
+            collect_sources([fact_record("fact:one")], [feature])
+
 
 class LeakageUnitTest(unittest.TestCase):
     def test_feature_and_referenced_fact_share_one_unit(self) -> None:
@@ -167,6 +205,26 @@ class LeakageUnitTest(unittest.TestCase):
 
         with self.assertRaisesRegex(SourceSplitError, "references missing fact"):
             build_units(sources)
+
+    def test_fact_frozen_acceptance_feature_is_its_own_unit(self) -> None:
+        sources = collect_sources(
+            [fact_record("fact:one")],
+            [
+                feature_record(
+                    "feature:acceptance",
+                    [],
+                    transition="acceptance",
+                )
+            ],
+        )
+
+        self.assertEqual(
+            build_units(sources),
+            {
+                "fact:one": ("fact:one",),
+                "feature:acceptance": ("feature:acceptance",),
+            },
+        )
 
 
 class AssignmentTest(unittest.TestCase):

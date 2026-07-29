@@ -246,7 +246,7 @@ def source_from_feature(record: Mapping[str, Any]) -> Source:
             if evidence_id.startswith("fact:")
         )
     )
-    if not fact_ids:
+    if not fact_ids and record.get("transition") != "acceptance":
         raise SourceSplitError(
             f"FeatureDelta has no referenced AtomicFactDelta: {feature_id}"
         )
