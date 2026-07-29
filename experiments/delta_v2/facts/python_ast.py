@@ -178,6 +178,12 @@ def _config_decorator_state(node: ast.ClassDef) -> str:
     for decorator in node.decorator_list:
         if isinstance(decorator, ast.Name) and decorator.id == "config":
             return "exact"
+        if (
+            isinstance(decorator, ast.Call)
+            and isinstance(decorator.func, ast.Name)
+            and decorator.func.id == "config"
+        ):
+            return "exact"
         target = decorator.func if isinstance(decorator, ast.Call) else decorator
         if _terminal_name(target) == "config":
             return "ambiguous"
@@ -243,7 +249,7 @@ def _extract_config_fields(
                 store=store,
                 family_id=CONFIG_FIELD_FAMILY,
                 node=statement,
-                reason="config decorator is aliased, attributed, or called",
+                reason="config decorator is aliased or attributed",
             )
             continue
         if decorator_state != "exact":

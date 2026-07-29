@@ -56,13 +56,16 @@ families:
       - literal_default
       - static_field_constraints
     inclusion_rules:
+      - >-
+        Accept both bare @config and calls whose decorator function is the
+        exact name config.
       - Include instance fields whether a default is present or absent.
       - Preserve Field and dataclasses.field calls as canonical AST.
       - Evaluate a literal default only when ast.literal_eval succeeds.
     rejection_rules:
       - Reject ClassVar annotations because they are class constants, not instance configuration.
       - Reject tuple, attribute, subscript, or other non-Name assignment targets.
-      - Reject decorator aliases or dynamically constructed decorators.
+      - Reject attributed aliases and dynamically selected decorator callables.
 
   - id: python.cli_option.v1
     description: >-

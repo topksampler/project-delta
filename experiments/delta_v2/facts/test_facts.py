@@ -100,6 +100,14 @@ class DemoConfig:
     required: int
     limit: int = Field(default=4, gt=0, le=8)
     items: list[str] = field(default_factory=list, init=False)
+
+@config(config=ConfigDict(arbitrary_types_allowed=True))
+class CalledConfig:
+    enabled: bool = True
+
+@helpers.config
+class AliasedConfig:
+    skipped: int = 1
 """,
             path="vllm/config/demo.py",
         )
@@ -109,7 +117,7 @@ class DemoConfig:
             for row in store.observations
             if row.family_id == CONFIG_FIELD_FAMILY
         ]
-        self.assertEqual(len(rows), 3)
+        self.assertEqual(len(rows), 4)
         by_key = {row.semantic_key: row for row in rows}
         limit = by_key[
             "python-config-field:vllm.config.demo:DemoConfig.limit"
@@ -125,7 +133,10 @@ class DemoConfig:
         )
         self.assertEqual(
             [row.reason for row in store.rejections],
-            ["ClassVar is not an instance configuration field"],
+            [
+                "ClassVar is not an instance configuration field",
+                "config decorator is aliased or attributed",
+            ],
         )
 
     def test_extracts_cli_options_and_rejects_ambiguous_calls(self) -> None:
