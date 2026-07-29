@@ -1,0 +1,53 @@
+schema: delta.feature_delta.v1
+
+feature_id: feature:vllm-prefix-cache-retention
+source_candidate_id: feature-candidate:vllm-prefix-cache-retention
+repository: vllm-project/vllm
+transition: development
+
+summary: >-
+  vLLM adds an optional prefix-cache retention interval that preserves dense
+  sliding-window checkpointing when unset, supports sparse interval or
+  latest-boundary retention, and rejects negative or misaligned values.
+status: added
+
+evidence_ids:
+  - fact:717e42584616457338dae6cae10686391a1ae66e37bbb96a467e93dbb97ed440
+  - file:1c563eba687c12bbadecbd66ab44ec1b7d7294ceb2149c7c16c3cf3b91c8b6af
+  - file:b985624ae98911d18d3569c9a600d2c9238b01beaa132ac33270b6c39cfd40fb
+  - file:5304f7a2ea75a5ff171d5a85a8646bc1378e0d766d80ba62456bc4ca53aedd42
+  - file:bf66deb3e83e45ef21d9fe7988ea15e5576754c9a4fb1288accc74eb2a0e3fd8
+  - file:33a5b2764a3936e95999bc8063bd34e74fe162c4db8567090edd2bc2b255a0c3
+  - file:80e4e38251884239a737b2b9f1a88afaa8e26d4d0355f5fddbf5461f5f1a9c7a
+  - file:8a7d2e10cd5d4e3b55e8c58191dab9ad3217b82bfb3cd85afb505fd713a11609
+  - pull-request:vllm-project/vllm#43447
+
+behavior_probe_ids:
+  - behavior-probe:vllm-prefix-cache-retention-env-interface-v1
+  - behavior-probe:vllm-prefix-cache-retention-mechanics-v1
+
+verification:
+  old_revision: unavailable
+  new_revision: pass
+  recipe: delta-v2-prefix-cache-retention-promotion-v1
+  probe_results:
+    behavior-probe:vllm-prefix-cache-retention-env-interface-v1:
+      sha256: 2838adddfc48ef334a948c9d9e2d55a34abf37a07be59cdf1cce270a1fcea884
+      claim_scope: configuration-interface-only
+    behavior-probe:vllm-prefix-cache-retention-mechanics-v1:
+      sha256: 0180c2e7a688a4a87c1a418c4ced09289f1d51c447337f56835f3d3d08d4587b
+      claim_scope: complete-candidate
+
+environment_status: development-only-unfrozen
+
+limitations:
+  - >-
+    Promotion is based on the pinned v0.22.0 to v0.23.0 development
+    transition; the sealed acceptance transition has not been accessed.
+  - >-
+    The old/new mechanics contract uses a deterministic pure sliding-window
+    CPU scenario. Focused upstream after-revision tests additionally cover
+    hybrid managers and block recycling.
+  - >-
+    This FeatureDelta is verified source truth, not an EvalItem and not
+    evidence about any model's knowledge.
