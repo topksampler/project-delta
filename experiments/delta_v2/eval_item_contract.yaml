@@ -1,0 +1,67 @@
+schema: delta.eval_item_contract.v1
+
+contract_id: delta-v2-eval-items-v1
+transition: development
+source_split_contract_id: delta-v2-development-source-split-v1
+
+eligibility:
+  atomic_fact_delta:
+    include_nonstable_statuses: [added, removed, changed]
+    stable_controls:
+      ratio_to_nonstable: "1:1"
+      strata: [split, family]
+      ranking_algorithm: sha256-source-id-v1
+      salt: delta-v2-stable-control-v1
+  feature_delta:
+    include: all-promoted
+    required_probe_scope: complete-candidate
+  exclude:
+    - feature_candidate
+    - file_delta
+    - pull_request_evidence
+    - rejected_fact_observation
+
+templates:
+  atomic_fact_change_status:
+    version: delta-v2-fact-status-template-v1
+    response_labels: [stable, added, removed, changed]
+    scorer: exact-enum-v1
+  feature_behavior_matrix:
+    version: delta-v2-prefix-retention-matrix-v1
+    feature_id: feature:vllm-prefix-cache-retention
+    probe_id: behavior-probe:vllm-prefix-cache-retention-mechanics-v1
+    response_schema:
+      unset: dense
+      positive_aligned_interval: sparse_interval_plus_latest_boundary
+      zero: latest_boundary_only
+      negative: rejected
+      misaligned: rejected
+    scorer: exact-structured-json-v1
+
+generator:
+  version: delta-v2-eval-generator-v1
+  method: deterministic-template-only
+  teacher_role: forbidden
+  revisions:
+    before: v0.22.0
+    after: v0.23.0
+
+split_policy:
+  source: development_source_splits.jsonl
+  invariant: every-item-inherits-source-split
+  development_eval_items: forbidden
+  acceptance_future_split: eval
+
+human_audit:
+  algorithm: stratified-hash-sample-v1
+  sample_size: 32
+  mandatory:
+    - every-feature-item
+    - one-atomic-item-per-nonempty-split-family-status-stratum
+  fill_ranking:
+    algorithm: sha256-eval-id-v1
+    salt: delta-v2-human-audit-v1
+  judgments: [truth, version_status, answerability]
+  pass_threshold_per_judgment: 0.90
+
+freeze_state: unfrozen
