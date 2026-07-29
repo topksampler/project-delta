@@ -85,4 +85,4 @@ runtime:
 promotion_rule: >-
   Every case must match on both development revisions. The exact source
   commits and trees must match snapshots.yaml. PR prose and static facts cannot
-substitute for these runtime outcomes.
+  substitute for these runtime outcomes.
