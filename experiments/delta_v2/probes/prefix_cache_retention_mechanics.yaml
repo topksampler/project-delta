@@ -1,0 +1,88 @@
+schema: delta.behavior_probe.v1
+
+probe_id: behavior-probe:vllm-prefix-cache-retention-mechanics-v1
+candidate_id: feature-candidate:vllm-prefix-cache-retention
+transition: development
+
+claim: >-
+  VLLM_PREFIX_CACHE_RETENTION_INTERVAL changes which sliding-window KV
+  checkpoints remain available for prefix-cache reuse, while preserving dense
+  behavior when unset and rejecting invalid configured intervals.
+claim_scope: complete-candidate
+
+scenario:
+  id: pure-swa-16x16-v1
+  block_size: 16
+  sliding_window: 16
+  prompt_blocks: 16
+  num_cache_blocks: 100
+  max_model_len: 8192
+
+cases:
+  - case_id: dense_default
+    environment_value: null
+    expected_before:
+      kind: cache_state
+      cached_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+      replay_computed_tokens: 240
+    expected_after:
+      kind: cache_state
+      cached_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+      replay_computed_tokens: 240
+
+  - case_id: interval_64
+    environment_value: "64"
+    expected_before:
+      kind: cache_state
+      cached_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+      replay_computed_tokens: 240
+    expected_after:
+      kind: cache_state
+      cached_indices: [3, 7, 11, 14, 15]
+      replay_computed_tokens: 240
+
+  - case_id: latest_only
+    environment_value: "0"
+    expected_before:
+      kind: cache_state
+      cached_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+      replay_computed_tokens: 240
+    expected_after:
+      kind: cache_state
+      cached_indices: [14]
+      replay_computed_tokens: 240
+
+  - case_id: negative_rejected
+    environment_value: "-32"
+    expected_before:
+      kind: cache_state
+      cached_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+      replay_computed_tokens: 240
+    expected_after:
+      kind: construction_error
+      category: non_negative
+
+  - case_id: misaligned_rejected
+    environment_value: "33"
+    expected_before:
+      kind: cache_state
+      cached_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+      replay_computed_tokens: 240
+    expected_after:
+      kind: construction_error
+      category: scheduler_block_size_multiple
+
+runtime:
+  target: local-cpu
+  environment_status: development-only-unfrozen
+  python_requirement: ">=3.11"
+  dependency_source:
+    snapshot_role: development_after
+    path: requirements/common.txt
+  source_execution: exact-detached-worktree-v1
+  process_isolation: one-process-per-snapshot
+
+promotion_rule: >-
+  Every case must match on both development revisions. The exact source
+  commits and trees must match snapshots.yaml. PR prose and static facts cannot
+substitute for these runtime outcomes.
