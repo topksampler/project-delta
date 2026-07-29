@@ -40,6 +40,42 @@ EXPECTED_SNAPSHOT_ROLES = {
         "git-tree-sha1:ce348f7622d677acf4ee7bc4e5e8a826c2bc2c1f",
     ),
 }
+ENVIRONMENT_PROFILES = {
+    "delta-v2-vllm-source-build-v1": {
+        "acceptance_contract_id": "delta-v2-acceptance-eval-items-v2",
+        "acceptance_judge_contract_id": (
+            "delta-v2-acceptance-evidence-grounded-llm-judge-v2"
+        ),
+        "acceptance_eval_items": 42,
+        "acceptance_feature_items": 0,
+        "acceptance_feature_status": "partial",
+        "limitations": {
+            "acceptance-facts-only",
+            "acceptance-additions-and-stable-controls-only",
+            "acceptance-feature-eval-not-generalized",
+            "acceptance-selection-amended-after-unseal",
+            "acceptance-endpoint-seen-in-prior-broad-e1-work",
+            "no-target-model-result",
+        },
+    },
+    "delta-v2-vllm-source-build-v2": {
+        "acceptance_contract_id": "delta-v2-acceptance-eval-items-v3",
+        "acceptance_judge_contract_id": (
+            "delta-v2-acceptance-evidence-grounded-llm-judge-v3"
+        ),
+        "acceptance_eval_items": 43,
+        "acceptance_feature_items": 1,
+        "acceptance_feature_status": "implemented",
+        "limitations": {
+            "acceptance-additions-and-stable-controls-only",
+            "acceptance-selection-amended-after-unseal",
+            "acceptance-feature-selected-after-unseal",
+            "acceptance-endpoint-seen-in-prior-broad-e1-work",
+            "endpoint-plugin-probe-isolated-no-full-server",
+            "no-target-model-result",
+        },
+    },
+}
 
 
 class EnvironmentFreezeError(ValueError):
@@ -114,7 +150,10 @@ def validate_policy(manifest: Mapping[str, Any]) -> None:
         != "local-reproducible-not-published"
     ):
         raise EnvironmentFreezeError("environment identity or state changed")
-    _string(manifest.get("environment_id"), "environment_id")
+    environment_id = _string(manifest.get("environment_id"), "environment_id")
+    if environment_id not in ENVIRONMENT_PROFILES:
+        raise EnvironmentFreezeError("unsupported environment revision")
+    profile = ENVIRONMENT_PROFILES[environment_id]
     code_commit = _string(manifest.get("code_commit"), "code_commit")
     if not COMMIT_SHA.fullmatch(code_commit):
         raise EnvironmentFreezeError("code_commit must be a full commit SHA")
@@ -125,7 +164,9 @@ def validate_policy(manifest: Mapping[str, Any]) -> None:
         "sense_target_model_drift": "deferred",
         "build_fact_environment": "implemented",
         "build_development_feature_proof": "implemented",
-        "build_acceptance_feature_eval": "partial",
+        "build_acceptance_feature_eval": profile[
+            "acceptance_feature_status"
+        ],
         "decide": "deferred",
         "adapt": "deferred",
         "verify": "deferred",
@@ -161,16 +202,39 @@ def validate_policy(manifest: Mapping[str, Any]) -> None:
     ):
         raise EnvironmentFreezeError("execution boundary changed")
 
+    dataset = _mapping(manifest.get("dataset_contract"), "dataset_contract")
+    development = _mapping(dataset.get("development"), "dataset.development")
+    acceptance = _mapping(dataset.get("acceptance"), "dataset.acceptance")
+    if dict(development) != {
+        "transition": "v0.22.0-to-v0.23.0",
+        "train_items": 65,
+        "dev_items": 22,
+        "eval_items": 0,
+        "verified_feature_items": 1,
+    }:
+        raise EnvironmentFreezeError("development dataset contract changed")
+    if dict(acceptance) != {
+        "transition": "v0.25.1-to-v0.26.0",
+        "train_items": 0,
+        "dev_items": 0,
+        "eval_items": profile["acceptance_eval_items"],
+        "added_items": 21,
+        "stable_control_items": 21,
+        "verified_feature_items": profile["acceptance_feature_items"],
+    }:
+        raise EnvironmentFreezeError("acceptance dataset contract changed")
+    if (
+        dataset.get("scorers")
+        != ["exact-enum-v1", "exact-structured-json-v1"]
+        or dataset.get("cross_transition_source_overlap") != 0
+    ):
+        raise EnvironmentFreezeError("dataset scorer or leakage policy changed")
+
     limitations = manifest.get("limitations")
-    required_limitations = {
-        "acceptance-facts-only",
-        "acceptance-additions-and-stable-controls-only",
-        "acceptance-feature-eval-not-generalized",
-        "acceptance-selection-amended-after-unseal",
-        "acceptance-endpoint-seen-in-prior-broad-e1-work",
-        "no-target-model-result",
-    }
-    if not isinstance(limitations, list) or set(limitations) != required_limitations:
+    if (
+        not isinstance(limitations, list)
+        or set(limitations) != profile["limitations"]
+    ):
         raise EnvironmentFreezeError("required limitations are incomplete")
 
     gate = _mapping(manifest.get("test_gate"), "test_gate")
@@ -277,13 +341,27 @@ def validate_eval_summary(
             ),
             "cross_transition_exclusions",
         )
+        contract_id = payload.get("contract_id")
+        expected = {
+            "delta-v2-acceptance-eval-items-v2": {
+                "items": 42,
+                "task_counts": {"atomic_fact_change_status": 42},
+            },
+            "delta-v2-acceptance-eval-items-v3": {
+                "items": 43,
+                "task_counts": {
+                    "atomic_fact_change_status": 42,
+                    "feature_behavior_matrix": 1,
+                },
+            },
+        }.get(str(contract_id))
         if (
-            payload.get("contract_id")
-            != "delta-v2-acceptance-eval-items-v2"
-            or payload.get("items") != 42
-            or payload.get("split_counts") != {"eval": 42}
+            expected is None
+            or payload.get("items") != expected["items"]
+            or payload.get("split_counts") != {"eval": expected["items"]}
             or payload.get("fact_status_counts")
             != {"added": 21, "stable": 21}
+            or payload.get("task_counts") != expected["task_counts"]
             or payload.get("cross_transition_source_overlap") != []
             or payload.get("acceptance_accessed") is not True
             or exclusions.get("rows") != 995
@@ -297,6 +375,7 @@ def validate_judge_summary(
     payload: Mapping[str, Any],
     *,
     transition: str,
+    expected_contract_id: str | None = None,
 ) -> None:
     rates = _mapping(payload.get("dimension_pass_rates"), "dimension_pass_rates")
     if (
@@ -307,6 +386,10 @@ def validate_judge_summary(
         or set(rates) != {"truth", "version_status", "answerability"}
         or any(float(rate) < 0.90 for rate in rates.values())
         or payload.get("acceptance_accessed") is (transition == "development")
+        or (
+            expected_contract_id is not None
+            and payload.get("contract_id") != expected_contract_id
+        )
     ):
         raise EnvironmentFreezeError(f"{transition} grounded LLM audit failed")
 
@@ -359,18 +442,49 @@ def development_source_ids(rows: Iterable[Mapping[str, Any]]) -> set[str]:
     return source_ids
 
 
-def validate_bound_environment(bindings: Mapping[str, Path]) -> dict[str, Any]:
+def acceptance_source_ids(rows: Iterable[Mapping[str, Any]]) -> set[str]:
+    source_ids = set()
+    for row in rows:
+        if (
+            row.get("schema") != SPLIT_SCHEMA
+            or row.get("split") != "eval"
+            or row.get("transition") != "acceptance"
+        ):
+            raise EnvironmentFreezeError("invalid acceptance source split")
+        source_id = _string(row.get("source_id"), "source_id")
+        if source_id in source_ids:
+            raise EnvironmentFreezeError("duplicate acceptance source identity")
+        source_ids.add(source_id)
+    return source_ids
+
+
+def validate_bound_environment(
+    bindings: Mapping[str, Path],
+    *,
+    environment_id: str,
+) -> dict[str, Any]:
+    profile = ENVIRONMENT_PROFILES[environment_id]
     required = {
         "snapshots",
         "development_source_splits",
         "development_eval_items",
         "development_eval_summary",
         "development_judge_summary",
+        "acceptance_source_splits",
         "acceptance_eval_items",
         "acceptance_eval_exclusions",
         "acceptance_eval_summary",
         "acceptance_judge_summary",
     }
+    if profile["acceptance_feature_items"] == 1:
+        required.update(
+            {
+                "acceptance_feature_candidate",
+                "acceptance_feature_delta",
+                "acceptance_probe_contract",
+                "acceptance_probe_result",
+            }
+        )
     missing = required.difference(bindings)
     if missing:
         raise EnvironmentFreezeError(
@@ -381,10 +495,15 @@ def validate_bound_environment(bindings: Mapping[str, Path]) -> dict[str, Any]:
         load_json(bindings["development_eval_summary"]),
         transition="development",
     )
+    acceptance_summary = load_json(bindings["acceptance_eval_summary"])
     validate_eval_summary(
-        load_json(bindings["acceptance_eval_summary"]),
+        acceptance_summary,
         transition="acceptance",
     )
+    if acceptance_summary.get("contract_id") != profile["acceptance_contract_id"]:
+        raise EnvironmentFreezeError(
+            "acceptance EvalItem contract does not match environment revision"
+        )
     validate_judge_summary(
         load_json(bindings["development_judge_summary"]),
         transition="development",
@@ -392,6 +511,7 @@ def validate_bound_environment(bindings: Mapping[str, Path]) -> dict[str, Any]:
     validate_judge_summary(
         load_json(bindings["acceptance_judge_summary"]),
         transition="acceptance",
+        expected_contract_id=str(profile["acceptance_judge_contract_id"]),
     )
     development_ids = development_source_ids(
         load_jsonl(bindings["development_source_splits"])
@@ -401,13 +521,31 @@ def validate_bound_environment(bindings: Mapping[str, Path]) -> dict[str, Any]:
         allowed_splits={"train", "dev"},
         expected_count=87,
     )
+    acceptance_split_ids = acceptance_source_ids(
+        load_jsonl(bindings["acceptance_source_splits"])
+    )
+    acceptance_rows = load_jsonl(bindings["acceptance_eval_items"])
     acceptance_ids = validate_items(
-        load_jsonl(bindings["acceptance_eval_items"]),
+        acceptance_rows,
         allowed_splits={"eval"},
-        expected_count=42,
+        expected_count=int(profile["acceptance_eval_items"]),
     )
     if not train_dev_ids.issubset(development_ids):
         raise EnvironmentFreezeError("development item lacks source assignment")
+    if not acceptance_ids.issubset(acceptance_split_ids):
+        raise EnvironmentFreezeError("acceptance item lacks source assignment")
+    feature_rows = [
+        row
+        for row in acceptance_rows
+        if row.get("source_kind") == "feature_delta"
+    ]
+    if len(feature_rows) != profile["acceptance_feature_items"]:
+        raise EnvironmentFreezeError("acceptance feature item count changed")
+    if feature_rows and (
+        feature_rows[0].get("source_id") != "feature:vllm-endpoint-plugins"
+        or feature_rows[0].get("scorer") != "exact-structured-json-v1"
+    ):
+        raise EnvironmentFreezeError("unexpected acceptance feature item")
     overlap = sorted(development_ids.intersection(acceptance_ids))
     if overlap:
         raise EnvironmentFreezeError(
@@ -427,7 +565,9 @@ def validate_bound_environment(bindings: Mapping[str, Path]) -> dict[str, Any]:
     return {
         "development_source_ids": len(development_ids),
         "development_eval_items": len(train_dev_ids),
+        "acceptance_source_ids": len(acceptance_split_ids),
         "acceptance_eval_items": len(acceptance_ids),
+        "acceptance_feature_items": len(feature_rows),
         "acceptance_exclusions": len(excluded_ids),
         "cross_transition_source_overlap": 0,
     }
@@ -485,7 +625,10 @@ def validate_freeze(
     if commit_check.returncode != 0:
         raise EnvironmentFreezeError("frozen code commit is unavailable")
     bindings = verify_bindings(manifest.get("bindings"), repo_root=repo_root)
-    environment = validate_bound_environment(bindings)
+    environment = validate_bound_environment(
+        bindings,
+        environment_id=str(manifest["environment_id"]),
+    )
     test_gate = (
         run_test_gate(manifest, repo_root=repo_root)
         if run_tests

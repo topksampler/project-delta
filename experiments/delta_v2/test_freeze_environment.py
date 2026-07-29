@@ -9,6 +9,7 @@ from pathlib import Path
 
 from experiments.delta_v2.freeze_environment import (
     EnvironmentFreezeError,
+    acceptance_source_ids,
     development_source_ids,
     validate_eval_summary,
     validate_items,
@@ -18,10 +19,36 @@ from experiments.delta_v2.freeze_environment import (
 )
 
 
-def policy() -> dict:
+def policy(environment_revision: int = 1) -> dict:
+    acceptance_feature_status = (
+        "partial" if environment_revision == 1 else "implemented"
+    )
+    acceptance_items = 42 if environment_revision == 1 else 43
+    acceptance_feature_items = 0 if environment_revision == 1 else 1
+    limitations = (
+        [
+            "acceptance-facts-only",
+            "acceptance-additions-and-stable-controls-only",
+            "acceptance-feature-eval-not-generalized",
+            "acceptance-selection-amended-after-unseal",
+            "acceptance-endpoint-seen-in-prior-broad-e1-work",
+            "no-target-model-result",
+        ]
+        if environment_revision == 1
+        else [
+            "acceptance-additions-and-stable-controls-only",
+            "acceptance-selection-amended-after-unseal",
+            "acceptance-feature-selected-after-unseal",
+            "acceptance-endpoint-seen-in-prior-broad-e1-work",
+            "endpoint-plugin-probe-isolated-no-full-server",
+            "no-target-model-result",
+        ]
+    )
     return {
         "schema": "delta.eval_environment.v1",
-        "environment_id": "environment:test",
+        "environment_id": (
+            f"delta-v2-vllm-source-build-v{environment_revision}"
+        ),
         "experiment_id": "delta_v2",
         "repository": "vllm-project/vllm",
         "code_commit": "a" * 40,
@@ -32,7 +59,7 @@ def policy() -> dict:
             "sense_target_model_drift": "deferred",
             "build_fact_environment": "implemented",
             "build_development_feature_proof": "implemented",
-            "build_acceptance_feature_eval": "partial",
+            "build_acceptance_feature_eval": acceptance_feature_status,
             "decide": "deferred",
             "adapt": "deferred",
             "verify": "deferred",
@@ -45,6 +72,29 @@ def policy() -> dict:
             "llm_role": "review-only",
             "llm_may_change_gold": False,
             "conflict_action": "fail-build",
+        },
+        "dataset_contract": {
+            "development": {
+                "transition": "v0.22.0-to-v0.23.0",
+                "train_items": 65,
+                "dev_items": 22,
+                "eval_items": 0,
+                "verified_feature_items": 1,
+            },
+            "acceptance": {
+                "transition": "v0.25.1-to-v0.26.0",
+                "train_items": 0,
+                "dev_items": 0,
+                "eval_items": acceptance_items,
+                "added_items": 21,
+                "stable_control_items": 21,
+                "verified_feature_items": acceptance_feature_items,
+            },
+            "scorers": [
+                "exact-enum-v1",
+                "exact-structured-json-v1",
+            ],
+            "cross_transition_source_overlap": 0,
         },
         "execution": {
             "target_model_runs": 0,
@@ -59,14 +109,7 @@ def policy() -> dict:
                 "b2-write",
             ],
         },
-        "limitations": [
-            "acceptance-facts-only",
-            "acceptance-additions-and-stable-controls-only",
-            "acceptance-feature-eval-not-generalized",
-            "acceptance-selection-amended-after-unseal",
-            "acceptance-endpoint-seen-in-prior-broad-e1-work",
-            "no-target-model-result",
-        ],
+        "limitations": limitations,
         "test_gate": {
             "command": ["python", "-m", "unittest"],
             "expected_tests": 1,
@@ -74,7 +117,7 @@ def policy() -> dict:
     }
 
 
-def eval_summary(transition: str) -> dict:
+def eval_summary(transition: str, environment_revision: int = 1) -> dict:
     common = {
         "schema": "delta.eval_item_build_audit.v1",
         "status": "pass",
@@ -91,11 +134,20 @@ def eval_summary(transition: str) -> dict:
             "eval_items": 0,
             "acceptance_accessed": False,
         }
+    acceptance_items = 42 if environment_revision == 1 else 43
+    task_counts = {"atomic_fact_change_status": 42}
+    if environment_revision == 2:
+        task_counts["feature_behavior_matrix"] = 1
     return {
         **common,
-        "contract_id": "delta-v2-acceptance-eval-items-v2",
-        "items": 42,
-        "split_counts": {"eval": 42},
+        "contract_id": (
+            "delta-v2-acceptance-eval-items-v2"
+            if environment_revision == 1
+            else "delta-v2-acceptance-eval-items-v3"
+        ),
+        "items": acceptance_items,
+        "split_counts": {"eval": acceptance_items},
+        "task_counts": task_counts,
         "fact_status_counts": {"added": 21, "stable": 21},
         "cross_transition_source_overlap": [],
         "acceptance_accessed": True,
@@ -146,6 +198,14 @@ class PolicyTest(unittest.TestCase):
         with self.assertRaisesRegex(EnvironmentFreezeError, "overclaims"):
             validate_policy(altered)
 
+    def test_v2_policy_requires_completed_acceptance_feature_and_limit(self) -> None:
+        validate_policy(policy(2))
+        altered = copy.deepcopy(policy(2))
+        altered["module_status"]["build_acceptance_feature_eval"] = "partial"
+
+        with self.assertRaisesRegex(EnvironmentFreezeError, "overclaims"):
+            validate_policy(altered)
+
 
 class BindingTest(unittest.TestCase):
     def test_binding_hash_drift_fails(self) -> None:
@@ -166,6 +226,10 @@ class AuditTest(unittest.TestCase):
     def test_exact_development_and_acceptance_counts_pass(self) -> None:
         validate_eval_summary(eval_summary("development"), transition="development")
         validate_eval_summary(eval_summary("acceptance"), transition="acceptance")
+        validate_eval_summary(
+            eval_summary("acceptance", 2),
+            transition="acceptance",
+        )
 
     def test_acceptance_overlap_claim_fails(self) -> None:
         altered = eval_summary("acceptance")
@@ -212,6 +276,23 @@ class DatasetTest(unittest.TestCase):
             "development source split",
         ):
             development_source_ids(rows)
+
+    def test_acceptance_source_split_requires_eval_and_transition(self) -> None:
+        row = {
+            "schema": "delta.source_split_assignment.v1",
+            "contract_id": "test",
+            "source_id": "feature:one",
+            "split": "eval",
+            "transition": "acceptance",
+        }
+
+        self.assertEqual(acceptance_source_ids([row]), {"feature:one"})
+        row["transition"] = "development"
+        with self.assertRaisesRegex(
+            EnvironmentFreezeError,
+            "acceptance source split",
+        ):
+            acceptance_source_ids([row])
 
 
 if __name__ == "__main__":
