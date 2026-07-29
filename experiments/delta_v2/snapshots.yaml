@@ -1,0 +1,28 @@
+schema: delta.source_snapshots.v1
+
+repository:
+  id: vllm-project/vllm
+  url: https://github.com/vllm-project/vllm.git
+
+content_hash_algorithm: git-tree-sha1
+
+snapshots:
+  - role: development_before
+    revision: v0.22.0
+    commit_sha: 0b3ba88f165976e77ca5e6a7a3f5bba4562b80af
+    content_hash: git-tree-sha1:92701b6c49f4969297d5d11a2cac91c180690482
+
+  - role: development_after
+    revision: v0.23.0
+    commit_sha: 0fc695fc6d1d82e9a5ac6835ac8e4e1c83703665
+    content_hash: git-tree-sha1:e18d76eec620cdfc6559d7152f9911b7e91f84f8
+
+  - role: acceptance_before
+    revision: v0.25.0
+    commit_sha: 702f4814fe54fabff350d43cb753ae3e47c0c276
+    content_hash: git-tree-sha1:c3bd047c427ed0ba746188634e1fa1406037fa4e
+
+  - role: acceptance_after
+    revision: v0.25.1
+    commit_sha: 752a3a504485790a2e8491cacbb35c137339ad34
+    content_hash: git-tree-sha1:3ec7a4eb00f9bc8fec399bea6cf7de27a7936372
