@@ -1,0 +1,97 @@
+schema: delta.source_comparison_control_protocol.v1
+protocol_id: delta-v2-c3-source-comparison-qwen35-08b-v1
+experiment_id: delta_v2
+condition_id: c3_source_comparison
+state: preregistered-for-execution
+
+decision_trigger:
+  run_id: delta-v2-c2-oracle-source-context-qwen35-08b-modal-v1
+  metrics_sha256: 3da05d8420a5dc32ee146c05293edd5517ce49823aee17be9287dd83e7356bc6
+  samples_sha256: b292ac14f618f29bf073067cb5405d8cbaf338104fa3d8d230c304ebecb740e3
+  fact_response: changed
+  fact_response_count: 42
+  feature_correct: true
+  rationale: >-
+    Test whether deterministic comparison features repair the target's failure
+    to compare canonical SHA-256 values.
+
+oracle_contract:
+  path: experiments/delta_v2/oracle_source_context_protocol.yaml
+  sha256: c16136937d87bb6b51269ae39f6f4ab5f4e37fa6ead48aa49a0d9239294c322a
+  request_sha256: b4b39f0e325b502d3cf8fb7d5e7fb9329b92ce1301d26e4f2758619c91a98023
+  truth_sources_unchanged: true
+  acceptance_items_unchanged: true
+
+representation:
+  role: deterministic-source-comparison-control
+  fact_projection:
+    - before_present
+    - after_present
+    - canonical_equal
+  canonical_equal_rule: >-
+    true only when both canonical source values are present and their exact
+    canonical SHA-256 values are equal
+  excluded:
+    - canonical_sha256_values
+    - semantic_key
+    - gold
+    - status
+    - provenance
+    - scorer
+  feature_projection: inherited-unchanged-from-c2
+
+adaptation:
+  method: deterministic-source-comparison-features-v1
+  role: upper-bound-control
+  production_retrieval_claim: forbidden
+  weight_updates: false
+  fact_instruction: >-
+    Use only SOURCE_COMPARISON. If before_present=true,
+    after_present=true, and canonical_equal=true, answer stable. If
+    before_present=false and after_present=true, answer added. If
+    before_present=true and after_present=false, answer removed. If both are
+    present and canonical_equal=false, answer changed. Return exactly one label
+    and no explanation.
+  feature_instruction: >-
+    Use only the verified behavior evidence below. Map default_off=true to
+    default_without_allowlist=not_loaded; allowlisted_task_match_loads=true to
+    allowlisted_matching_task=loaded; required_task_miss_skips=true to
+    required_task_mismatch=skipped; factory_failure_isolated=true to
+    factory_exception=isolated; route_phase_attaches=true together with
+    attach_router_hook=true to route_phase=attach_router; and
+    state_phase_initializes=true together with async_init_state_hook=true to
+    post_engine_state_phase=await_init_state. Return one plain JSON object with
+    exactly the requested keys and no Markdown fences or explanation.
+
+generation:
+  method: greedy
+  do_sample: false
+  temperature: none
+  max_new_tokens: 128
+  num_return_sequences: 1
+  repeats: 2
+  seed: 20260730
+  repeat_invariant: byte-identical-raw-continuation
+
+scoring_and_reporting:
+  inherited_from: delta-v2-c0-base-qwen35-08b-v1
+  target_scorers_unchanged: true
+  pooled_overall_accuracy: forbidden
+  required_strata:
+    atomic_fact_added: 21
+    atomic_fact_stable: 21
+    feature_added: 1
+  primary_question: >-
+    Can the target map deterministic source-comparison booleans to the frozen
+    output labels?
+  interpretation_limit: >-
+    This is an oracle representation upper bound, not production retrieval.
+  feature_signal: report-separately
+
+execution_boundary:
+  expected_request_sha256: 080337920a74694131463385915ddc4237ff25071ac13eff2deb9fe746dbcab1
+  model_invocations_completed: 0
+  target_model_results_exist: false
+  modal_authorized: true
+  training: forbidden
+  fine_tuning: forbidden
