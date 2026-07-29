@@ -1,0 +1,40 @@
+schema: delta.target_model_run_config.v1
+run_id: delta-v2-c0-base-qwen35-08b-modal-v1
+experiment_id: delta_v2
+condition_id: c0_base
+eval_environment_id: delta-v2-vllm-source-build-v2
+task: eval
+
+protocol:
+  protocol_id: delta-v2-c0-base-qwen35-08b-v1
+  path: experiments/delta_v2/target_baseline_protocol.yaml
+  sha256: e26985e78b94365123cb8f4c0d1cf34d377d6b488f70f7ca618946336eb9b98d
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter: none
+  quantization: none
+
+runtime:
+  profile: delta-v2-baseline-modal-v1
+  python: 3.11.9
+  torch: 2.10.0
+  transformers: 5.14.1
+  device: cuda
+  dtype: bfloat16
+  attention_implementation: eager
+  deterministic_algorithms: true
+
+eval:
+  module: experiments.delta_v2.run_baseline
+  path: data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_eval_items_v3.jsonl
+  sha256: 1125a7a5429cf847d16475259ffeb6578b8d4841c81f2f01d20d4065f4c188cb
+
+output:
+  dir: runs/delta-v2-c0-base-qwen35-08b-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_baseline_app.py
+  gpu: A10G
+  timeout_seconds: 3600
