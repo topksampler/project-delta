@@ -1,0 +1,133 @@
+schema: delta.build_recipe_freeze.v1
+
+recipe_id: delta-v2-development-recipe-freeze-v1
+experiment_id: delta_v2
+repository: vllm-project/vllm
+frozen_transition: development
+code_commit: 005f0360678e8e3a28179e0608d92688fe3adcc7
+
+protocol:
+  audit_actor:
+    kind: evidence-grounded-llm
+    amendment_timing: before-development-freeze-and-before-acceptance-unseal
+    truth_authority: deterministic-sources-and-executable-probes
+  acceptance_feature_policy:
+    state: excluded-from-v1-eval
+    reason: acceptance-feature-verification-not-yet-generalized
+    development_feature_evidence_retained: true
+
+acceptance_unlock:
+  initial_state: sealed
+  condition: this-manifest-validates
+  permitted_operations:
+    - complete-file-inventory
+    - frozen-atomic-fact-extraction
+    - all-sources-eval-assignment
+    - deterministic-fact-evalitem-generation
+    - evidence-grounded-llm-audit
+  forbidden_operations:
+    - target-model-run
+    - training
+    - fine-tuning
+    - modal-job
+    - lambda-job
+    - b2-write
+
+test_gate:
+  command:
+    - python
+    - -m
+    - unittest
+    - discover
+    - -s
+    - experiments/delta_v2
+    - -p
+    - test_*.py
+  expected_tests: 110
+
+recipe_files:
+  - path: experiments/delta_v2/inventory.py
+    sha256: 9d06b83d2624b0102ce82e4c98d01cacbf854ca6414971658d00dc9d1b3a793e
+  - path: experiments/delta_v2/fact_family_manifest.py
+    sha256: bd77d133669fa26aec0a076c267191bc4e910b43d50198e94c4f2d51f31273e3
+  - path: experiments/delta_v2/facts/model.py
+    sha256: e17cf96f3871a4290e3b67d1bbb321bd3dd7423f76464b03fd980e5a80ec2557
+  - path: experiments/delta_v2/facts/python_ast.py
+    sha256: 6b24a414661ac7c40e86c594ea04f13abf3a0e2e225c9c244089a0140a33e25d
+  - path: experiments/delta_v2/facts/build.py
+    sha256: e408b00168d68d76851030955ea03cf9a97a4f1ecf6ae7976b3c915e85d2d284
+  - path: experiments/delta_v2/source_split.py
+    sha256: 6fe424184f5c5ba80037bc3dccaf6a5d11ed7d3c7257f08d55e3b8cb4a964f37
+  - path: experiments/delta_v2/build_eval.py
+    sha256: 2c05f7019b689c172db06b3f350dfcf063a7c4e59c87f4b3794ae4183d41cf38
+  - path: experiments/delta_v2/judge_eval.py
+    sha256: 946b1f0db9844208c0dc6328bf35ea7decc7718f4761d649f8bd68b432f249d5
+  - path: experiments/delta_v2/snapshots.yaml
+    sha256: 65658b13d917145943ce43dbf34b25896ad0b7c7406e1faec92b31e9cacc0508
+  - path: experiments/delta_v2/fact_families.yaml
+    sha256: aaf99951fe7da6da4aa5bacb1b63187f4c46131703d30fab1666be4d02a3d210
+  - path: experiments/delta_v2/source_split_contract.yaml
+    sha256: 67c4d8891f064e5b21adb0969dfdc46cd3ecb50797493618bbc2251036465cdf
+  - path: experiments/delta_v2/eval_item_contract.yaml
+    sha256: b5a2b26789816096afa2c98df1552e97c85d1439da9ba595750cd84461d27cce
+  - path: experiments/delta_v2/acceptance_eval_item_contract.yaml
+    sha256: 32d41b6e0181124c93f2e024aec9e988d8414ff845b003ae597047ff5b5ece6d
+  - path: experiments/delta_v2/llm_judge_contract.yaml
+    sha256: 38c1c4ea2c7fcf2c4af0622d4ed7b35b18e51ea4e0a238c6d25e2b5fa78ddb56
+
+development_evidence:
+  - path: experiments/delta_v2/features/prefix_cache_retention_candidate.yaml
+    sha256: 8944bd6379a23c08d03dc6cbe54a4afd2d52dea376a09e41c96411dc50798965
+  - path: experiments/delta_v2/features/prefix_cache_retention_feature_delta.yaml
+    sha256: 85852d298636f40ce9f947a87c2edf3c48440207890669d901b2373150711229
+  - path: experiments/delta_v2/probes/prefix_cache_retention_env.yaml
+    sha256: e059d041d4653440526ad84539a3810b0027fc0e575ef73f4653ab87aa6f677b
+  - path: experiments/delta_v2/probes/prefix_cache_retention_mechanics.yaml
+    sha256: cef4622d27fc236b1ce7f8ccf655d60da1bb5366489eb2375e6957b808dd5cc2
+  - path: experiments/delta_v2/provenance/pull_requests/43447.yaml
+    sha256: 6874dbda00db4a3ddb0474c95f1336b91bceddb1f4d7d6fad8fbb3ed9bb0da70
+  - path: artifacts/reports/delta_v2/development_llm_judge_attestation.yaml
+    sha256: 3a4d8c062958d885811e948d6e99ecd69df77bc2a7e38f1922390c7a6c84deea
+  - path: data/experiments/delta_v2/file_deltas_development.jsonl
+    sha256: 129831f4b6fa4b0604fe2c1f31854947df66df3dd4bf9101700e2386cb95c6b9
+  - path: data/experiments/delta_v2/facts/atomic_fact_deltas_development.jsonl
+    sha256: a5827d0a66289552bc707f75e20ce4ecd74a1e22dba6b3144a87ab8f27241017
+  - path: data/experiments/delta_v2/probes/prefix_cache_retention_env.result.json
+    sha256: 2838adddfc48ef334a948c9d9e2d55a34abf37a07be59cdf1cce270a1fcea884
+  - path: data/experiments/delta_v2/probes/prefix_cache_retention_mechanics.result.json
+    sha256: 0180c2e7a688a4a87c1a418c4ced09289f1d51c447337f56835f3d3d08d4587b
+  - path: data/experiments/delta_v2/splits/development_source_splits.jsonl
+    sha256: 6961545f88805c962390b79ba44ebeee3613472113682940e83b42aae0839f53
+  - path: data/experiments/delta_v2/eval/development_eval_items.jsonl
+    sha256: db169943888ec2258d6b43638a07e5c4c85998a5a50524eec3709258096c3059
+  - path: data/experiments/delta_v2/eval/development_human_audit_packet.jsonl
+    sha256: 31b70ad2327b35a2531c2798ef065e3b6e1a5464fceec46bdcbc319384c495ea
+  - path: data/experiments/delta_v2/eval/development_llm_judge_evidence.jsonl
+    sha256: 43712d6b7da6293b777b9536c995920e5fd3ebf0b548d46cf1aa675fcbf08ed0
+  - path: data/experiments/delta_v2/eval/development_llm_judge_verdicts.jsonl
+    sha256: 3a28ed44016acf6071be8f7ca4c3fcebe7bd99cc39407b620bb635a5a5a72d82
+
+audit_summaries:
+  - kind: file_inventory
+    path: data/experiments/delta_v2/file_deltas_development.summary.json
+    sha256: fd8e157130b5390f3873e16a09a6c31b324f950c263f6c0e79d9c6ed0cd1c097
+  - kind: atomic_facts
+    path: data/experiments/delta_v2/facts/atomic_fact_extraction_development.summary.json
+    sha256: ebf9b3a48c01da8db510651235b61bca26ea7983f795a13a834fabf996bc6364
+  - kind: behavior_probe
+    path: data/experiments/delta_v2/probes/prefix_cache_retention_env.result.json
+    sha256: 2838adddfc48ef334a948c9d9e2d55a34abf37a07be59cdf1cce270a1fcea884
+  - kind: behavior_probe
+    path: data/experiments/delta_v2/probes/prefix_cache_retention_mechanics.result.json
+    sha256: 0180c2e7a688a4a87c1a418c4ced09289f1d51c447337f56835f3d3d08d4587b
+  - kind: source_split
+    path: data/experiments/delta_v2/splits/development_source_splits.summary.json
+    sha256: 986bf9497029f5d264bb9f8c7511f5b3ebfd1461278c2408fe2bc64cc4d67046
+  - kind: eval_items
+    path: data/experiments/delta_v2/eval/development_eval_items.summary.json
+    sha256: 979f622f29a1d498d35439141e70f77598440b6fc9a898d62fd182d27df29fab
+  - kind: llm_judge
+    path: data/experiments/delta_v2/eval/development_llm_judge.summary.json
+    sha256: 8ea4a31cffd46fabfe0fa80707229db8095a91b435e173343074437f92ce70b0
+
+freeze_state: frozen
