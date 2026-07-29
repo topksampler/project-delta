@@ -127,8 +127,8 @@ def validate_policy(manifest: Mapping[str, Any]) -> None:
         not isinstance(part, str) or not part for part in command
     ):
         raise RecipeFreezeError("test command must be an argument list")
-    if test_gate.get("expected_tests") != 110:
-        raise RecipeFreezeError("test gate must bind all 110 tests")
+    if test_gate.get("expected_tests") != 111:
+        raise RecipeFreezeError("test gate must bind all 111 tests")
     if manifest.get("freeze_state") != "frozen":
         raise RecipeFreezeError("freeze manifest must declare frozen")
 
@@ -364,6 +364,9 @@ def validate_freeze(
         }
     )
     manifest_hash = _sha256(manifest_path)
+    prior_attempts = manifest.get("prior_acceptance_attempts", [])
+    if not isinstance(prior_attempts, list):
+        raise RecipeFreezeError("prior_acceptance_attempts must be a list")
     return {
         "schema": RESULT_SCHEMA,
         "recipe_id": manifest["recipe_id"],
@@ -375,7 +378,8 @@ def validate_freeze(
         "development_evidence_files": len(evidence_files),
         "audit_summaries": len(audits),
         "test_gate": test_gate,
-        "acceptance_accessed": False,
+        "prior_acceptance_attempts_recorded": len(prior_attempts),
+        "selected_acceptance_accessed": False,
         "acceptance_unlock": "granted",
         "forbidden_operations_remain_forbidden": True,
     }

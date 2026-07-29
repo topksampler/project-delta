@@ -52,7 +52,7 @@ def policy() -> dict:
         },
         "test_gate": {
             "command": ["python", "-m", "unittest"],
-            "expected_tests": 110,
+            "expected_tests": 111,
         },
         "freeze_state": "frozen",
     }
