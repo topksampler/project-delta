@@ -15,6 +15,9 @@ EVAL_DATA = (
     "data/experiments/delta_v2/acceptance_attempt_2/eval/"
     "acceptance_eval_items_v3.jsonl"
 )
+DEVELOPMENT_DATA = (
+    "data/experiments/delta_v2/eval/development_eval_items.jsonl"
+)
 
 app = modal.App("lalith-ai-lab-delta-v2-baseline")
 secrets = [modal.Secret.from_name("lalith-lab")]
@@ -61,6 +64,10 @@ image = (
     .add_local_file(
         EVAL_DATA,
         remote_path=f"/root/lalith-ai-lab/{EVAL_DATA}",
+    )
+    .add_local_file(
+        DEVELOPMENT_DATA,
+        remote_path=f"/root/lalith-ai-lab/{DEVELOPMENT_DATA}",
     )
 )
 

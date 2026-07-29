@@ -1,0 +1,119 @@
+schema: delta.prompt_adaptation_protocol.v1
+protocol_id: delta-v2-c1-task-calibration-qwen35-08b-v1
+experiment_id: delta_v2
+condition_id: c1_task_calibration
+state: preregistered-for-execution
+
+decision_trigger:
+  run_id: delta-v2-c0-base-qwen35-08b-modal-v3
+  metrics_sha256: 9a218d184b25f1c80356b6ef01a38f40b728b2783b10b8f382e833f1dfc8b981
+  samples_sha256: 605482c56c7482171670db72ea5d04975106d7575cb0fc4863444dab7e2e8696
+  state: baseline-incapable-of-localizing-drift
+  observed_fact_responses:
+    added: 33
+    changed: 9
+    removed: 0
+    stable: 0
+  rationale: >-
+    Repair task-label calibration before interpreting an acceptance miss as a
+    source-knowledge gap.
+
+baseline_contract:
+  path: experiments/delta_v2/target_baseline_protocol.yaml
+  sha256: e26985e78b94365123cb8f4c0d1cf34d377d6b488f70f7ca618946336eb9b98d
+  acceptance_eval_items_sha256: 1125a7a5429cf847d16475259ffeb6578b8d4841c81f2f01d20d4065f4c188cb
+  acceptance_rows: 43
+
+development_context:
+  path: data/experiments/delta_v2/eval/development_eval_items.jsonl
+  sha256: db169943888ec2258d6b43638a07e5c4c85998a5a50524eec3709258096c3059
+  source_transition: vllm-v0.22.0-to-v0.23.0
+  allowed_split: train
+  selection:
+    algorithm: eval-id-ascending-first-two-per-label-v1
+    fact_label_order: [stable, added, removed, changed]
+    fact_examples_per_label: 2
+    fact_eval_ids:
+      - eval:19e5e309801b953eca3af7f870259051a02579ec2399ec0a1b0c65cf490c7181
+      - eval:1d046b9019fcf7880d59c58713e6aae726427b729760cc15b263f130df42909f
+      - eval:46436fffd50f44d08033c5e96479ae35a2087e3cc958ced27c3f8bf6f0dd21d8
+      - eval:5116c995a4cb171216aa18cff136d164f38632f8c8c987149e59c3c8d93439ce
+      - eval:00dfe4bc9446d781da22f9ac6ef955dcf8bd5519a61a67d9cb3df95e13fc0124
+      - eval:52cd98b563a45c038c3374c2443556efd8438817c3fa83eb0ce1219e65f966d0
+      - eval:0de08e8382d338e99a667e258cb216e9e07000611efab9f72d513f1d6c00d753
+      - eval:26d915f2d4a19eef10c2b054a81abafcf41c518c6a77d8424057b68cd932f8ce
+    feature_eval_id: eval:379be8c847d38e071735dc3f8add0051a1693eb42294d39b8604f0d2b55cdaed
+  model_visible_fields:
+    - selected_development_prompt
+    - selected_development_answer
+    - acceptance_prompt
+  forbidden_model_inputs:
+    - acceptance_gold
+    - acceptance_provenance
+    - acceptance_scorer
+    - acceptance_source_snapshot
+    - acceptance_atomic_fact_record
+    - acceptance_feature_delta_record
+    - acceptance_behavior_probe_result
+    - acceptance_judge_evidence
+    - development_dev_items
+
+adaptation:
+  method: development-only-in-context-task-calibration-v1
+  weight_updates: false
+  retrieval: false
+  source_evidence_injection: false
+  fact_instruction: >-
+    Calibrate the change labels as follows. stable means the contract is
+    present in both revisions with the same verified canonical value; added
+    means absent before and present after; removed means present before and
+    absent after; changed means present in both with a different verified
+    canonical value. For the final question, return exactly one label and no
+    explanation.
+  fact_acknowledgement: Understood. I will answer the final question with exactly one label.
+  feature_instruction: >-
+    Calibrate the required response format from the example. For the final
+    question, return one plain JSON object with exactly the requested keys and
+    allowed values. Do not use Markdown fences or add an explanation.
+  feature_acknowledgement: Understood. I will return one plain JSON object only.
+  example_rendering:
+    prompt_role: user
+    answer_role: assistant
+    fact_answer: exact-gold-status-label
+    feature_answer: canonical-compact-sorted-json
+  target_rendering:
+    role: user
+    content: acceptance-prompt-only
+
+generation:
+  method: greedy
+  do_sample: false
+  temperature: none
+  max_new_tokens: 128
+  num_return_sequences: 1
+  repeats: 2
+  seed: 20260730
+  repeat_invariant: byte-identical-raw-continuation
+
+scoring_and_reporting:
+  inherited_from: delta-v2-c0-base-qwen35-08b-v1
+  target_scorers_unchanged: true
+  pooled_overall_accuracy: forbidden
+  required_strata:
+    atomic_fact_added: 21
+    atomic_fact_stable: 21
+    feature_added: 1
+  primary_question: >-
+    Does development-only calibration restore stable-control capability?
+  secondary_question: >-
+    After capability is restored, are added facts selectively weaker than
+    stable facts?
+  feature_signal: report-separately
+
+execution_boundary:
+  expected_request_sha256: 96e209a30ca9b723f8e28e2af9c233f2a48b277c913bbb5da5bc4e7019ffbe77
+  model_invocations_completed: 0
+  target_model_results_exist: false
+  modal_authorized: true
+  training: forbidden
+  fine_tuning: forbidden
