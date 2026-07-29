@@ -1,0 +1,39 @@
+schema: delta.llm_judge_attestation.v1
+
+contract_id: delta-v2-acceptance-evidence-grounded-llm-judge-v3
+evidence_bundle_sha256: 6bc757e476beefa5c4f18346f1f52a032e4317d99b856ee1df6f556e6f6aa4a9
+reviewed_eval_ids_sha256: fdc1a6296c37e8b5502cb793f2dcbb848f7776485e26cd5760be41471551f137
+reviewed_items: 32
+
+judge_run:
+  judge_run_id: judge:delta-v2-acceptance-v3-codex-2026-07-30
+  kind: llm
+  runtime: codex-desktop
+  model_family: GPT-5
+  target_model: false
+
+default_dimensions:
+  truth:
+    verdict: pass
+    reason: >-
+      All 31 sampled fact labels match their independently extracted records:
+      added facts are absent before and present after, while stable facts have
+      equal canonical values at both revisions. The endpoint-plugin matrix
+      exactly translates the passing complete-candidate probe observations for
+      opt-in loading, task gating, failure isolation, and both lifecycle hooks.
+  version_status:
+    verdict: pass
+    reason: >-
+      Every fact is rooted in exact acceptance_before and acceptance_after
+      evidence for v0.25.1 and v0.26.0. The feature is unavailable in the
+      pinned old snapshot and verified in the pinned new snapshot; the item
+      asks only about v0.26.0 behavior and does not imply earlier availability.
+  answerability:
+    verdict: pass
+    reason: >-
+      Each fact prompt identifies one exact semantic source and four exclusive
+      status labels. The feature prompt supplies six exact keys and a
+      one-to-one ordered label vocabulary, and its claimed scope stays within
+      the isolated executable probe rather than a full-server assertion.
+
+exceptions: []

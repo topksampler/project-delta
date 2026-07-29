@@ -11,7 +11,8 @@ from experiments.delta_v2.build_eval import (
     AUDIT_ROW_SCHEMA,
     FACT_TASK,
     FEATURE_TASK,
-    PROBE_RESULT_SCHEMA,
+    EvalBuildError,
+    _feature_gold_from_probe,
     build_fact_item,
     build_feature_item,
     load_json,
@@ -107,12 +108,29 @@ def validate_contract(contract: Mapping[str, Any]) -> None:
         or amendment.get("preserves_threshold") != 0.90
     ):
         raise JudgeAuditError("protocol amendment changed")
-    if transition == "acceptance" and (
-        amendment.get("implementation_timing")
-        != "validator-parameterized-after-acceptance-unseal"
-        or amendment.get("source_or_gold_changed") is not False
-    ):
-        raise JudgeAuditError("acceptance audit timing is not explicit")
+    if transition == "acceptance":
+        if amendment.get("implementation_timing") != (
+            "validator-parameterized-after-acceptance-unseal"
+        ):
+            raise JudgeAuditError("acceptance audit timing is not explicit")
+        contract_id = str(contract["contract_id"])
+        if contract_id == "delta-v2-acceptance-evidence-grounded-llm-judge-v2":
+            if amendment.get("source_or_gold_changed") is not False:
+                raise JudgeAuditError("v2 acceptance amendment changed")
+        elif contract_id == (
+            "delta-v2-acceptance-evidence-grounded-llm-judge-v3"
+        ):
+            if (
+                amendment.get("source_or_gold_changed") is not True
+                or amendment.get("selection_changed") is not True
+                or amendment.get("change_scope")
+                != "one-promoted-fact-frozen-acceptance-feature"
+            ):
+                raise JudgeAuditError(
+                    "v3 acceptance feature amendment is not explicit"
+                )
+        else:
+            raise JudgeAuditError("unsupported acceptance judge contract")
 
     authority = _mapping(contract.get("truth_authority"), "truth_authority")
     if (
@@ -237,57 +255,14 @@ def _fact_evidence(
     return evidence
 
 
-def _probe_gold(probe: Mapping[str, Any]) -> dict[str, str]:
-    if (
-        probe.get("schema") != PROBE_RESULT_SCHEMA
-        or probe.get("status") != "pass"
-        or probe.get("claim_scope") != "complete-candidate"
-    ):
-        raise JudgeAuditError("feature judge requires a passing complete probe")
-    cases = {
-        _string(case.get("case_id"), "case_id"): _mapping(
-            case.get("observed_after"),
-            "observed_after",
-        )
-        for case in probe.get("cases", [])
-    }
-    expected_cases = {
-        "dense_default",
-        "interval_64",
-        "latest_only",
-        "negative_rejected",
-        "misaligned_rejected",
-    }
-    if set(cases) != expected_cases:
-        raise JudgeAuditError("feature probe case set changed")
-    if (
-        cases["dense_default"].get("kind") != "cache_state"
-        or cases["dense_default"].get("cached_indices") != list(range(16))
-    ):
-        raise JudgeAuditError("dense feature observation changed")
-    if (
-        cases["interval_64"].get("kind") != "cache_state"
-        or cases["interval_64"].get("cached_indices")
-        != [3, 7, 11, 14, 15]
-    ):
-        raise JudgeAuditError("interval feature observation changed")
-    if (
-        cases["latest_only"].get("kind") != "cache_state"
-        or cases["latest_only"].get("cached_indices") != [14]
-    ):
-        raise JudgeAuditError("zero feature observation changed")
-    if (
-        cases["negative_rejected"].get("kind") != "construction_error"
-        or cases["misaligned_rejected"].get("kind") != "construction_error"
-    ):
-        raise JudgeAuditError("rejection feature observations changed")
-    return {
-        "unset": "dense",
-        "positive_aligned_interval": "sparse_interval_plus_latest_boundary",
-        "zero": "latest_boundary_only",
-        "negative": "rejected",
-        "misaligned": "rejected",
-    }
+def _probe_gold(
+    probe: Mapping[str, Any],
+    eval_contract: Mapping[str, Any],
+) -> dict[str, str]:
+    try:
+        return _feature_gold_from_probe(probe, eval_contract)
+    except EvalBuildError as exc:
+        raise JudgeAuditError(str(exc)) from exc
 
 
 def _feature_evidence(
@@ -303,7 +278,7 @@ def _feature_evidence(
     if probe_id not in probes:
         raise JudgeAuditError(f"missing feature probe: {probe_id}")
     probe = probes[probe_id]
-    gold = _probe_gold(probe)
+    gold = _probe_gold(probe, eval_contract)
     if row.get("proposed_gold") != gold:
         raise JudgeAuditError(f"proposed feature gold disagrees: {feature_id}")
     regenerated = build_feature_item(

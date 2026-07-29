@@ -23,9 +23,15 @@ JUDGE_CONTRACT_PATH = Path(__file__).with_name("llm_judge_contract.yaml")
 ACCEPTANCE_JUDGE_CONTRACT_PATH = Path(__file__).with_name(
     "acceptance_llm_judge_contract_v2.yaml"
 )
+ACCEPTANCE_FEATURE_JUDGE_CONTRACT_PATH = Path(__file__).with_name(
+    "acceptance_llm_judge_contract_v3.yaml"
+)
 EVAL_CONTRACT_PATH = Path(__file__).with_name("eval_item_contract.yaml")
 ACCEPTANCE_EVAL_CONTRACT_PATH = Path(__file__).with_name(
     "acceptance_eval_item_contract_v2.yaml"
+)
+ACCEPTANCE_FEATURE_EVAL_CONTRACT_PATH = Path(__file__).with_name(
+    "acceptance_eval_item_contract_v3.yaml"
 )
 
 
@@ -124,6 +130,74 @@ def probe_result() -> dict:
                 "observed_after": observed,
             }
             for case_id, observed in cases
+        ],
+    }
+
+
+def acceptance_feature_record() -> dict:
+    return {
+        "schema": "delta.feature_delta.v1",
+        "feature_id": "feature:vllm-endpoint-plugins",
+        "source_candidate_id": "feature-candidate:endpoint-plugins",
+        "repository": "vllm-project/vllm",
+        "transition": "acceptance",
+        "summary": "Endpoint plugins",
+        "status": "added",
+        "fact_policy": "no-post-unseal-fact-family-expansion",
+        "evidence_ids": [
+            "file:one",
+            "pull-request:vllm-project/vllm#1",
+        ],
+        "behavior_probe_ids": [
+            "behavior-probe:vllm-endpoint-plugins-framework-v1"
+        ],
+        "verification": {
+            "old_revision": "unavailable",
+            "new_revision": "pass",
+            "recipe": "test-v1",
+            "probe_results": {
+                "behavior-probe:vllm-endpoint-plugins-framework-v1": {
+                    "sha256": "a" * 64,
+                    "claim_scope": "complete-candidate",
+                }
+            },
+        },
+        "environment_status": "acceptance-feature-unfrozen",
+    }
+
+
+def endpoint_probe_result() -> dict:
+    return {
+        "schema": "delta.behavior_probe_result.v1",
+        "probe_id": "behavior-probe:vllm-endpoint-plugins-framework-v1",
+        "claim_scope": "complete-candidate",
+        "status": "pass",
+        "cases": [
+            {
+                "case_id": "complete_endpoint_plugin_framework",
+                "status": "pass",
+                "observed_before": {
+                    "kind": "unavailable",
+                    "loader": False,
+                    "protocol": False,
+                    "route_phase": False,
+                    "state_phase": False,
+                },
+                "observed_after": {
+                    "kind": "endpoint_plugin_framework",
+                    "allowlisted_task_match_loads": True,
+                    "async_init_state_hook": True,
+                    "attach_router_hook": True,
+                    "default_off": True,
+                    "documentation_present": True,
+                    "factory_failure_isolated": True,
+                    "required_task_miss_skips": True,
+                    "route_phase_attaches": True,
+                    "runtime_checkable_protocol": True,
+                    "state_phase_initializes": True,
+                    "upstream_tests_present": True,
+                },
+            }
         ],
     }
 
@@ -239,6 +313,21 @@ class JudgeContractTest(unittest.TestCase):
         self.assertFalse(amendment["source_or_gold_changed"])
         self.assertTrue(amendment["selection_changed"])
 
+    def test_acceptance_v3_discloses_added_feature_source_and_gold(self) -> None:
+        import yaml
+
+        contract = yaml.safe_load(
+            ACCEPTANCE_FEATURE_JUDGE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+
+        validate_contract(contract)
+        amendment = contract["protocol_amendment"]
+        self.assertTrue(amendment["source_or_gold_changed"])
+        self.assertEqual(
+            amendment["change_scope"],
+            "one-promoted-fact-frozen-acceptance-feature",
+        )
+
 
 class EvidenceBundleTest(unittest.TestCase):
     def build(self) -> tuple[list[dict], dict]:
@@ -342,6 +431,116 @@ class EvidenceBundleTest(unittest.TestCase):
 
         self.assertEqual(len(bundle), 32)
         self.assertTrue(all(row["root_check"] == "pass" for row in bundle))
+
+    def test_acceptance_feature_bundle_roots_gold_in_complete_probe(self) -> None:
+        import yaml
+
+        judge_contract = yaml.safe_load(
+            ACCEPTANCE_FEATURE_JUDGE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        eval_contract = yaml.safe_load(
+            ACCEPTANCE_FEATURE_EVAL_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        facts: list[dict] = []
+        rows: list[dict] = []
+        for index in range(31):
+            status = "stable" if index % 2 == 0 else "added"
+            fact = fact_record(status)
+            fact["fact_id"] = f"fact:acceptance-v3:{index:02d}"
+            fact["semantic_key"] = (
+                f"python-environment-variable:VLLM_ACCEPTANCE_V3_{index:02d}"
+            )
+            item = build_fact_item(
+                fact,
+                split="eval",
+                eligibility_reason=(
+                    "stable_control" if status == "stable" else "nonstable"
+                ),
+                contract=eval_contract,
+            )
+            facts.append(fact)
+            rows.append(audit_row(item, index + 1))
+        feature = acceptance_feature_record()
+        probe = endpoint_probe_result()
+        feature_item = build_feature_item(
+            feature,
+            split="eval",
+            probe_result=probe,
+            contract=eval_contract,
+        )
+        rows.append(audit_row(feature_item, 32))
+
+        bundle = build_evidence_bundle(
+            audit_rows=rows,
+            fact_records=facts,
+            feature_records=[feature],
+            probe_results={str(probe["probe_id"]): probe},
+            contract=judge_contract,
+            eval_contract=eval_contract,
+        )
+        feature_evidence = bundle[-1]
+
+        self.assertEqual(len(bundle), 32)
+        self.assertEqual(
+            feature_evidence["proposed_gold"]["route_phase"],
+            "attach_router",
+        )
+        self.assertEqual(
+            [row["kind"] for row in feature_evidence["evidence"]],
+            ["promoted-feature", "executable-after-observation"],
+        )
+
+    def test_acceptance_feature_bundle_rejects_probe_mismatch(self) -> None:
+        import yaml
+
+        judge_contract = yaml.safe_load(
+            ACCEPTANCE_FEATURE_JUDGE_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        eval_contract = yaml.safe_load(
+            ACCEPTANCE_FEATURE_EVAL_CONTRACT_PATH.read_text(encoding="utf-8")
+        )
+        facts: list[dict] = []
+        rows: list[dict] = []
+        for index in range(31):
+            status = "stable" if index % 2 == 0 else "added"
+            fact = fact_record(status)
+            fact["fact_id"] = f"fact:acceptance-v3:{index:02d}"
+            fact["semantic_key"] = (
+                f"python-environment-variable:VLLM_ACCEPTANCE_V3_{index:02d}"
+            )
+            item = build_fact_item(
+                fact,
+                split="eval",
+                eligibility_reason=(
+                    "stable_control" if status == "stable" else "nonstable"
+                ),
+                contract=eval_contract,
+            )
+            facts.append(fact)
+            rows.append(audit_row(item, index + 1))
+        feature = acceptance_feature_record()
+        probe = endpoint_probe_result()
+        feature_item = build_feature_item(
+            feature,
+            split="eval",
+            probe_result=probe,
+            contract=eval_contract,
+        )
+        rows.append(audit_row(feature_item, 32))
+        probe["cases"][0]["observed_after"]["route_phase_attaches"] = False
+
+        with self.assertRaisesRegex(
+            JudgeAuditError,
+            "observations do not support",
+        ):
+            build_evidence_bundle(
+                audit_rows=rows,
+                fact_records=facts,
+                feature_records=[feature],
+                probe_results={str(probe["probe_id"]): probe},
+                contract=judge_contract,
+                eval_contract=eval_contract,
+            )
 
 
 class AttestationTest(unittest.TestCase):
