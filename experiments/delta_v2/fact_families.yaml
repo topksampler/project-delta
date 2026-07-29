@@ -1,0 +1,158 @@
+schema: delta.atomic_fact_families.v1
+source_manifest: snapshots.yaml
+transition: development
+
+extraction:
+  source_selection: complete-snapshot-tree
+  extract_each_snapshot_independently: true
+  parser:
+    implementation: cpython.ast
+    feature_version: "3.11"
+    canonical_form: ast-structural-json-v1
+  encoding: utf-8
+  syntax_error_policy: fail-snapshot
+  duplicate_semantic_key_policy: fail-family-snapshot
+  rejected_candidate_policy: record-reason-without-fact
+
+comparison:
+  join_key:
+    - family_id
+    - semantic_key
+  statuses:
+    absent_present: added
+    present_absent: removed
+    equal_equal: stable
+    unequal_unequal: changed
+
+evidence:
+  required_fields:
+    - snapshot_role
+    - path
+    - line_start
+    - line_end
+    - git_blob_sha1
+    - source_sha256
+    - extractor_version
+
+families:
+  - id: python.config_field.v1
+    description: >-
+      Static field contracts declared directly on vLLM configuration classes.
+    rationale: >-
+      Configuration fields expose high-value names, types, defaults, and
+      constraints without claiming runtime behavior.
+    paths:
+      include:
+        - vllm/config/**/*.py
+      exclude: []
+    selector:
+      container: top-level class with the exact decorator name config
+      node: direct class-body AnnAssign with a simple Name target
+    semantic_key: python-config-field:{module}:{class}.{field}
+    normalized_value:
+      - annotation_ast
+      - default_kind
+      - default_ast
+      - literal_default
+      - static_field_constraints
+    inclusion_rules:
+      - Include instance fields whether a default is present or absent.
+      - Preserve Field and dataclasses.field calls as canonical AST.
+      - Evaluate a literal default only when ast.literal_eval succeeds.
+    rejection_rules:
+      - Reject ClassVar annotations because they are class constants, not instance configuration.
+      - Reject tuple, attribute, subscript, or other non-Name assignment targets.
+      - Reject decorator aliases or dynamically constructed decorators.
+
+  - id: python.cli_option.v1
+    description: >-
+      Statically declared command-line option contracts from add_argument calls.
+    rationale: >-
+      CLI options are user-facing surfaces with deterministic names and often
+      checkable types, defaults, choices, and actions.
+    paths:
+      include:
+        - vllm/**/*.py
+      exclude: []
+    selector:
+      container: module or lexical function/class scope
+      node: Call whose callable attribute is exactly add_argument
+    semantic_key: python-cli-option:{module}:{lexical_scope}:{primary_option}
+    normalized_value:
+      - option_strings
+      - destination
+      - action
+      - type_expression
+      - choices
+      - default_expression
+      - required
+    inclusion_rules:
+      - >-
+        Require every positional option string to be a string literal beginning
+        with a hyphen.
+      - >-
+        Choose the longest double-hyphen option as primary_option, breaking ties
+        by declaration order; otherwise choose the first declared option.
+      - >-
+        Normalize supported keyword values as literals or canonical AST
+        expressions without executing code.
+    rejection_rules:
+      - Reject calls with expanded positional or keyword arguments.
+      - Reject calls with a nonliteral option string.
+      - Reject duplicate semantic keys within one snapshot.
+      - Never infer parser hierarchy, runtime defaults, or option behavior from the call alone.
+
+  - id: python.environment_variable.v1
+    description: >-
+      Environment-variable keys declared in the vLLM environment registry.
+    rationale: >-
+      The registry is the authoritative code location for whether an
+      environment knob is declared, while its meaning remains a documentation
+      or behavior question.
+    paths:
+      include:
+        - vllm/envs.py
+      exclude: []
+    selector:
+      container: top-level assignment to the exact name environment_variables
+      node: dictionary entry with a string-literal key
+    semantic_key: python-environment-variable:{key}
+    normalized_value:
+      - key
+      - getter_expression_ast
+      - type_checking_annotation_ast
+    inclusion_rules:
+      - Record the exact canonical getter expression without invoking it.
+      - Attach a same-name TYPE_CHECKING annotation when one exists.
+    rejection_rules:
+      - Reject dictionary expansion entries and nonliteral keys.
+      - Reject duplicate environment keys within one snapshot.
+      - Never describe a getter expression as observed runtime behavior.
+
+  - id: python.literal_domain.v1
+    description: >-
+      Literal value domains assigned to top-level aliases in vLLM configuration
+      modules.
+    rationale: >-
+      Literal domains provide exact allowed-value vocabularies that complement
+      config-field type references.
+    paths:
+      include:
+        - vllm/config/**/*.py
+      exclude: []
+    selector:
+      container: module scope
+      node: >-
+        simple-name Assign or AnnAssign whose value is a Subscript of the exact
+        name Literal
+    semantic_key: python-literal-domain:{module}:{alias}
+    normalized_value:
+      - ordered_literal_values
+      - annotation_ast
+    inclusion_rules:
+      - Accept only string, integer, float, boolean, bytes, or None literal elements.
+      - Preserve declared order while comparing values structurally.
+    rejection_rules:
+      - Reject nested expressions, starred elements, and imported or computed values.
+      - Reject aliases whose right-hand side is a union or wrapper around Literal.
+      - Reject duplicate semantic keys within one snapshot.
