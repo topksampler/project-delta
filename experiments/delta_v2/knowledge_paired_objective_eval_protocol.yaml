@@ -1,0 +1,57 @@
+schema: delta.knowledge_eval_extension_protocol.v1
+
+protocol_id: delta-v2-knowledge-paired-objective-eval-v1
+experiment_id: delta_v2
+condition_id: d3_paired_objective_lora_eval
+state: preregistered-for-evaluation
+
+parent_eval:
+  protocol_id: delta-v2-knowledge-eval-v1
+  path: experiments/delta_v2/knowledge_eval_protocol.yaml
+  sha256: 0ba449b993cd9afb356d35952283b582d81519960ae362137456173c3978c226
+  only_extension: target-condition-and-adapter-lineage
+  dataset_unchanged: true
+  prompting_unchanged: true
+  generation_unchanged: true
+  scoring_unchanged: true
+  reporting_unchanged: true
+
+decision_trigger:
+  margin_run_id: delta-v2-d3-knowledge-paired-objective-margin-modal-v1
+  margin_launch_commit: 421684e
+  margin_receipt_sha256: 1b815304bfa52bf5f665bf698d108ec6af58fd75b85ac6eddb1b1c2b2d34bfc7
+  margin_metrics_sha256: 959a15dbc94efb27f1f4e6d22b788508371c4716a44a22f2a064b721cf63a09d
+  first_gate_passed: true
+  truth_conditioned_pairs: 59/63
+
+candidate:
+  training_run_id: delta-v2-d3-knowledge-paired-objective-qwen35-08b-modal-v1
+  training_protocol_id: delta-v2-knowledge-paired-objective-v1
+  training_protocol_sha256: 610cf70ccc0678f2bb1d21e43f6142ea21a4ec0fc2da6a4a252af0fae8daaf67
+  training_receipt_sha256: 9b78887be36662b2087a988eb49cb34606f57acf7eae38cda40cdf84f653b171
+  objective_id: paired-boolean-logistic-ranking-v1
+  adapter_sha256: 3de6466516530533e0a060224df99e05966e1639f30fc71cb52aed2fb3ef21ae
+  base_revision: 2fc06364715b967f1860aea9cf38778875588b17
+  initialization: fresh-base
+
+comparison_gates:
+  source_protocol:
+    path: experiments/delta_v2/knowledge_lora_protocol_v2.yaml
+    sha256: 73f7dde372ebdbeafd56cd25808b9dcc7135bbeafd829f91ff4d970abdd44331
+  acquisition_choice_accuracy_minimum: 0.50
+  acquisition_boolean_true_accuracy_minimum: 0.80
+  acquisition_boolean_false_accuracy_minimum: 0.80
+  retention_boolean_false_accuracy_minimum: 0.90
+  pooled_overall_score: forbidden
+  recall: advisory
+  feature: report-separately
+  result: candidate-only-no-promotion
+
+execution_boundary:
+  unchanged_full_eval_authorized: true
+  model_updates: 0
+  additional_training_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false
