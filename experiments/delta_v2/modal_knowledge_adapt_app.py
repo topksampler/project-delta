@@ -21,6 +21,18 @@ PAIRED_DATA = "data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl"
 PAIRED_SUMMARY_DATA = (
     "data/experiments/delta_v2/knowledge_paired_v2/summary.json"
 )
+STABILITY_REPLAY_DATA = (
+    "data/experiments/delta_v2/knowledge_stability_replay_v1/"
+    "replay_train.jsonl"
+)
+STABILITY_REPLAY_PAIRS = (
+    "data/experiments/delta_v2/knowledge_stability_replay_v1/"
+    "replay_pairs.jsonl"
+)
+STABILITY_DEV_DATA = (
+    "data/experiments/delta_v2/knowledge_stability_replay_v1/"
+    "stability_dev.jsonl"
+)
 
 app = modal.App("lalith-ai-lab-delta-v2-knowledge-adapt")
 secrets = [modal.Secret.from_name("lalith-lab")]
@@ -85,6 +97,18 @@ image = (
     .add_local_file(
         PAIRED_SUMMARY_DATA,
         remote_path=f"/root/lalith-ai-lab/{PAIRED_SUMMARY_DATA}",
+    )
+    .add_local_file(
+        STABILITY_REPLAY_DATA,
+        remote_path=f"/root/lalith-ai-lab/{STABILITY_REPLAY_DATA}",
+    )
+    .add_local_file(
+        STABILITY_REPLAY_PAIRS,
+        remote_path=f"/root/lalith-ai-lab/{STABILITY_REPLAY_PAIRS}",
+    )
+    .add_local_file(
+        STABILITY_DEV_DATA,
+        remote_path=f"/root/lalith-ai-lab/{STABILITY_DEV_DATA}",
     )
 )
 

@@ -1,0 +1,70 @@
+schema: delta.knowledge_stability_eval_protocol.v1
+
+protocol_id: delta-v2-knowledge-stability-base-v1
+experiment_id: delta_v2
+condition_id: d4_stability_base
+state: preregistered-for-base-baseline
+
+dataset:
+  dataset_id: delta-v2-knowledge-stability-replay-v1
+  freeze_path: experiments/delta_v2/knowledge_stability_replay_data_freeze.yaml
+  freeze_sha256: e0956600529a056dc5d13328b2a13b28ff4294e2fa7eafcfddb4ed6bbccb8101
+  eval_path: data/experiments/delta_v2/knowledge_stability_replay_v1/stability_dev.jsonl
+  eval_sha256: f9c4c150aaf5db7edd2caba10801acd05b8e34cced443afdfa678aca3ed71b3a
+  sources: 15
+  rows: 60
+  model_visible_fields: [prompt]
+
+target_model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter: none
+  quantization: none
+
+prompting:
+  interface: official-chat-template
+  messages:
+    - role: user
+      content_from: prompt
+  add_generation_prompt: true
+  chat_template_kwargs:
+    enable_thinking: false
+  system_prompt: none
+
+generation:
+  method: greedy
+  do_sample: false
+  max_new_tokens: 256
+  repeats: 2
+  seed: 20260730
+  repeat_invariant: byte-identical-raw-continuation
+
+scoring:
+  exact_choice:
+    valid: [A, B, C, D]
+  exact_boolean:
+    valid: [yes, no]
+  exact_json:
+    repair: forbidden
+  invalid_or_unparseable: incorrect
+  llm_judge: forbidden
+
+reporting:
+  pooled_overall_score: forbidden
+  required_probe_counts:
+    choice: 15
+    boolean_true: 15
+    boolean_false: 15
+    recall: 15
+  headline_probe_kinds: [choice, boolean_true, boolean_false]
+  advisory_probe_kinds: [recall]
+  role: zero-update-reference-not-candidate-gate
+
+execution_boundary:
+  base_baseline_authorized: true
+  model_updates: 0
+  lora_training_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false
