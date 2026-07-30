@@ -1,0 +1,54 @@
+schema: delta.knowledge_eval_extension_protocol.v1
+
+protocol_id: delta-v2-knowledge-paired-control-eval-v1
+experiment_id: delta_v2
+condition_id: d2_paired_data_sft_control_eval
+state: preregistered-for-evaluation
+
+parent_eval:
+  protocol_id: delta-v2-knowledge-eval-v1
+  path: experiments/delta_v2/knowledge_eval_protocol.yaml
+  sha256: 0ba449b993cd9afb356d35952283b582d81519960ae362137456173c3978c226
+  only_extension: target-condition-and-adapter-lineage
+  dataset_unchanged: true
+  prompting_unchanged: true
+  generation_unchanged: true
+  scoring_unchanged: true
+  reporting_unchanged: true
+
+decision_trigger:
+  margin_run_id: delta-v2-d2-knowledge-paired-data-sft-control-margin-modal-v1
+  margin_launch_commit: ccb8609
+  margin_receipt_sha256: f9cc242bee8bab98d29fbca7f683303360c37286d5c4245d80143f15f5dceb68
+  margin_metrics_sha256: a954b4501fe9a60a2a8c842a69ad050fa278e9c28baa446300002aed5c02ce5b
+  first_gate_passed: true
+  truth_conditioned_pairs: 57/63
+
+candidate:
+  training_run_id: delta-v2-d2-knowledge-paired-data-sft-control-qwen35-08b-modal-v1
+  objective_id: assistant-only-generative-sft-v1
+  adapter_sha256: 9ef3caaf1f1d83a26df485ee0abcd365d1f932e0752cb9a99d9c5ac3510565a5
+  base_revision: 2fc06364715b967f1860aea9cf38778875588b17
+  initialization: fresh-base
+
+comparison_gates:
+  source_protocol:
+    path: experiments/delta_v2/knowledge_lora_protocol_v2.yaml
+    sha256: 73f7dde372ebdbeafd56cd25808b9dcc7135bbeafd829f91ff4d970abdd44331
+  acquisition_choice_accuracy_minimum: 0.50
+  acquisition_boolean_true_accuracy_minimum: 0.80
+  acquisition_boolean_false_accuracy_minimum: 0.80
+  retention_boolean_false_accuracy_minimum: 0.90
+  pooled_overall_score: forbidden
+  recall: advisory
+  feature: report-separately
+  result: candidate-only-no-promotion
+
+execution_boundary:
+  unchanged_full_eval_authorized: true
+  model_updates: 0
+  paired_objective_training_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false
