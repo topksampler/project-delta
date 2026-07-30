@@ -1,0 +1,87 @@
+schema: delta.knowledge_adaptation_contract.v1
+
+contract_id: delta-v2-knowledge-adaptation-v1
+experiment_id: delta_v2
+parent_environment_id: delta-v2-vllm-source-build-v2
+target_revision: v0.26.0
+
+truth_sources:
+  fact_deltas:
+    path: data/experiments/delta_v2/acceptance_attempt_2/facts/atomic_fact_deltas_acceptance.jsonl
+    sha256: 52f5f8bfa247550ef50277657900725db6ed8cc99bc3fe21d8a112629ffec75a
+  frozen_eval_selection:
+    path: data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_eval_items_v3.jsonl
+    sha256: 1125a7a5429cf847d16475259ffeb6578b8d4841c81f2f01d20d4065f4c188cb
+  feature_probe:
+    path: data/experiments/delta_v2/acceptance_attempt_2/probes/endpoint_plugins_framework.result.json
+    sha256: 3352044178ac07f2988d0fb70ce66536ab485755b788a1ed773f6293819921f5
+
+knowledge_card:
+  generator_version: delta-v2-knowledge-card-v1
+  source_status: added
+  source_count: 21
+  supported_families:
+    - python.config_field.v1
+    - python.environment_variable.v1
+  authority: normalized-after-revision-AST-observation
+  model_visible_fields:
+    python.config_field.v1: [kind, annotation, default, constraints]
+    python.environment_variable.v1: [kind, annotation, getter]
+
+training:
+  format: chat-messages
+  surfaces_per_source:
+    - exact_recall
+    - verify_true
+    - verify_false
+  rows_per_source: 3
+  rows: 63
+  truth_balance:
+    exact_recall: 21
+    "yes": 21
+    "no": 21
+  target_model_inputs: [messages]
+  forbidden_inputs:
+    - source_status
+    - original_eval_prompt
+    - original_eval_gold
+    - scorer
+    - provenance
+    - verifier
+
+evaluation:
+  acquisition:
+    sources: same-21-added-source-cards
+    claim_overlap_with_training: intentional
+    exact_prompt_overlap_with_training: forbidden
+    permitted_claim: same-claim-new-surface-knowledge-acquisition
+    forbidden_claim: held-out-fact-generalization
+    probes_per_source: [choice, boolean_true, boolean_false, recall]
+  retention:
+    sources: frozen-21-stable-controls
+    source_overlap_with_training: forbidden
+    probes_per_source: [choice, boolean_true, boolean_false, recall]
+  feature_retention:
+    source: feature:vllm-endpoint-plugins
+    source_overlap_with_training: forbidden
+    evidence: verified-observed-after-booleans
+  reporting:
+    pooled_overall_score: forbidden
+    headline_scorers: [exact-choice-v1, exact-boolean-v1]
+    advisory_scorers: [exact-json-v1]
+    compare: base-versus-lora-on-identical-probes
+
+split_policy:
+  training_source_ids: frozen-added-fact-selection
+  retention_source_ids: frozen-stable-control-selection
+  feature_source_ids: frozen-promoted-feature-selection
+  all_eval_wording_generated_after-source-selection: true
+
+outputs:
+  root: data/experiments/delta_v2/knowledge_adaptation_v1
+  train: train.jsonl
+  dev: dev.jsonl
+  eval: eval.jsonl
+  summary: summary.json
+
+freeze_state: preregistered

@@ -1,0 +1,85 @@
+schema: delta.knowledge_adaptation_freeze.v1
+
+dataset_id: delta-v2-vllm-knowledge-adaptation-v1
+experiment_id: delta_v2
+parent_environment_id: delta-v2-vllm-source-build-v2
+target_revision: v0.26.0
+freeze_state: frozen
+publication_state: local-reproducible-not-yet-published
+
+model_boundary:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  base_baseline_required_before_training: true
+  permitted_weight_update: lora-only
+  full_weight_fine_tuning: deferred
+
+scoreboards:
+  acquisition:
+    sources: 21
+    probes: 84
+    training_relation: same-claim-new-surface
+    permitted_claim: knowledge-acquisition
+    forbidden_claim: held-out-fact-generalization
+  retention:
+    sources: 21
+    probes: 84
+    training_relation: source-disjoint
+  feature_retention:
+    sources: 1
+    probes: 1
+    training_relation: source-disjoint
+  pooled_overall_score: forbidden
+  headline_probes: [choice, boolean_true, boolean_false]
+  advisory_probes: [recall]
+
+training_data:
+  rows: 63
+  source_cards: 21
+  surfaces_per_source: 3
+  truth_balance:
+    recall: 21
+    "yes": 21
+    "no": 21
+  dev_rows: 21
+
+leakage_gate:
+  exact_train_eval_prompt_overlap: 0
+  original_eval_prompt_overlap: 0
+  retention_source_overlap: 0
+  feature_source_overlap: 0
+  acquisition_source_overlap: 21
+  acquisition_overlap_is_preregistered: true
+
+bindings:
+  - id: contract
+    path: experiments/delta_v2/knowledge_adaptation_contract.yaml
+    sha256: 2a323dca87f24e26394294fa6b5f08afa643591e4c625cb31fa853f72d0e92ea
+  - id: generator
+    path: experiments/delta_v2/knowledge_adaptation.py
+    sha256: 80d81e3e2effe8e973ff5498ce1332b489e799d1ccf810bbca42868eab978354
+  - id: generator_tests
+    path: experiments/delta_v2/test_knowledge_adaptation.py
+    sha256: 9a0ab58c3461bc26e91b42093d831a4e1b768382022489fe54813d2da32a6858
+  - id: train
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/train.jsonl
+    sha256: 16ad0d2c12a823722501800227c739e59131fd7c7e0f774e2f1faab2e4bd4b95
+  - id: dev
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+    sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+  - id: eval
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl
+    sha256: 5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c
+  - id: build_summary
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/summary.json
+    sha256: fe85d71fb5c3a950aecfe365ec09d852fc2e106c21c0f45173580590bc9395e9
+  - id: llm_judge_attestation
+    path: artifacts/reports/delta_v2/knowledge_adaptation_llm_judge_attestation.yaml
+    sha256: 34739d4c7174508bbecf992b276885c47cb0f022312876e3f3bc032ee762e884
+
+execution_boundary:
+  base_knowledge_runs: 0
+  lora_training_runs: 0
+  adapter_eval_runs: 0
+  dispatch_authorized: true
+  promotion_authorized: false

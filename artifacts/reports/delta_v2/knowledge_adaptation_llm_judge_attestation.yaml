@@ -1,0 +1,69 @@
+schema: delta.knowledge_adaptation_llm_judge_attestation.v1
+
+contract_id: delta-v2-knowledge-adaptation-v1
+status: pass
+judge:
+  kind: evidence-grounded-llm
+  role: wording-and-answerability-review-only
+  gold_authority: frozen-normalized-source-and-executable-evidence
+  may_change_gold: false
+
+audited_inputs:
+  contract:
+    path: experiments/delta_v2/knowledge_adaptation_contract.yaml
+    sha256: 2a323dca87f24e26394294fa6b5f08afa643591e4c625cb31fa853f72d0e92ea
+  fact_deltas:
+    path: data/experiments/delta_v2/acceptance_attempt_2/facts/atomic_fact_deltas_acceptance.jsonl
+    sha256: 52f5f8bfa247550ef50277657900725db6ed8cc99bc3fe21d8a112629ffec75a
+  train:
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/train.jsonl
+    sha256: 16ad0d2c12a823722501800227c739e59131fd7c7e0f774e2f1faab2e4bd4b95
+  eval:
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl
+    sha256: 5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c
+
+scope:
+  added_source_cards_reviewed: 21
+  acquisition_probe_sets_reviewed: 21
+  stable_retention_probe_sets_reviewed: 21
+  verified_feature_probes_reviewed: 1
+
+judgments:
+  deterministic_truth_projection:
+    pass: 21
+    fail: 0
+    basis: >-
+      Every knowledge card is a lossless human-readable rendering of the
+      normalized value_after AST record. No teacher-authored fact enters gold.
+  answerability:
+    pass: 21
+    fail: 0
+    basis: >-
+      Each prompt names one exact semantic source identity and one pinned
+      revision. Choice and boolean answers are uniquely determined by the
+      rendered card.
+  false_alternative_integrity:
+    pass: 21
+    fail: 0
+    basis: >-
+      Every false card differs from the exact deterministic card, and every
+      four-way choice contains one and only one exact card.
+  feature_truth_routing:
+    pass: 1
+    fail: 0
+    basis: >-
+      The feature-retention prompt contains only the eight verified
+      observed_after booleans from the frozen executable probe.
+
+leakage:
+  original_eval_prompt_overlap: 0
+  exact_train_eval_prompt_overlap: 0
+  stable_source_overlap_with_training: 0
+  feature_source_overlap_with_training: 0
+  acquisition_source_overlap_with_training: 21
+  acquisition_overlap_policy: intentional-same-claim-new-surface
+
+claim_limits:
+  - Acquisition probes measure same-claim learning, not held-out-fact generalization.
+  - Free recall is advisory; choice and balanced boolean probes are headline evidence.
+  - The LLM review cannot override deterministic source or executable truth.
