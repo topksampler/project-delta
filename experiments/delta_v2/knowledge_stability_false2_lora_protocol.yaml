@@ -1,0 +1,76 @@
+schema: delta.knowledge_stability_false2_lora_protocol.v1
+protocol_id: delta-v2-knowledge-stability-false2-lora-v1
+experiment_id: delta_v2
+condition_id: d6_stability_false2_sft_control
+state: preregistered-for-training
+
+decision_trigger:
+  parent_candidate: d5_stability_replay50_sft_control
+  d5_training_receipt_sha256: 448adf5dcd5b049d4cbf3edb2832c2b951ff11eaf059accb262305aa024f986c
+  d5_training_metrics_sha256: 2971fb93488aeafcc88979327b00a951378b3b77bf4e0c56c95340d769191c7e
+  d5_stability_receipt_sha256: 30fd04620b5b6194392e63279aaf73a8d2a0147aaab1abbff807f8f5b9a99dcc
+  d5_stability_metrics_sha256: eb4681387cf599dbc7babab55f36cc844270cb85c3acce6ff19f609e94a0be29
+  observed:
+    stability_choice_parseable: 15/15
+    stability_boolean_true: 13/15
+    stability_boolean_false: 9/15
+    stability_gate: fail
+  decision: double-negative-target-loss-exposure
+
+parent_protocol:
+  path: experiments/delta_v2/knowledge_stability_replay50_lora_protocol.yaml
+  sha256: 50d3ce50b03ca863059aec955a4ab53da0549e52b64e4417824d957595c8c05f
+  only_intervention_factor: boolean-negative-target-loss-exposure
+
+implementation:
+  engine_path: experiments/delta_v2/knowledge_stability_replay_lora.py
+  engine_sha256: f5d250446837c075db8a4cddfe515d2f8cbc86fd14d5854de1afc507dd31f569
+  source_schedule_owned_by: experiments/delta_v2/train_knowledge_stability_false2.py
+
+unchanged:
+  initialization: fresh-base
+  base_revision: 2fc06364715b967f1860aea9cf38778875588b17
+  replay_share: 0.50
+  total_training_units: 240
+  acquisition_units: 120
+  replay_units: 120
+  recall_units: 60
+  boolean_pair_units: 180
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+  learning_rate: 0.0001
+  optimizer_steps: 60
+  gradient_accumulation_steps: 4
+  seed: 20260730
+
+objective:
+  objective_id: assistant-only-generative-sft-false2-v1
+  recall_loss: teacher-forced-assistant-token-cross-entropy
+  boolean_loss:
+    positive_target_exposures: 120
+    negative_target_exposures: 240
+    negative_to_positive_ratio: 2.0
+    implementation: 120-balanced-pair-units-plus-60-negative-only-pair-units
+  pair_normalization: one-schedule-unit-equals-one-training-unit
+  truth_margin_term: absent
+  pair-ranking_term: absent
+
+verification:
+  stability_dev_gates_unchanged: true
+  acquisition_margin_gates_unchanged: true
+  stability_gate_runs_first: true
+  acquisition_margin_only_after_stability_pass: true
+  full_eval_only_after_both_pre_gates: true
+  verify_v2_only_after_full_eval: true
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_adapter_write_authorized: true
+  pre_gate_evaluation_authorized: true
+  full_eval_authorized: false
+  verify_v2_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false
