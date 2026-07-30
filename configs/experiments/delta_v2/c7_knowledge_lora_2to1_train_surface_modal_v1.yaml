@@ -1,0 +1,52 @@
+schema: delta.knowledge_train_surface_diagnostic_config.v1
+run_id: delta-v2-c7-knowledge-lora-2to1-train-surface-modal-v1
+experiment_id: delta_v2
+condition_id: c7_knowledge_lora_2to1_diagnostic
+task: eval
+
+protocol:
+  protocol_id: delta-v2-knowledge-c7-2to1-train-surface-v1
+  path: experiments/delta_v2/knowledge_lora_c7_train_surface_diagnostic_protocol.yaml
+  sha256: 02a7addc93be91a072ad0afed73381fb181a8b85bf45fa7d482d3ee614400696
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter:
+    kind: lora
+    run_id: delta-v2-c7-knowledge-lora-2to1-qwen35-08b-modal-v1
+    path: runs/delta-v2-c7-knowledge-lora-2to1-qwen35-08b-modal-v1/adapter
+    sha256: 89f79fe8763e3184ef3d701ac42afa657769f7bf0d5a09df920b9d32d3544549
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  attention_implementation: eager
+  deterministic_algorithms: true
+
+data:
+  train_path: data/experiments/delta_v2/knowledge_adaptation_v1/train.jsonl
+
+eval:
+  module: experiments.delta_v2.run_knowledge_lora_c7_train_surface_diagnostic
+
+output:
+  dir: runs/delta-v2-c7-knowledge-lora-2to1-train-surface-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: A10G
+  timeout_seconds: 3600
