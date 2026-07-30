@@ -1,0 +1,51 @@
+schema: delta.knowledge_stability_replay_eval_protocol.v1
+protocol_id: delta-v2-knowledge-stability-multisurface-weighted-eval-v1
+experiment_id: delta_v2
+condition_id: d10_stability_multisurface_weighted_eval
+state: preregistered-for-pre-gate
+
+decision_trigger:
+  training_run_id: delta-v2-d10-stability-multisurface-weighted-lora-qwen35-08b-modal-v1
+  training_launch_commit: f1c4305
+  training_receipt_sha256: 9935cb02d2151a43606f4db266e9d4b60059506624966f0b87406d02b385166b
+  training_metrics_sha256: 8af62cba25f21cad408c9ba68c9ae82d92f27fa07b5653ad81c178e886a85407
+  adapter_sha256: 6ac65a0c94fae3b31b4d791f076a018e2e493015daa4a88778eaa19af7d1db29
+
+dataset:
+  path: data/experiments/delta_v2/knowledge_stability_claim_covered_v1/eval.jsonl
+  sha256: 3b6def494dc791ff3d4d46bde569485656d4ab0a1084dd7dc059e863f96d0ae7
+  sources: 15
+  rows: 60
+  training_overlap: same-claim-new-wording
+  exact_prompt_overlap_with_training: 0
+  probe_counts:
+    choice: 15
+    boolean_true: 15
+    boolean_false: 15
+    recall: 15
+
+generation:
+  method: greedy
+  do_sample: false
+  max_new_tokens: 256
+  repeats: 2
+  seed: 20260730
+  repeat_invariant: byte-identical-raw-continuation
+
+gates:
+  choice_parseable_minimum: 0.90
+  boolean_parseable_minimum: 1.0
+  boolean_true_accuracy_minimum: 0.80
+  boolean_false_accuracy_minimum: 0.90
+  recall: advisory
+  pooled_score: forbidden
+  all_gates_required: true
+
+execution_boundary:
+  modal_evaluation_authorized: true
+  model_updates: 0
+  adapter_mutation: forbidden
+  acquisition_margin_authorized_only_after_pass: true
+  full_eval_authorized: false
+  verify_v2_authorized: false
+  promotion_authorized: false
