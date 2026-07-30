@@ -96,6 +96,40 @@ def sync_inputs(
             if last_error is None:
                 raise RuntimeError(f"no B2 candidate for input: {relative}")
             raise last_error
+
+    model = config.get("model") or {}
+    adapter_run = model.get("adapter_run_id")
+    adapter = model.get("adapter")
+    if isinstance(adapter, dict) and adapter.get("kind") == "lora":
+        declared_run = adapter.get("run_id")
+        declared_path = adapter.get("path")
+        if not isinstance(declared_run, str) or not declared_run:
+            raise ValueError("LoRA adapter run_id must be a non-empty string")
+        expected_path = Path("runs") / declared_run / "adapter"
+        if Path(str(declared_path)) != expected_path:
+            raise ValueError(
+                "LoRA adapter path must be runs/<run_id>/adapter"
+            )
+        if adapter_run and adapter_run != declared_run:
+            raise ValueError("conflicting LoRA adapter run IDs")
+        adapter_run = declared_run
+
+    if adapter_run:
+        if not isinstance(adapter_run, str):
+            raise ValueError("adapter_run_id must be a string")
+        local_adapter = repo_root / "runs" / adapter_run / "adapter"
+        marker = local_adapter / "adapter_model.safetensors"
+        if marker.exists():
+            print(f"adapter already local at {local_adapter}, skipping B2 pull")
+        else:
+            local_adapter.mkdir(parents=True, exist_ok=True)
+            _s5cmd(
+                [
+                    "cp",
+                    f"{_s3(f'runs/{adapter_run}/adapter')}/*",
+                    f"{local_adapter}/",
+                ]
+            )
     return config_path
 
 
@@ -106,6 +140,17 @@ def eval_module(config: dict) -> str:
     if config.get("experiment_id") == "e1_vllm":
         return "lab.eval_vllm_qa"
     return "lab.eval_run_spec"
+
+
+def train_module(config: dict) -> str:
+    """Select a configured training entrypoint."""
+    module = (
+        (config.get("training") or {}).get("module")
+        or (config.get("train") or {}).get("module")
+    )
+    if module:
+        return str(module)
+    return "lab.train_sft_lora"
 
 
 def run_module(
