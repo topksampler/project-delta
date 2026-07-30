@@ -1,0 +1,62 @@
+schema: delta.knowledge_paired_margin_config.v1
+run_id: delta-v2-d3-knowledge-paired-objective-margin-modal-v1
+experiment_id: delta_v2
+condition_id: d3_paired_objective_lora_margin
+task: eval
+
+protocol:
+  protocol_id: delta-v2-knowledge-paired-objective-margin-v1
+  path: experiments/delta_v2/knowledge_paired_objective_margin_protocol.yaml
+  sha256: 0bc60ddef307be99d380a5917cd12ebde5bb77068ca20eb2f8e9ef70a7744495
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter:
+    kind: lora
+    run_id: delta-v2-d3-knowledge-paired-objective-qwen35-08b-modal-v1
+    path: runs/delta-v2-d3-knowledge-paired-objective-qwen35-08b-modal-v1/adapter
+    sha256: 3de6466516530533e0a060224df99e05966e1639f30fc71cb52aed2fb3ef21ae
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  attention_implementation: eager
+  deterministic_algorithms: true
+
+data:
+  train_path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+  pairs_path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+
+inputs:
+  run_artifacts:
+    - run_id: delta-v2-d3-knowledge-paired-objective-qwen35-08b-modal-v1
+      path: runs/delta-v2-d3-knowledge-paired-objective-qwen35-08b-modal-v1/run_receipt.json
+      sha256: 9b78887be36662b2087a988eb49cb34606f57acf7eae38cda40cdf84f653b171
+    - run_id: delta-v2-d3-knowledge-paired-objective-qwen35-08b-modal-v1
+      path: runs/delta-v2-d3-knowledge-paired-objective-qwen35-08b-modal-v1/train_metrics.json
+      sha256: 4ae603a3d0d7219b183e366d28a92716dac21fca14ecca2c885fb77810461bd0
+
+eval:
+  module: experiments.delta_v2.run_knowledge_paired_objective_margin
+
+output:
+  dir: runs/delta-v2-d3-knowledge-paired-objective-margin-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: A10G
+  timeout_seconds: 3600

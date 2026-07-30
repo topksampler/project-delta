@@ -1,0 +1,66 @@
+schema: delta.knowledge_paired_margin_protocol.v1
+
+protocol_id: delta-v2-knowledge-paired-objective-margin-v1
+experiment_id: delta_v2
+condition_id: d3_paired_objective_lora_margin
+state: preregistered-for-diagnostic
+
+decision_trigger:
+  training_protocol:
+    path: experiments/delta_v2/knowledge_paired_objective_protocol.yaml
+    sha256: 610cf70ccc0678f2bb1d21e43f6142ea21a4ec0fc2da6a4a252af0fae8daaf67
+  training_run_id: delta-v2-d3-knowledge-paired-objective-qwen35-08b-modal-v1
+  training_launch_commit: "2086374"
+  training_receipt_sha256: 9b78887be36662b2087a988eb49cb34606f57acf7eae38cda40cdf84f653b171
+  training_metrics_sha256: 4ae603a3d0d7219b183e366d28a92716dac21fca14ecca2c885fb77810461bd0
+  adapter_sha256: 3de6466516530533e0a060224df99e05966e1639f30fc71cb52aed2fb3ef21ae
+  objective_id: paired-boolean-logistic-ranking-v1
+
+dataset:
+  dataset_id: delta-v2-knowledge-paired-v2
+  freeze_path: experiments/delta_v2/knowledge_paired_data_freeze.yaml
+  freeze_sha256: 705eeff619fba976c395e3e8cd5fb53ab3e38d4badb1715dbf1ef995f5b8c490
+  train_path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+  train_sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  train_rows: 147
+  pairs_path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+  pairs_sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+  pair_rows: 63
+  included_surfaces: [verify_true, verify_false]
+  included_rows: 126
+  mutation: forbidden
+
+scoring:
+  source_protocol:
+    path: experiments/delta_v2/knowledge_paired_margin_protocol.yaml
+    sha256: 4ba79e2fecb720cdec5d7a8a36b648b68669c1d14b38da72cd216a33930ba149
+  teacher_forced_gold_nll: assistant-completion-sequence
+  sequence_margin: log_probability_yes-minus-log_probability_no
+  predicted_yes_if: sequence-margin-strictly-positive
+  pair_separation: true-sequence-margin-minus-false-sequence-margin
+  truth_conditioned_pair: true-margin-positive-and-false-margin-negative
+  deterministic_repeats: not-applicable-exact-forward-pass
+  pooled_overall_score: forbidden
+
+gates:
+  verify_true_margin_accuracy_minimum: 0.80
+  verify_false_margin_accuracy_minimum: 0.80
+  truth_conditioned_pair_rate_minimum: 0.80
+  per_corruption_family_false_accuracy_minimum: 0.80
+  all_gates_required: true
+  full_frozen_eval_only_if_pass: true
+  additional_training_requires_separate_protocol: true
+  promotion_authorized: false
+
+implementation:
+  path: experiments/delta_v2/run_knowledge_paired_objective_margin.py
+  sha256: 59c425f184cf0fc29204816f6eb2f33d20fdc3093874d4de049b2132aaa9da8e
+
+execution_boundary:
+  modal_diagnostic_authorized: true
+  model_updates: 0
+  optimizer_steps: 0
+  adapter_mutation: forbidden
+  full_eval_conditional: true
+  additional_training_authorized: false
+  promotion_authorized: false
