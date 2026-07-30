@@ -1,13 +1,15 @@
 # delta_v2 paired-objective LoRA — Modal v1 audit
 
-Status: `implemented`; adapter training and repaired-pair first gate passed,
-unchanged full evaluation eligible, promotion unauthorized.
+Status: `implemented`; repaired-pair first gate passed, unchanged full
+evaluation failed acquisition-choice and retention-false gates, promotion
+unauthorized.
 
 Loop position: ADAPT produced one fresh-base Stage 2 supervised-LoRA
 `CandidateState` whose only causal change from the repaired-data SFT control is
 the Boolean-pair learning objective. Its conditional training-surface gate
-passed, so it may enter the unchanged 169-item VERIFY environment. The active
-state has not changed.
+passed, but it failed two gates in the unchanged 169-item VERIFY environment
+and rolled back to the pinned base. DELTA is at `DECIDE` before any new
+`InterventionPlan`; the active state has not changed.
 
 ## causal boundary
 
@@ -100,8 +102,96 @@ source-disjoint retention.
 All gate evidence hashes were independently recomputed after B2 pull. Training
 plus gate cost an estimated USD 0.6260.
 
-## decision
+## unchanged full evaluation
 
-Every separate first-gate cell passed. The only authorized next action is the
-unchanged 169-item evaluation with the original acquisition and retention
-gates. No promotion or further training is authorized by this result.
+- run:
+  `delta-v2-d3-knowledge-paired-objective-eval-modal-v1`
+- extension protocol:
+  `delta-v2-knowledge-paired-objective-eval-v1`
+- successful launch commit:
+  `5ed421788cfeb0a43cbddf075ff5ba1aff966499`
+- parent evaluation protocol SHA-256:
+  `0ba449b993cd9afb356d35952283b582d81519960ae362137456173c3978c226`
+- extension protocol SHA-256:
+  `0fefe6f2b1bbf687e75ce484183b4f231857eb42109c5cb1a826850987d89857`
+- config SHA-256:
+  `9a58babbc0b749d2f8b731bda6b4e404abaa3ac7d4d28b4a00f713cc2d163dee`
+- evaluation-bank SHA-256:
+  `5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c`
+- request SHA-256:
+  `5d6d686cba3a20bef8ff7b0d00f456b7dd54e1141cd3218b2cb8057cb6371b8c`
+- metrics SHA-256:
+  `cfbffc48b24347e4f4701d29fb27823cfa0d3f61a5fdf35d6235892c8d97a740`
+- samples SHA-256:
+  `edffd8990058184a5aa28eca45e7df8e3fa1acaeeaeb0d38bd19d99bd1f50063`
+- run-receipt SHA-256:
+  `5d9cf9be0eb4dd31c3d40587fe3305934256805bd5bb4117294ad767ecbe6f57`
+- model outputs: 338 deterministic continuations for 169 items
+- model updates: 0
+- model work: 1,615.72 seconds on NVIDIA A10
+- estimated successful-run cost: USD 0.5026
+
+The adapter, pinned base, and Stage 1 control used the same frozen evaluation
+bank, parent protocol, prompting, generation, scoring, and reporting. Recall is
+advisory, the feature cell is separate, and no pooled score is defined.
+
+| cell | pinned base | Stage 1 generative | Stage 2 ranking |
+|---|---:|---:|---:|
+| acquisition choice | 0/21 | 12/21 | 0/21 |
+| acquisition boolean true | 0/21 | 20/21 | 20/21 |
+| acquisition boolean false | 21/21 | 18/21 | 19/21 |
+| acquisition recall, advisory | 0/21 | 9/21 | 3/21 |
+| retention choice | 0/21 | 8/21 | 0/21 |
+| retention boolean true | 1/21 | 18/21 | 18/21 |
+| retention boolean false | 21/21 | 16/21 | 15/21 |
+| retention recall, advisory | 0/21 | 1/21 | 1/21 |
+| feature retention | 0/1 | 0/1 | 0/1 |
+
+| preregistered gate | minimum | observed | result |
+|---|---:|---:|---|
+| acquisition choice | 50% | 0% | **fail** |
+| acquisition boolean true | 80% | 95.24% | pass |
+| acquisition boolean false | 80% | 90.48% | pass |
+| retention boolean false | 90% | 71.43% | **fail** |
+
+All 42 choice outputs were unparseable under the exact-choice scorer. They were
+not random: the model usually embedded a selected letter in a long explanation
+instead of returning the required single letter. Ten of 169 unique
+continuations reached the unchanged 256-token limit, all in the choice cell.
+The scorer correctly applied no repair. This response-format regression also
+explains why the run took materially longer than Stage 1.
+
+All full-evaluation hashes were independently recomputed after B2 pull and
+matched the signed receipt.
+
+## interpretation and decision
+
+The paired ranking objective improves the frozen Boolean-pair surface, but
+that gain does not transfer to the complete task. Relative to Stage 1, it gains
+one acquisition false item and loses one retention false item, twelve
+acquisition choice items, and six advisory acquisition recall items.
+
+The causal result is therefore narrow and negative:
+
+- repairing the data is necessary and makes LoRA acquire changed-source facts;
+- generative SFT transfers the required short-answer behavior but fails the
+  source-disjoint retention boundary;
+- Boolean-only ranking sharpens truth separation but removes that
+  short-answer transfer and does not repair retention.
+
+Neither more steps under Stage 1 nor more steps under Stage 2 are justified.
+Any next supervised-LoRA candidate needs a new frozen contract for a
+retention-preserving, multi-surface objective. It must preserve choice-format
+supervision without copying evaluation wording and must use stability controls
+that remain source-disjoint from the 21 frozen retention facts. That is a new
+intervention, not a retry.
+
+The first full-evaluation attempt stopped before model load because the bound
+training receipt was not declared as a worker input. It produced no samples,
+metrics, or run receipt and cost an estimated USD 0.0062. The packaging fix
+mounted that already-frozen receipt; no scientific field changed. Including
+training, margin gate, successful full evaluation, and this preflight stop,
+Stage 2 cost an estimated USD 1.1348.
+
+QLoRA, full-weight training, reinforcement learning, additional training, and
+promotion remain unauthorized.
