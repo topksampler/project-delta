@@ -1,0 +1,149 @@
+schema: delta.knowledge_stability_replay_lora_protocol.v1
+
+protocol_id: delta-v2-knowledge-stability-replay-lora-v1
+experiment_id: delta_v2
+condition_id: d4_stability_replay_sft_control
+state: preregistered-for-training
+
+decision_trigger:
+  design_id: delta-v2-knowledge-stability-replay-v1
+  data_freeze:
+    path: experiments/delta_v2/knowledge_stability_replay_data_freeze.yaml
+    sha256: e0956600529a056dc5d13328b2a13b28ff4294e2fa7eafcfddb4ed6bbccb8101
+  base_run_id: delta-v2-d4-stability-base-qwen35-08b-modal-v1
+  base_receipt:
+    path: runs/delta-v2-d4-stability-base-qwen35-08b-modal-v1/run_receipt.json
+    sha256: e91cd432da6d524bfcbb05626386335336a540e14f4d99f017cc11ade50fec97
+  base_metrics:
+    path: runs/delta-v2-d4-stability-base-qwen35-08b-modal-v1/metrics.json
+    sha256: e6382bca092a87ff5587f7aaf5f1d113f46f00ee9f07f288efa3725be3858158
+  baseline:
+    choice: 0/15
+    boolean_true: 1/15
+    boolean_false: 14/15
+    recall: advisory-0/15
+  intervention: add-source-disjoint-stability-replay-at-fixed-budget
+
+parent_control:
+  path: experiments/delta_v2/knowledge_paired_sft_control_protocol.yaml
+  sha256: 7c97f2581636510403f7af8792e044fd7543c8be66500f5d923f73ef0feb72cd
+  preserved:
+    - assistant-only-generative-sft-v1
+    - fresh-base-initialization
+    - lora-topology
+    - optimizer
+    - learning-rate
+    - optimizer-steps
+    - gradient-accumulation
+    - seed
+
+data:
+  acquisition_train:
+    path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+    sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+    rows: 147
+  acquisition_pairs:
+    path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+    sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+    rows: 63
+  replay_train:
+    path: data/experiments/delta_v2/knowledge_stability_replay_v1/replay_train.jsonl
+    sha256: 3cce6b51aefb3ee876599485c7726aebe3568b3f86cec021c66eda49b1f4d98f
+    rows: 105
+  replay_pairs:
+    path: data/experiments/delta_v2/knowledge_stability_replay_v1/replay_pairs.jsonl
+    sha256: 4c99f8d95ec5e365f50b897659683d1b227d00ef6c5c582bff3e4761f5c1acb3
+    rows: 45
+  acquisition_dev:
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+    sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+    rows: 21
+  evaluation_wording_added_to_training: false
+
+implementation:
+  engine_path: experiments/delta_v2/knowledge_stability_replay_lora.py
+  engine_sha256: f5d250446837c075db8a4cddfe515d2f8cbc86fd14d5854de1afc507dd31f569
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  initialization: fresh-base
+  base_weights: frozen
+  quantization: none
+  full_weight_training: forbidden
+
+lora:
+  implementation: peft-0.19.0
+  rank: 8
+  alpha: 16
+  dropout: 0.05
+  bias: none
+  target_modules_regex: '^model\.language_model\.layers\.\d+\.(?:self_attn\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\.(?:in_proj_a|in_proj_b|in_proj_qkv|in_proj_z|out_proj)|mlp\.(?:gate_proj|up_proj|down_proj))$'
+  vision_modules_trainable: false
+
+objective:
+  objective_id: assistant-only-generative-sft-v1
+  recall_loss: teacher-forced-assistant-token-cross-entropy
+  boolean_pair_loss: mean-of-positive-and-negative-gold-cross-entropy
+  pair_normalization: one-pair-equals-one-training-unit
+  truth_margin_term: absent
+  pair-ranking_term: absent
+
+optimization:
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.0001
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  deterministic_algorithms: required
+
+schedule:
+  total_units: 240
+  acquisition_units: 180
+  replay_units: 60
+  replay_share: 0.25
+  acquisition_boolean_pairs: 135
+  acquisition_recall: 45
+  replay_boolean_pairs: 45
+  replay_recall: 15
+  step_types:
+    - count: 45
+      units: [acquisition_pair, acquisition_pair, acquisition_recall, replay_pair]
+    - count: 15
+      units: [acquisition_pair, acquisition_pair, acquisition_pair, replay_recall]
+  step_type_order: deterministic-seeded-shuffle
+  within_stream_order: deterministic-seeded-shuffle
+
+verification:
+  first_gate:
+    acquisition_pair_margin:
+      verified_true_minimum: 0.80
+      verified_false_minimum: 0.80
+      truth_conditioned_pairs_minimum: 0.80
+      every_corruption_family_false_minimum: 0.80
+    held_out_stability_dev:
+      choice_parseable_minimum: 0.90
+      boolean_parseable_minimum: 1.0
+      boolean_true_accuracy_minimum: 0.80
+      boolean_false_accuracy_minimum: 0.90
+      recall: advisory
+      pooled_score: forbidden
+  full_eval_only_after_first_gate: true
+  verify_v2_only_after_full_eval: true
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_adapter_write_authorized: true
+  pre_gate_evaluation_authorized: true
+  full_eval_authorized: false
+  verify_v2_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false
