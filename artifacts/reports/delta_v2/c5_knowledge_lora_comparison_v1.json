@@ -1,0 +1,147 @@
+{
+  "adapter_run_id": "delta-v2-c5-knowledge-lora-eval-qwen35-08b-modal-v1",
+  "base_run_id": "delta-v2-c4-knowledge-base-qwen35-08b-modal-v1",
+  "candidate_gate_pass": false,
+  "candidate_state": "evaluation-gates-fail",
+  "cells": {
+    "acquisition_added.boolean_false": {
+      "adapter_correct": 21,
+      "adapter_exact_accuracy": 1.0,
+      "adapter_parseable": 21,
+      "base_correct": 21,
+      "base_exact_accuracy": 1.0,
+      "base_parseable": 21,
+      "correct_delta": 0,
+      "exact_accuracy_delta": 0.0,
+      "items": 21
+    },
+    "acquisition_added.boolean_true": {
+      "adapter_correct": 0,
+      "adapter_exact_accuracy": 0.0,
+      "adapter_parseable": 21,
+      "base_correct": 0,
+      "base_exact_accuracy": 0.0,
+      "base_parseable": 21,
+      "correct_delta": 0,
+      "exact_accuracy_delta": 0.0,
+      "items": 21
+    },
+    "acquisition_added.choice": {
+      "adapter_correct": 10,
+      "adapter_exact_accuracy": 0.47619047619047616,
+      "adapter_parseable": 21,
+      "base_correct": 0,
+      "base_exact_accuracy": 0.0,
+      "base_parseable": 0,
+      "correct_delta": 10,
+      "exact_accuracy_delta": 0.47619047619047616,
+      "items": 21
+    },
+    "acquisition_added.recall": {
+      "adapter_correct": 10,
+      "adapter_exact_accuracy": 0.47619047619047616,
+      "adapter_parseable": 21,
+      "base_correct": 0,
+      "base_exact_accuracy": 0.0,
+      "base_parseable": 18,
+      "correct_delta": 10,
+      "exact_accuracy_delta": 0.47619047619047616,
+      "items": 21
+    },
+    "feature_retention.verified_behavior_json": {
+      "adapter_correct": 0,
+      "adapter_exact_accuracy": 0.0,
+      "adapter_parseable": 1,
+      "base_correct": 0,
+      "base_exact_accuracy": 0.0,
+      "base_parseable": 1,
+      "correct_delta": 0,
+      "exact_accuracy_delta": 0.0,
+      "items": 1
+    },
+    "retention_stable.boolean_false": {
+      "adapter_correct": 21,
+      "adapter_exact_accuracy": 1.0,
+      "adapter_parseable": 21,
+      "base_correct": 21,
+      "base_exact_accuracy": 1.0,
+      "base_parseable": 21,
+      "correct_delta": 0,
+      "exact_accuracy_delta": 0.0,
+      "items": 21
+    },
+    "retention_stable.boolean_true": {
+      "adapter_correct": 1,
+      "adapter_exact_accuracy": 0.047619047619047616,
+      "adapter_parseable": 21,
+      "base_correct": 1,
+      "base_exact_accuracy": 0.047619047619047616,
+      "base_parseable": 21,
+      "correct_delta": 0,
+      "exact_accuracy_delta": 0.0,
+      "items": 21
+    },
+    "retention_stable.choice": {
+      "adapter_correct": 7,
+      "adapter_exact_accuracy": 0.3333333333333333,
+      "adapter_parseable": 21,
+      "base_correct": 0,
+      "base_exact_accuracy": 0.0,
+      "base_parseable": 0,
+      "correct_delta": 7,
+      "exact_accuracy_delta": 0.3333333333333333,
+      "items": 21
+    },
+    "retention_stable.recall": {
+      "adapter_correct": 3,
+      "adapter_exact_accuracy": 0.14285714285714285,
+      "adapter_parseable": 20,
+      "base_correct": 0,
+      "base_exact_accuracy": 0.0,
+      "base_parseable": 17,
+      "correct_delta": 3,
+      "exact_accuracy_delta": 0.14285714285714285,
+      "items": 21
+    }
+  },
+  "claim_boundary": {
+    "acquisition": "same-claim-new-surface",
+    "feature": "separate",
+    "held_out_fact_generalization": false,
+    "recall": "advisory"
+  },
+  "dataset_id": "delta-v2-vllm-knowledge-adaptation-v1",
+  "identical_protocol_and_eval_bank": true,
+  "lora_protocol_id": "delta-v2-knowledge-lora-v2",
+  "lora_protocol_sha256": "73f7dde372ebdbeafd56cd25808b9dcc7135bbeafd829f91ff4d970abdd44331",
+  "pooled_overall_accuracy": null,
+  "preregistered_gates": {
+    "acquisition_boolean_false": {
+      "cell": "acquisition_added.boolean_false",
+      "minimum": 0.8,
+      "observed": 1.0,
+      "pass": true
+    },
+    "acquisition_boolean_true": {
+      "cell": "acquisition_added.boolean_true",
+      "minimum": 0.8,
+      "observed": 0.0,
+      "pass": false
+    },
+    "acquisition_choice": {
+      "cell": "acquisition_added.choice",
+      "minimum": 0.5,
+      "observed": 0.47619047619047616,
+      "pass": false
+    },
+    "retention_boolean_false": {
+      "cell": "retention_stable.boolean_false",
+      "minimum": 0.9,
+      "observed": 1.0,
+      "pass": true
+    }
+  },
+  "promotion_authorized": false,
+  "protocol_id": "delta-v2-knowledge-eval-v1",
+  "schema": "delta.knowledge_condition_comparison.v1"
+}
