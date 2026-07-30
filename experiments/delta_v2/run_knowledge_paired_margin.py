@@ -254,6 +254,25 @@ def validate_config(
         "pairs_path": str(PAIRS_PATH),
     }:
         raise PairedMarginError("paired margin config data changed")
+    if dict(_mapping(config.get("inputs"), "inputs")) != {
+        "run_artifacts": [
+            {
+                "run_id": TRAINING_RUN_ID,
+                "path": str(
+                    Path("runs") / TRAINING_RUN_ID / "run_receipt.json"
+                ),
+                "sha256": trigger["training_receipt_sha256"],
+            },
+            {
+                "run_id": TRAINING_RUN_ID,
+                "path": str(
+                    Path("runs") / TRAINING_RUN_ID / "train_metrics.json"
+                ),
+                "sha256": trigger["training_metrics_sha256"],
+            },
+        ]
+    }:
+        raise PairedMarginError("paired margin run inputs changed")
     if dict(_mapping(config.get("eval"), "eval")) != {
         "module": "experiments.delta_v2.run_knowledge_paired_margin"
     }:

@@ -41,6 +41,15 @@ data:
   train_path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
   pairs_path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
 
+inputs:
+  run_artifacts:
+    - run_id: delta-v2-d2-knowledge-paired-data-sft-control-qwen35-08b-modal-v1
+      path: runs/delta-v2-d2-knowledge-paired-data-sft-control-qwen35-08b-modal-v1/run_receipt.json
+      sha256: cff9d721dadbf48d8974504728ef0fba3b14e9b498a0a893f4dbdba8c32c8f07
+    - run_id: delta-v2-d2-knowledge-paired-data-sft-control-qwen35-08b-modal-v1
+      path: runs/delta-v2-d2-knowledge-paired-data-sft-control-qwen35-08b-modal-v1/train_metrics.json
+      sha256: 4cc7035c23ff0b949810e7b7e2ad599243cbb574bb3d111a4a234d9ccfea27b2
+
 eval:
   module: experiments.delta_v2.run_knowledge_paired_margin
 

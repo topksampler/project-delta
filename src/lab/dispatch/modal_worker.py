@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import platform
@@ -96,6 +97,60 @@ def sync_inputs(
             if last_error is None:
                 raise RuntimeError(f"no B2 candidate for input: {relative}")
             raise last_error
+
+    inputs = config.get("inputs") or {}
+    run_artifacts = inputs.get("run_artifacts") or []
+    if not isinstance(run_artifacts, list):
+        raise ValueError("inputs.run_artifacts must be a list")
+    for index, artifact in enumerate(run_artifacts):
+        if not isinstance(artifact, dict) or set(artifact) != {
+            "run_id",
+            "path",
+            "sha256",
+        }:
+            raise ValueError(
+                f"inputs.run_artifacts[{index}] must bind run_id, path, sha256"
+            )
+        declared_run = artifact["run_id"]
+        declared_path = Path(str(artifact["path"]))
+        expected_sha256 = artifact["sha256"]
+        if not isinstance(declared_run, str) or not declared_run:
+            raise ValueError("run artifact run_id must be a non-empty string")
+        if (
+            declared_path.is_absolute()
+            or ".." in declared_path.parts
+            or len(declared_path.parts) < 3
+            or declared_path.parts[:2] != ("runs", declared_run)
+        ):
+            raise ValueError(
+                "run artifact path must stay under runs/<run_id>/"
+            )
+        if (
+            not isinstance(expected_sha256, str)
+            or len(expected_sha256) != 64
+            or any(
+                character not in "0123456789abcdef"
+                for character in expected_sha256
+            )
+        ):
+            raise ValueError("run artifact sha256 must be lowercase hex")
+        local_artifact = repo_root / declared_path
+        if not local_artifact.exists():
+            local_artifact.parent.mkdir(parents=True, exist_ok=True)
+            _s5cmd(
+                [
+                    "cp",
+                    _s3(declared_path.as_posix()),
+                    str(local_artifact),
+                ]
+            )
+        actual_sha256 = hashlib.sha256(
+            local_artifact.read_bytes()
+        ).hexdigest()
+        if actual_sha256 != expected_sha256:
+            raise ValueError(
+                f"run artifact bytes changed: {declared_path}"
+            )
 
     model = config.get("model") or {}
     adapter_run = model.get("adapter_run_id")
