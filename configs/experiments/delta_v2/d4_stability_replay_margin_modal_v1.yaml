@@ -1,0 +1,62 @@
+schema: delta.knowledge_stability_replay_margin_config.v1
+run_id: delta-v2-d4-stability-replay-margin-modal-v1
+experiment_id: delta_v2
+condition_id: d4_stability_replay_margin
+task: eval
+
+protocol:
+  protocol_id: delta-v2-knowledge-stability-replay-margin-v1
+  path: experiments/delta_v2/knowledge_stability_replay_margin_protocol.yaml
+  sha256: bd58da08a97430a947fcdbd05a4a3692857d97da510e1a547f9977c42e1e2f32
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter:
+    kind: lora
+    run_id: delta-v2-d4-stability-replay-lora-qwen35-08b-modal-v1
+    path: runs/delta-v2-d4-stability-replay-lora-qwen35-08b-modal-v1/adapter
+    sha256: 0260638f253090c6ab89e38e10ff025fbdc57ef9b736f5457faa26a339fed4c7
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  attention_implementation: eager
+  deterministic_algorithms: true
+
+data:
+  train_path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+  pairs_path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+
+inputs:
+  run_artifacts:
+    - run_id: delta-v2-d4-stability-replay-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d4-stability-replay-lora-qwen35-08b-modal-v1/run_receipt.json
+      sha256: bf4b665b8274012ba6ad1e0e6d1417a3708756c24c0e5369a30f1bb89b1d488b
+    - run_id: delta-v2-d4-stability-replay-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d4-stability-replay-lora-qwen35-08b-modal-v1/train_metrics.json
+      sha256: 6544aff7b1d426e2ed3bcef51537941e071ea7fa56ce7fcf8ebf1da449c0e1d1
+
+eval:
+  module: experiments.delta_v2.run_knowledge_stability_replay_margin
+
+output:
+  dir: runs/delta-v2-d4-stability-replay-margin-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: A10G
+  timeout_seconds: 3600

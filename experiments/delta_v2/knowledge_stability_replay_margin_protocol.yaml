@@ -1,0 +1,41 @@
+schema: delta.knowledge_stability_replay_margin_protocol.v1
+protocol_id: delta-v2-knowledge-stability-replay-margin-v1
+experiment_id: delta_v2
+condition_id: d4_stability_replay_margin
+state: preregistered-for-pre-gate
+
+decision_trigger:
+  training_run_id: delta-v2-d4-stability-replay-lora-qwen35-08b-modal-v1
+  training_launch_commit: 922f93b
+  training_receipt_sha256: bf4b665b8274012ba6ad1e0e6d1417a3708756c24c0e5369a30f1bb89b1d488b
+  training_metrics_sha256: 6544aff7b1d426e2ed3bcef51537941e071ea7fa56ce7fcf8ebf1da449c0e1d1
+  adapter_sha256: 0260638f253090c6ab89e38e10ff025fbdc57ef9b736f5457faa26a339fed4c7
+  objective_id: assistant-only-generative-sft-v1
+  schedule_sha256: 7af9409e76c5c6242c6c1e949dce597c71668ccef75b98a7b4c5d0c1685a577a
+
+dataset:
+  freeze_path: experiments/delta_v2/knowledge_paired_data_freeze.yaml
+  freeze_sha256: 705eeff619fba976c395e3e8cd5fb53ab3e38d4badb1715dbf1ef995f5b8c490
+  train_path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+  train_sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  pairs_path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+  pairs_sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+  boolean_rows: 126
+  pairs: 63
+
+gates:
+  verify_true_margin_accuracy_minimum: 0.80
+  verify_false_margin_accuracy_minimum: 0.80
+  truth_conditioned_pair_rate_minimum: 0.80
+  per_corruption_family_false_accuracy_minimum: 0.80
+  all_gates_required: true
+  pooled_overall_score: forbidden
+
+execution_boundary:
+  modal_diagnostic_authorized: true
+  model_updates: 0
+  adapter_mutation: forbidden
+  stability_dev_eval_authorized: true
+  full_eval_authorized: false
+  verify_v2_authorized: false
+  promotion_authorized: false
