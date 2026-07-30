@@ -1,0 +1,108 @@
+schema: delta.knowledge_paired_lora_protocol.v1
+
+protocol_id: delta-v2-knowledge-paired-sft-control-v1
+experiment_id: delta_v2
+condition_id: d2_paired_data_sft_control
+state: preregistered-for-training
+
+decision_trigger:
+  paired_dataset_id: delta-v2-knowledge-paired-v2
+  paired_dataset_freeze_commit: ea8e01a
+  diagnostic_result: global-label-intercept-not-truth-conditioned
+  data_warning_repaired: annotation-only-negative-bank
+
+causal_role:
+  stage: 1
+  name: repaired-data-original-objective-control
+  establishes_baseline_for: paired-boolean-objective
+  interpretable_as_objective_effect_vs_c7: false
+  stage_2_only_change: learning-objective
+
+dataset:
+  dataset_id: delta-v2-knowledge-paired-v2
+  freeze_path: experiments/delta_v2/knowledge_paired_data_freeze.yaml
+  freeze_sha256: 705eeff619fba976c395e3e8cd5fb53ab3e38d4badb1715dbf1ef995f5b8c490
+  train_path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+  train_sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  train_rows: 147
+  pairs_path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+  pairs_sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+  pair_rows: 63
+  dev_path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+  dev_sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+  dev_rows: 21
+  frozen_eval_path: data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl
+  frozen_eval_sha256: 5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c
+  b2_prefix: datasets/experiments/delta_v2/knowledge_paired_v2/
+  evaluation_wording_added_to_training: false
+
+implementation:
+  engine_path: experiments/delta_v2/knowledge_paired_lora.py
+  engine_sha256: d5e473fe118807feea1255e6a299f80c6ef72ca2088272de79eaea02b7d860c9
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  initialization: fresh-base
+  base_weights: frozen
+  quantization: none
+  full_weight_training: forbidden
+
+lora:
+  implementation: peft-0.19.0
+  rank: 8
+  alpha: 16
+  dropout: 0.05
+  bias: none
+  target_modules_regex: '^model\.language_model\.layers\.\d+\.(?:self_attn\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\.(?:in_proj_a|in_proj_b|in_proj_qkv|in_proj_z|out_proj)|mlp\.(?:gate_proj|up_proj|down_proj))$'
+  vision_modules_trainable: false
+
+training_units:
+  construction: fixed-recall-and-boolean-pair-units
+  recall_units: 21
+  boolean_pair_units: 63
+  units_per_cycle: 84
+  pair_contains: [verify_true, verify_false]
+  pair_members_share_source_and-corruption-family: true
+  deterministic_unit_shuffle: true
+
+objective:
+  objective_id: assistant-only-generative-sft-v1
+  recall_loss: teacher-forced-assistant-token-cross-entropy
+  boolean_pair_loss: mean-of-positive-and-negative-gold-cross-entropy
+  pair_normalization: one-pair-equals-one-training-unit
+  truth_margin_term: absent
+  pair-ranking_term: absent
+
+optimization:
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.0001
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  deterministic_algorithms: required
+
+verification:
+  first_gate: repaired-pair-boolean-margin-v1
+  verify_true_margin_accuracy_minimum: 0.80
+  verify_false_margin_accuracy_minimum: 0.80
+  truth_conditioned_pair_rate_minimum: 0.80
+  per_corruption_family_false_accuracy_minimum: 0.80
+  pooled_overall_score: forbidden
+  full_frozen_eval_only_after_first_gate: true
+  stage_2_requires_separate_protocol_after_stage_1_receipt: true
+  result: candidate-only-no-promotion
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_adapter_write_authorized: true
+  repaired_pair_diagnostic_authorized: true
+  full_eval_conditional: true
+  stage_2_training_authorized: false
+  promotion_authorized: false

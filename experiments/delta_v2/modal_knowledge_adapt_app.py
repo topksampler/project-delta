@@ -14,6 +14,10 @@ REPO_ROOT = Path("/root/lalith-ai-lab")
 TRAIN_DATA = "data/experiments/delta_v2/knowledge_adaptation_v1/train.jsonl"
 DEV_DATA = "data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl"
 EVAL_DATA = "data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl"
+PAIRED_TRAIN_DATA = (
+    "data/experiments/delta_v2/knowledge_paired_v2/train.jsonl"
+)
+PAIRED_DATA = "data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl"
 
 app = modal.App("lalith-ai-lab-delta-v2-knowledge-adapt")
 secrets = [modal.Secret.from_name("lalith-lab")]
@@ -66,6 +70,14 @@ image = (
     .add_local_file(
         EVAL_DATA,
         remote_path=f"/root/lalith-ai-lab/{EVAL_DATA}",
+    )
+    .add_local_file(
+        PAIRED_TRAIN_DATA,
+        remote_path=f"/root/lalith-ai-lab/{PAIRED_TRAIN_DATA}",
+    )
+    .add_local_file(
+        PAIRED_DATA,
+        remote_path=f"/root/lalith-ai-lab/{PAIRED_DATA}",
     )
 )
 

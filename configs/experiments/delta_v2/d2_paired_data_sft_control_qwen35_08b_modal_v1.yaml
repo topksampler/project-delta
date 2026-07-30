@@ -1,0 +1,82 @@
+schema: delta.knowledge_paired_lora_train_config.v1
+run_id: delta-v2-d2-knowledge-paired-data-sft-control-qwen35-08b-modal-v1
+experiment_id: delta_v2
+condition_id: d2_paired_data_sft_control
+eval_environment_id: delta-v2-knowledge-paired-v2
+task: train
+
+protocol:
+  protocol_id: delta-v2-knowledge-paired-sft-control-v1
+  path: experiments/delta_v2/knowledge_paired_sft_control_protocol.yaml
+  sha256: 7c97f2581636510403f7af8792e044fd7543c8be66500f5d923f73ef0feb72cd
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter: new-lora
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  deterministic_algorithms: true
+
+data:
+  train_path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+  train_sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  pairs_path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+  pairs_sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+  eval_path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+  eval_sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+
+lora:
+  implementation: peft-0.19.0
+  rank: 8
+  alpha: 16
+  dropout: 0.05
+  bias: none
+  target_modules_regex: '^model\.language_model\.layers\.\d+\.(?:self_attn\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\.(?:in_proj_a|in_proj_b|in_proj_qkv|in_proj_z|out_proj)|mlp\.(?:gate_proj|up_proj|down_proj))$'
+  vision_modules_trainable: false
+
+objective:
+  objective_id: assistant-only-generative-sft-v1
+  recall_loss: teacher-forced-assistant-token-cross-entropy
+  boolean_pair_loss: mean-of-positive-and-negative-gold-cross-entropy
+  pair_normalization: one-pair-equals-one-training-unit
+  truth_margin_term: absent
+  pair-ranking_term: absent
+
+training:
+  module: experiments.delta_v2.train_knowledge_paired_sft_control
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.0001
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  deterministic_algorithms: required
+
+output:
+  dir: runs/delta-v2-d2-knowledge-paired-data-sft-control-qwen35-08b-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: H100
+  timeout_seconds: 7200
