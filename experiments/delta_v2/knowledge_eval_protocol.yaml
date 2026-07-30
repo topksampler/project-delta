@@ -1,0 +1,77 @@
+schema: delta.knowledge_eval_protocol.v1
+
+protocol_id: delta-v2-knowledge-eval-v1
+experiment_id: delta_v2
+state: preregistered-for-base-and-lora
+
+dataset:
+  dataset_id: delta-v2-vllm-knowledge-adaptation-v1
+  freeze_path: experiments/delta_v2/knowledge_adaptation_freeze.yaml
+  freeze_sha256: 1fab0084c1804805d11c16b432b6b208661a8825e1da40c6606e4313183cc2eb
+  eval_path: data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl
+  eval_sha256: 5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c
+  rows: 169
+  model_visible_fields: [prompt]
+
+target_model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  conditions:
+    - c4_knowledge_base
+    - c5_knowledge_lora
+
+prompting:
+  interface: official-chat-template
+  messages:
+    - role: user
+      content_from: prompt
+  add_generation_prompt: true
+  chat_template_kwargs:
+    enable_thinking: false
+  system_prompt: none
+
+generation:
+  method: greedy
+  do_sample: false
+  max_new_tokens: 256
+  repeats: 2
+  seed: 20260730
+  repeat_invariant: byte-identical-raw-continuation
+
+scoring:
+  authority: frozen-deterministic-probe-gold
+  exact_choice:
+    scorer_id: exact-choice-v1
+    valid: [A, B, C, D]
+  exact_boolean:
+    scorer_id: exact-boolean-v1
+    valid: ["yes", "no"]
+  exact_json:
+    scorer_id: exact-json-v1
+    repair: forbidden
+    markdown_fences: invalid
+  invalid_or_unparseable: incorrect
+  llm_judge: forbidden
+
+reporting:
+  pooled_overall_score: forbidden
+  required_strata:
+    acquisition_added: 84
+    retention_stable: 84
+    feature_retention: 1
+  headline_probe_kinds:
+    - choice
+    - boolean_true
+    - boolean_false
+  advisory_probe_kinds:
+    - recall
+  feature_signal: separate
+  comparison: identical-probes-base-versus-lora
+  acquisition_claim: same-claim-new-surface
+  held_out_fact_generalization_claim: forbidden
+
+execution_boundary:
+  base_run_required_before_lora: true
+  lora_training_authorized: true
+  full_weight_training: forbidden
+  promotion: forbidden
