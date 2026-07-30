@@ -7,7 +7,7 @@ world changes into measured drift, the least-cost effective intervention, and a
 verified model-state transition.
 
 ```text
-world changes → SENSE → BUILD → DECIDE → VERIFY → promote or rollback
+world changes → SENSE → BUILD → DECIDE → ADAPT → VERIFY → MEMORY or rollback
 ```
 
 ## invariant
@@ -58,7 +58,7 @@ flowchart LR
 | SENSE | detect, quantify, and localize knowledge drift | active model state, old source snapshot, new source snapshot | `DriftEvent` |
 | BUILD | generate grounded train and eval environments for affected knowledge | `DriftEvent`, pinned source snapshots | `EvalEnvironment`, candidate train data |
 | DECIDE | choose the least-cost intervention expected to recover quality | drift features, intervention history, budget and quality constraints | `InterventionPlan` |
-| ADAPT | execute no-op, context, RAG refresh, LoRA, or later post-training | `InterventionPlan` | `CandidateState` |
+| ADAPT | execute the selected no-weight control or weight-changing supervised / reinforcement intervention | `InterventionPlan`, grounded candidate train data | `CandidateState` |
 | VERIFY | measure recovery, regressions, calibration, and cost | candidate, active state, eval environment | `PromotionDecision` |
 | MEMORY | preserve lineage and resolve the active state | accepted decisions and artifacts | versioned adapters, indexes, manifests, active pointer |
 
@@ -116,8 +116,9 @@ The intervention ladder is ordered by expected cost:
 L0 no-op
 L1 prompt/context injection
 L2 RAG index refresh
-L3 LoRA delta adaptation
-L4 continued pre-training or RL post-training
+L3 supervised adapter update
+L4 supervised full-model update
+L5 verifier-grounded reinforcement update
 ```
 
 The policy objective is:
@@ -130,6 +131,54 @@ and regression <= regression budget
 
 The first policy will be deterministic and auditable. A learned policy is
 justified only after DELTA has enough intervention outcomes to train and test it.
+
+### ADAPT
+
+ADAPT executes both diagnostic controls and persistent weight adaptation. No-op,
+prompt/context injection, and RAG index refresh are no-weight controls: they may
+change the candidate's context or retrieval state, but they do not change model
+weights. They remain necessary comparators for deciding whether a weight update
+is justified. DELTA's adaptation research target is a model whose weights can
+remain correct as its versioned sources change.
+
+Weight-changing candidates are organized along two independent axes:
+
+| learning objective | adapter weights | full model weights |
+|---|---|---|
+| supervised | LoRA; QLoRA with a quantized frozen base | full SFT or continued training |
+| verifier-grounded reinforcement | adapter-policy RL for reward-harness validation | full-policy RL after the reward harness passes audit |
+
+QLoRA changes the training-time representation of the frozen base, not the
+weight-update scope: the durable learned state is still an adapter. Each
+candidate declares its objective, update scope, base revision, source rows,
+optimizer, and resulting artifact lineage before execution. Changing one of
+those factors creates a new candidate rather than silently mutating an existing
+condition.
+
+Verifier-grounded reinforcement has this module contract:
+
+```text
+verified development task
+  → policy rollout (answer, source action, tool call, or executable test)
+  → deterministic code / AST / documentation / behavior verifier
+  → separate reward components
+  → policy optimization
+  → changed policy weights
+  → frozen VERIFY
+```
+
+Correctness, provenance, honesty, stable-knowledge regression, and cost remain
+separate reward and reporting components. A language-model judge may propose or
+review wording, but it cannot define gold truth or override deterministic
+verification. The unseen acceptance transition is sealed for VERIFY and must
+never become an RL training environment.
+
+Before any reinforcement job, freeze the environment and allowed actions,
+observation boundary, rollout schema, deterministic reward components and
+aggregation, reward-hacking tests, stability policy, retention and false-accept
+controls, optimizer and update scope, and checkpoint / rollback / promotion
+gates. Adapter-policy RL validates that harness first. Full-policy RL is
+ineligible until the adapter-policy reward harness survives that audit.
 
 ### VERIFY and MEMORY
 

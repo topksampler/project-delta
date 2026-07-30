@@ -43,12 +43,33 @@ flowchart TD
     AcceptGate -->|"pass"| Env
     AcceptGate -->|"fail"| Failure["Record failure<br/>protocol bump — no silent tuning"]
 
-    subgraph Later["Later DELTA loop — out of current scope"]
+    subgraph Loop["DELTA loop after the frozen environment"]
         Env --> Episode["Active-model EvalEpisode"]
         Episode --> Drift["DriftEvent"]
         Drift --> Decide["DECIDE"]
-        Decide --> Adapt["ADAPT"]
-        Adapt --> Verify["VERIFY"]
+
+        subgraph Adapt["ADAPT — execute the selected intervention"]
+            Decide --> Controls["No-weight controls<br/>no-op · context · RAG"]
+
+            Decide --> Supervised["Supervised objective"]
+            Supervised --> LoRA["Adapter weights<br/>LoRA"]
+            Supervised --> QLoRA["Adapter weights<br/>QLoRA on a quantized frozen base"]
+            Supervised --> FullSFT["Full model weights<br/>full SFT / continued training"]
+
+            Decide --> Reinforcement["Verifier-grounded reinforcement objective"]
+            Reinforcement --> AdapterRL["Adapter weights<br/>adapter-policy RL validates the reward harness"]
+            AdapterRL --> Audit{"Reward-harness audit"}
+            Audit -->|"pass"| FullRL["Full model weights<br/>full-policy RL"]
+            Audit -->|"fail"| Blocked["Block full-policy RL<br/>revise and refreeze the contract"]
+        end
+
+        Controls --> Candidate["CandidateState"]
+        LoRA --> Candidate
+        QLoRA --> Candidate
+        FullSFT --> Candidate
+        AdapterRL --> Candidate
+        FullRL --> Candidate
+        Candidate --> Verify["VERIFY on the frozen environment"]
         Verify --> Memory["MEMORY"]
         Memory -. "next source transition" .-> World
     end
