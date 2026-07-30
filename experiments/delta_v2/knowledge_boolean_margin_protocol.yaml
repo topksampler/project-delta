@@ -1,0 +1,117 @@
+schema: delta.knowledge_boolean_margin_protocol.v1
+
+protocol_id: delta-v2-knowledge-boolean-margin-v1
+experiment_id: delta_v2
+state: preregistered-for-diagnostic
+
+question:
+  diagnosis: distinguish answer-prior shift from truth-conditioned separation
+  model_updates: forbidden
+  promotion_authorized: false
+
+dataset:
+  dataset_id: delta-v2-vllm-knowledge-adaptation-v1
+  path: data/experiments/delta_v2/knowledge_adaptation_v1/train.jsonl
+  sha256: 16ad0d2c12a823722501800227c739e59131fd7c7e0f774e2f1faab2e4bd4b95
+  rows: 63
+  included_surfaces: [verify_true, verify_false]
+  included_rows: 42
+  source_pairs: 21
+  mutation: forbidden
+
+pair_audit:
+  outer_prompt_template_identical_within_pair: required
+  contract_key_order_identical_within_pair: required
+  false_changed_fields: [annotation]
+  false_changed_field_count: 1
+  true_answer: "yes"
+  false_answer: "no"
+  formatting_or_label_leak: forbidden
+
+scoring:
+  candidate_completions: ["yes", "no"]
+  chat_template: official
+  add_generation_prompt: true
+  enable_thinking: false
+  max_sequence_length: 768
+  sequence_log_probability: sum-assistant-token-log-probability
+  first_token_margin: logit_yes-minus-logit_no
+  sequence_margin: log_probability_yes-minus-log_probability_no
+  gold_signed_margin:
+    verify_true: sequence_margin
+    verify_false: negative-sequence_margin
+  teacher_forced_gold_nll: negative-gold-sequence-log-probability
+  pair_separation: true-sequence-margin-minus-false-sequence-margin
+  truth_conditioned_pair: true-margin-positive-and-false-margin-negative
+  pooled_overall_score: forbidden
+
+conditions:
+  - condition_id: d1_margin_base
+    run_id: delta-v2-d1-knowledge-margin-base-qwen35-08b-modal-v1
+    role: frozen-base
+    training_run_id: null
+    adapter:
+      kind: none
+    surface_weights: null
+  - condition_id: d1_margin_c5_1to1
+    run_id: delta-v2-d1-knowledge-margin-c5-1to1-qwen35-08b-modal-v1
+    role: c5-balanced-negative
+    training_run_id: delta-v2-c5-knowledge-lora-qwen35-08b-modal-v2
+    adapter:
+      kind: lora
+      sha256: 83fb04ae52502432df6b17d2aaa12cfeb12f457df6a77c83f28fed433d9966fa
+    surface_weights:
+      exact_recall: 1
+      verify_true: 1
+      verify_false: 1
+  - condition_id: d1_margin_c7_2to1
+    run_id: delta-v2-d1-knowledge-margin-c7-2to1-qwen35-08b-modal-v1
+    role: c7-midpoint-negative
+    training_run_id: delta-v2-c7-knowledge-lora-2to1-qwen35-08b-modal-v1
+    adapter:
+      kind: lora
+      sha256: 89f79fe8763e3184ef3d701ac42afa657769f7bf0d5a09df920b9d32d3544549
+    surface_weights:
+      exact_recall: 1
+      verify_true: 2
+      verify_false: 1
+  - condition_id: d1_margin_c6_4to1
+    run_id: delta-v2-d1-knowledge-margin-c6-4to1-qwen35-08b-modal-v1
+    role: c6-true-weighted-negative
+    training_run_id: delta-v2-c6-knowledge-lora-true-weighted-qwen35-08b-modal-v1
+    adapter:
+      kind: lora
+      sha256: 8dae0e5cf7692542efc34f4fc836b1c96279bae680747edc368f646fdf938e36
+    surface_weights:
+      exact_recall: 1
+      verify_true: 4
+      verify_false: 1
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  device: cuda
+  dtype: bfloat16
+  attention_implementation: eager
+  deterministic_algorithms: true
+  seed: 20260730
+
+reporting:
+  per_surface:
+    - mean_teacher_forced_gold_nll
+    - mean_first_token_margin
+    - mean_sequence_margin
+    - mean_gold_signed_margin
+    - margin_accuracy
+  paired:
+    - mean_pair_separation
+    - truth_conditioned_pairs
+  per_source_samples: required
+  advisory_only: true
+
+execution_boundary:
+  modal_diagnostics_authorized: true
+  b2_write_authorized: true
+  training_authorized: false
+  optimizer_steps: 0
+  full_frozen_eval_authorized: false
+  promotion_authorized: false
