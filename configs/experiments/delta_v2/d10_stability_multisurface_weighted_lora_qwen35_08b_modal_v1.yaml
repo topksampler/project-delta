@@ -1,0 +1,88 @@
+schema: delta.knowledge_stability_multisurface_weighted_lora_config.v1
+run_id: delta-v2-d10-stability-multisurface-weighted-lora-qwen35-08b-modal-v1
+experiment_id: delta_v2
+condition_id: d10_stability_multisurface_weighted_sft_control
+task: train
+
+protocol:
+  protocol_id: delta-v2-knowledge-stability-multisurface-weighted-lora-v1
+  path: experiments/delta_v2/knowledge_stability_multisurface_weighted_lora_protocol.yaml
+  sha256: 94cda3ec5e4ebbdef8670cc56a839d31603abd2b65d1cdd0d1a572cb6168bf6d
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter: new-lora
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  deterministic_algorithms: true
+
+inputs:
+  run_artifacts:
+    - run_id: delta-v2-d9-stability-multisurface-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d9-stability-multisurface-lora-qwen35-08b-modal-v1/run_receipt.json
+      sha256: 9754524e590775ea1da8a9de81452a19382b592b43a29ac75e8282d9dd20af58
+    - run_id: delta-v2-d9-stability-multisurface-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d9-stability-multisurface-lora-qwen35-08b-modal-v1/train_metrics.json
+      sha256: c753afac00ebed075e383bdb3aaf7afffb26e052b0ce8439e72f951a3c337f3b
+    - run_id: delta-v2-d9-stability-multisurface-eval-modal-v1
+      path: runs/delta-v2-d9-stability-multisurface-eval-modal-v1/run_receipt.json
+      sha256: 2a6c3b706ecbfbb97992a834965cbe07e1101962c3fbc74caabf0f94cd3df98e
+    - run_id: delta-v2-d9-stability-multisurface-eval-modal-v1
+      path: runs/delta-v2-d9-stability-multisurface-eval-modal-v1/metrics.json
+      sha256: 0543f4411b28707f5cff6a6c269df0ec54594ae3ad1a89ffa30ae058ea9a2529
+
+lora:
+  implementation: peft-0.19.0
+  rank: 8
+  alpha: 16
+  dropout: 0.05
+  bias: none
+  target_modules_regex: '^model\.language_model\.layers\.\d+\.(?:self_attn\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\.(?:in_proj_a|in_proj_b|in_proj_qkv|in_proj_z|out_proj)|mlp\.(?:gate_proj|up_proj|down_proj))$'
+  vision_modules_trainable: false
+
+objective:
+  objective_id: generative-sft-plus-paired-ranking-v2
+  recall_loss: teacher-forced-assistant-token-cross-entropy
+  boolean_generative_loss: mean-positive-and-negative-gold-cross-entropy
+  boolean_ranking_loss: truth-conditioned-logistic-plus-pair-separation
+  ranking_margin: 1.0
+  ranking_weight: 0.50
+
+training:
+  module: experiments.delta_v2.train_knowledge_stability_multisurface_weighted
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.0001
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  deterministic_algorithms: required
+
+output:
+  dir: runs/delta-v2-d10-stability-multisurface-weighted-lora-qwen35-08b-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: H100
+  timeout_seconds: 7200
