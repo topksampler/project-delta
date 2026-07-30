@@ -33,6 +33,18 @@ STABILITY_DEV_DATA = (
     "data/experiments/delta_v2/knowledge_stability_replay_v1/"
     "stability_dev.jsonl"
 )
+STABILITY_CLAIM_TRAIN = (
+    "data/experiments/delta_v2/knowledge_stability_claim_covered_v1/"
+    "train.jsonl"
+)
+STABILITY_CLAIM_PAIRS = (
+    "data/experiments/delta_v2/knowledge_stability_claim_covered_v1/"
+    "pairs.jsonl"
+)
+STABILITY_CLAIM_EVAL = (
+    "data/experiments/delta_v2/knowledge_stability_claim_covered_v1/"
+    "eval.jsonl"
+)
 
 app = modal.App("lalith-ai-lab-delta-v2-knowledge-adapt")
 secrets = [modal.Secret.from_name("lalith-lab")]
@@ -109,6 +121,18 @@ image = (
     .add_local_file(
         STABILITY_DEV_DATA,
         remote_path=f"/root/lalith-ai-lab/{STABILITY_DEV_DATA}",
+    )
+    .add_local_file(
+        STABILITY_CLAIM_TRAIN,
+        remote_path=f"/root/lalith-ai-lab/{STABILITY_CLAIM_TRAIN}",
+    )
+    .add_local_file(
+        STABILITY_CLAIM_PAIRS,
+        remote_path=f"/root/lalith-ai-lab/{STABILITY_CLAIM_PAIRS}",
+    )
+    .add_local_file(
+        STABILITY_CLAIM_EVAL,
+        remote_path=f"/root/lalith-ai-lab/{STABILITY_CLAIM_EVAL}",
     )
 )
 

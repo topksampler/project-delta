@@ -1,0 +1,88 @@
+schema: delta.knowledge_stability_claim_covered_lora_config.v1
+run_id: delta-v2-d8-stability-claim-covered-lora-qwen35-08b-modal-v1
+experiment_id: delta_v2
+condition_id: d8_stability_claim_covered_sft_control
+task: train
+
+protocol:
+  protocol_id: delta-v2-knowledge-stability-claim-covered-lora-v1
+  path: experiments/delta_v2/knowledge_stability_claim_covered_lora_protocol.yaml
+  sha256: 3d66429980e7225a49601378c7b0c49cf981e54953174028a61a01c5e4ccd76a
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter: new-lora
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  deterministic_algorithms: true
+
+inputs:
+  run_artifacts:
+    - run_id: delta-v2-d7-stability-lrhalf-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d7-stability-lrhalf-lora-qwen35-08b-modal-v1/run_receipt.json
+      sha256: 4248f3917f217a03f970322df02af9c9392cb8a24c1e8ef38dd81966b701832b
+    - run_id: delta-v2-d7-stability-lrhalf-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d7-stability-lrhalf-lora-qwen35-08b-modal-v1/train_metrics.json
+      sha256: 9205fc73c1d9c5e06112c246072ac9ae140b329d78e55c84611000ac8e59f2c5
+    - run_id: delta-v2-d7-stability-lrhalf-eval-modal-v1
+      path: runs/delta-v2-d7-stability-lrhalf-eval-modal-v1/run_receipt.json
+      sha256: 1fd15c8642c3feaa32ac76833bef241a0f6988ef4c7fccac4fa9cd6560752c24
+    - run_id: delta-v2-d7-stability-lrhalf-eval-modal-v1
+      path: runs/delta-v2-d7-stability-lrhalf-eval-modal-v1/metrics.json
+      sha256: 1bd8b43cf8e363ce6d6ec0a35db9610f1429820a7307b7ebcc1e7b3ebc43ebb5
+
+lora:
+  implementation: peft-0.19.0
+  rank: 8
+  alpha: 16
+  dropout: 0.05
+  bias: none
+  target_modules_regex: '^model\.language_model\.layers\.\d+\.(?:self_attn\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\.(?:in_proj_a|in_proj_b|in_proj_qkv|in_proj_z|out_proj)|mlp\.(?:gate_proj|up_proj|down_proj))$'
+  vision_modules_trainable: false
+
+objective:
+  objective_id: assistant-only-generative-sft-v1
+  recall_loss: teacher-forced-assistant-token-cross-entropy
+  boolean_pair_loss: mean-of-positive-and-negative-gold-cross-entropy
+  pair_normalization: one-pair-equals-one-training-unit
+  truth_margin_term: absent
+  pair-ranking_term: absent
+
+training:
+  module: experiments.delta_v2.train_knowledge_stability_claim_covered
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.0001
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  deterministic_algorithms: required
+
+output:
+  dir: runs/delta-v2-d8-stability-claim-covered-lora-qwen35-08b-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: H100
+  timeout_seconds: 7200

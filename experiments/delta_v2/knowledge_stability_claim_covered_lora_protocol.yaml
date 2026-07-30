@@ -1,0 +1,76 @@
+schema: delta.knowledge_stability_claim_covered_lora_protocol.v1
+protocol_id: delta-v2-knowledge-stability-claim-covered-lora-v1
+experiment_id: delta_v2
+condition_id: d8_stability_claim_covered_sft_control
+state: preregistered-for-training
+
+decision_trigger:
+  d7_training_receipt_sha256: 4248f3917f217a03f970322df02af9c9392cb8a24c1e8ef38dd81966b701832b
+  d7_training_metrics_sha256: 9205fc73c1d9c5e06112c246072ac9ae140b329d78e55c84611000ac8e59f2c5
+  d7_stability_receipt_sha256: 1fd15c8642c3feaa32ac76833bef241a0f6988ef4c7fccac4fa9cd6560752c24
+  d7_stability_metrics_sha256: 1bd8b43cf8e363ce6d6ec0a35db9610f1429820a7307b7ebcc1e7b3ebc43ebb5
+  diagnosis: source-disjoint-replay-cannot-teach-unseen-exact-source-contracts
+  decision: train-required-stable-claims-evaluate-held-out-wording
+
+data:
+  protocol:
+    path: experiments/delta_v2/knowledge_stability_claim_covered_data_protocol.yaml
+  acquisition_train:
+    path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+    sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  acquisition_pairs:
+    path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+    sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+  acquisition_dev:
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+    sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+  stability_train:
+    path: data/experiments/delta_v2/knowledge_stability_claim_covered_v1/train.jsonl
+    sha256: ea1e97525271635407305b75573408174ae753a746c23f381c8218a599f49854
+  stability_pairs:
+    path: data/experiments/delta_v2/knowledge_stability_claim_covered_v1/pairs.jsonl
+    sha256: 1a9dac22302208ccdc212c3b91c4d1c8a5b7621e3daed483e1b4da6e0b0022b9
+  stability_eval:
+    path: data/experiments/delta_v2/knowledge_stability_claim_covered_v1/eval.jsonl
+    sha256: 3b6def494dc791ff3d4d46bde569485656d4ab0a1084dd7dc059e863f96d0ae7
+
+only_intervention_factor:
+  parent: d5_stability_replay50_sft_control
+  factor: stability-training-source-coverage
+  parent_value: source-disjoint-from-stability-eval
+  candidate_value: same-claims-with-zero-exact-prompt-overlap
+
+unchanged:
+  objective: assistant-only-generative-sft-v1
+  initialization: fresh-base
+  base_revision: 2fc06364715b967f1860aea9cf38778875588b17
+  replay_share: 0.50
+  total_training_units: 240
+  acquisition_units: 120
+  stability_units: 120
+  boolean_pair_units: 180
+  recall_units: 60
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+  learning_rate: 0.0001
+  optimizer_steps: 60
+  warmup_steps: 6
+  gradient_accumulation_steps: 4
+  seed: 20260730
+
+interpretation_boundary:
+  supports: new-wording-and-new-corruptions-on-ingested-claims
+  does_not_support: generalization-to-unseen-source-facts
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_adapter_write_authorized: true
+  stability_pre_gate_authorized: true
+  acquisition_margin_authorized_only_after_stability_pass: true
+  full_eval_authorized: false
+  verify_v2_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false

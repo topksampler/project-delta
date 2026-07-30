@@ -1,0 +1,56 @@
+schema: delta.knowledge_stability_claim_covered_data_protocol.v1
+protocol_id: delta-v2-knowledge-stability-claim-covered-data-v1
+dataset_id: delta-v2-knowledge-stability-claim-covered-v1
+experiment_id: delta_v2
+state: preregistered-for-build
+
+decision_trigger:
+  d4_stability:
+    boolean_true: 11/15
+    boolean_false: 11/15
+  d5_stability:
+    boolean_true: 13/15
+    boolean_false: 9/15
+  d6_stability:
+    boolean_true: 9/15
+    boolean_false: 9/15
+  d7_stability:
+    boolean_true: 11/15
+    boolean_false: 8/15
+  diagnosis: source-disjoint-replay-cannot-teach-unseen-exact-source-contracts
+  decision: cover-required-stable-claims-with-held-out-evaluation-wording
+
+builder:
+  path: experiments/delta_v2/build_knowledge_stability_claim_covered.py
+  sha256: 98cbf43b97bcd8656e747a48161ecf7405dcf91f37ff3626ebaa4d7abd198e74
+
+parent_partition:
+  path: experiments/delta_v2/knowledge_stability_replay_design.yaml
+  sha256: 301fc0de6e1961c67c40e1fec25a40444c301678b0b1b1a4e3dafbe6b5f99c01
+  selected_partition: stability_dev
+
+construction:
+  sources: 15
+  source_partition: stability_dev
+  train_rows: 105
+  recall_rows: 15
+  boolean_pairs: 45
+  positive_rows: 45
+  negative_rows: 45
+  eval_rows: 60
+  eval_probes_per_source: [choice, boolean_true, boolean_false, recall]
+  source_overlap_train_eval: required-same-claims
+  exact_prompt_overlap_train_eval: 0
+  eval_wording: held-out
+
+interpretation_boundary:
+  supports: new-wording-and-new-corruptions-on-ingested-claims
+  does_not_support: generalization-to-unseen-source-facts
+  ci_cd_semantics: all-required-current-source-facts-enter-adaptation-corpus
+
+execution_boundary:
+  dataset_build_authorized: true
+  model_invocations_completed: 0
+  optimizer_steps_completed: 0
+  modal_job_authorized: false
+  promotion_authorized: false
