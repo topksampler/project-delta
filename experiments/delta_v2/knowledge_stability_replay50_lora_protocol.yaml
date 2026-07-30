@@ -1,0 +1,77 @@
+schema: delta.knowledge_stability_replay50_lora_protocol.v1
+protocol_id: delta-v2-knowledge-stability-replay50-lora-v1
+experiment_id: delta_v2
+condition_id: d5_stability_replay50_sft_control
+state: preregistered-for-training
+
+decision_trigger:
+  parent_candidate: d4_stability_replay_sft_control
+  d4_training_receipt_sha256: bf4b665b8274012ba6ad1e0e6d1417a3708756c24c0e5369a30f1bb89b1d488b
+  d4_margin_receipt_sha256: f0a12cfebf9a54bf82cd1b42b700b1a3a3a28c8319ba201d4092e2524d360c22
+  d4_margin_metrics_sha256: b2d38bd87f1a37841c195047ae6fa3d7617d602e1aa7ef48b91a059dbad25e9d
+  d4_stability_receipt_sha256: c26f326f5cbd6f77076bab4b607d2dfc8f78e148c952cdd70d367123da1c91c6
+  d4_stability_metrics_sha256: 7c97c52a0603bf7b9b49d4d36679cad852536f79cfb0e128e6eeef3649ba4d83
+  observed:
+    acquisition_margin_gate: pass
+    stability_choice_parseable: 15/15
+    stability_boolean_true: 11/15
+    stability_boolean_false: 11/15
+    stability_gate: fail
+  decision: increase-replay-share-at-fixed-total-budget
+
+parent_protocol:
+  path: experiments/delta_v2/knowledge_stability_replay_lora_protocol.yaml
+  sha256: 34e798b2766eafbf5e799ba50cfd9945cdb4003b9edd3779cc705db41ebf18c6
+  only_intervention_factor: replay-share
+
+implementation:
+  engine_path: experiments/delta_v2/knowledge_stability_replay_lora.py
+  engine_sha256: f5d250446837c075db8a4cddfe515d2f8cbc86fd14d5854de1afc507dd31f569
+  source_schedule_owned_by: experiments/delta_v2/train_knowledge_stability_replay50.py
+
+unchanged:
+  objective: assistant-only-generative-sft-v1
+  initialization: fresh-base
+  base_revision: 2fc06364715b967f1860aea9cf38778875588b17
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+  learning_rate: 0.0001
+  optimizer_steps: 60
+  gradient_accumulation_steps: 4
+  seed: 20260730
+
+schedule:
+  total_units: 240
+  acquisition_units: 120
+  replay_units: 120
+  replay_share: 0.50
+  acquisition_boolean_pairs: 90
+  acquisition_recall: 30
+  replay_boolean_pairs: 90
+  replay_recall: 30
+  actual_step_types:
+    - count: 30
+      units: [acquisition_pair, acquisition_pair, replay_pair, replay_recall]
+    - count: 30
+      units: [acquisition_pair, acquisition_recall, replay_pair, replay_pair]
+  step_type_order: deterministic-seeded-shuffle
+  within_stream_order: deterministic-seeded-shuffle
+  total_optimizer_steps_unchanged: true
+
+verification:
+  acquisition_margin_gates_unchanged: true
+  stability_dev_gates_unchanged: true
+  full_eval_only_after_both_pre_gates: true
+  verify_v2_only_after_full_eval: true
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_adapter_write_authorized: true
+  pre_gate_evaluation_authorized: true
+  full_eval_authorized: false
+  verify_v2_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false
