@@ -18,6 +18,9 @@ PAIRED_TRAIN_DATA = (
     "data/experiments/delta_v2/knowledge_paired_v2/train.jsonl"
 )
 PAIRED_DATA = "data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl"
+PAIRED_SUMMARY_DATA = (
+    "data/experiments/delta_v2/knowledge_paired_v2/summary.json"
+)
 
 app = modal.App("lalith-ai-lab-delta-v2-knowledge-adapt")
 secrets = [modal.Secret.from_name("lalith-lab")]
@@ -78,6 +81,10 @@ image = (
     .add_local_file(
         PAIRED_DATA,
         remote_path=f"/root/lalith-ai-lab/{PAIRED_DATA}",
+    )
+    .add_local_file(
+        PAIRED_SUMMARY_DATA,
+        remote_path=f"/root/lalith-ai-lab/{PAIRED_SUMMARY_DATA}",
     )
 )
 
