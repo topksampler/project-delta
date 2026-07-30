@@ -256,12 +256,14 @@ def validate_config(
 def build_requests(
     rows: Sequence[Mapping[str, Any]],
     protocol: Mapping[str, Any],
+    *,
+    run_id: str = RUN_ID,
 ) -> list[dict[str, Any]]:
     requests: list[dict[str, Any]] = []
     generation = protocol["generation"]
     for row in rows:
         for repeat_index in range(1, int(generation["repeats"]) + 1):
-            identity = f"{RUN_ID}\0{row['row_id']}\0{repeat_index}"
+            identity = f"{run_id}\0{row['row_id']}\0{repeat_index}"
             requests.append(
                 {
                     "schema": REQUEST_SCHEMA,
@@ -289,6 +291,7 @@ def score(
     rows: Sequence[Mapping[str, Any]],
     outputs: Sequence[Mapping[str, Any]],
     protocol: Mapping[str, Any],
+    run_id: str = RUN_ID,
 ) -> dict[str, Any]:
     row_by_id = {str(row["row_id"]): row for row in rows}
     grouped: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
@@ -330,7 +333,7 @@ def score(
     )
     return {
         "schema": METRICS_SCHEMA,
-        "run_id": RUN_ID,
+        "run_id": run_id,
         "status": "pass",
         "rows": 63,
         "outputs": 126,
@@ -348,17 +351,22 @@ def score(
     }
 
 
-def execute(
+def execute_validated_diagnostic(
     *,
     config_path: Path,
     repo_root: Path,
+    config: Mapping[str, Any],
+    protocol: Mapping[str, Any],
+    rows: Sequence[Mapping[str, Any]],
+    run_id: str,
+    protocol_id: str,
+    protocol_path: Path,
+    train_path: Path,
     backend: Backend | None = None,
 ) -> dict[str, Any]:
     started_at = datetime.now(timezone.utc)
     started = time.perf_counter()
-    config = _load_yaml(config_path)
-    protocol, rows = validate_config(config, repo_root=repo_root)
-    requests = build_requests(rows, protocol)
+    requests = build_requests(rows, protocol, run_id=run_id)
     active = backend or TransformersKnowledgeBackend(
         config=config,
         protocol=protocol,
@@ -378,7 +386,12 @@ def execute(
                 "finish_reason": finish_reason,
             }
         )
-    metrics = score(rows=rows, outputs=outputs, protocol=protocol)
+    metrics = score(
+        rows=rows,
+        outputs=outputs,
+        protocol=protocol,
+        run_id=run_id,
+    )
     output_dir = repo_root / str(config["output"]["dir"])
     output_dir.mkdir(parents=True, exist_ok=True)
     samples_path = output_dir / "samples.jsonl"
@@ -396,11 +409,11 @@ def execute(
     )
     receipt = {
         "schema": RECEIPT_SCHEMA,
-        "run_id": RUN_ID,
-        "protocol_id": PROTOCOL_ID,
+        "run_id": run_id,
+        "protocol_id": protocol_id,
         "config_sha256": _sha256(config_path),
-        "protocol_sha256": _sha256(repo_root / PROTOCOL_PATH),
-        "train_sha256": _sha256(repo_root / TRAIN_PATH),
+        "protocol_sha256": _sha256(repo_root / protocol_path),
+        "train_sha256": _sha256(repo_root / train_path),
         "adapter_sha256": config["model"]["adapter"]["sha256"],
         "samples_sha256": _sha256(samples_path),
         "metrics_sha256": _sha256(metrics_path),
@@ -416,6 +429,28 @@ def execute(
         encoding="utf-8",
     )
     return {"metrics": metrics, "receipt": receipt}
+
+
+def execute(
+    *,
+    config_path: Path,
+    repo_root: Path,
+    backend: Backend | None = None,
+) -> dict[str, Any]:
+    config = _load_yaml(config_path)
+    protocol, rows = validate_config(config, repo_root=repo_root)
+    return execute_validated_diagnostic(
+        config_path=config_path,
+        repo_root=repo_root,
+        config=config,
+        protocol=protocol,
+        rows=rows,
+        run_id=RUN_ID,
+        protocol_id=PROTOCOL_ID,
+        protocol_path=PROTOCOL_PATH,
+        train_path=TRAIN_PATH,
+        backend=backend,
+    )
 
 
 def validate_only(config_path: Path, repo_root: Path) -> dict[str, Any]:

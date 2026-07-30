@@ -1,0 +1,41 @@
+schema: delta.knowledge_train_surface_diagnostic_protocol.v1
+protocol_id: delta-v2-knowledge-true-weighted-train-surface-v1
+experiment_id: delta_v2
+condition_id: c6_knowledge_lora_true_weighted_diagnostic
+state: preregistered-for-diagnostic
+
+trigger:
+  training_run_id: delta-v2-c6-knowledge-lora-true-weighted-qwen35-08b-modal-v1
+  training_metrics_sha256: 97083b6cc25e1839348505cf0af03d86d44e1964d1e00e69cf23f93bb4911f48
+  adapter_sha256: 8dae0e5cf7692542efc34f4fc836b1c96279bae680747edc368f646fdf938e36
+
+dataset:
+  dataset_id: delta-v2-vllm-knowledge-adaptation-v1
+  path: data/experiments/delta_v2/knowledge_adaptation_v1/train.jsonl
+  sha256: 16ad0d2c12a823722501800227c739e59131fd7c7e0f774e2f1faab2e4bd4b95
+  rows: 63
+  prompt_source: messages[0]
+  gold_source: messages[1]
+  mutation: forbidden
+
+generation:
+  method: greedy
+  do_sample: false
+  max_new_tokens: 256
+  repeats: 2
+  seed: 20260730
+  repeat_invariant: byte-identical-raw-continuation
+
+scoring:
+  authority: frozen-training-row-assistant-answer
+  method: exact-stripped-string
+  repair: forbidden
+  pooled_overall_score: forbidden
+
+decision:
+  boolean_surface_fit:
+    verify_true_accuracy_minimum: 0.80
+    verify_false_accuracy_minimum: 0.80
+  full_frozen_eval_if_passes: true
+  diagnostic_only: true
+  promotion_authorized: false
