@@ -1,0 +1,60 @@
+schema: delta.knowledge_stability_claim_covered_eval_config.v1
+run_id: delta-v2-d8-stability-claim-covered-eval-modal-v1
+experiment_id: delta_v2
+condition_id: d8_stability_claim_covered_eval
+task: eval
+
+protocol:
+  protocol_id: delta-v2-knowledge-stability-claim-covered-eval-v1
+  path: experiments/delta_v2/knowledge_stability_claim_covered_eval_protocol.yaml
+  sha256: e05e9a6cf155ec385af098f4a2bd82e1544468dc4ac97c9213fd91aacfe96103
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter:
+    kind: lora
+    run_id: delta-v2-d8-stability-claim-covered-lora-qwen35-08b-modal-v1
+    path: runs/delta-v2-d8-stability-claim-covered-lora-qwen35-08b-modal-v1/adapter
+    sha256: c813888787c3e9a827c7736219a6527639b658e853e09ac8ca7e4cbc7b468a3b
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  attention_implementation: eager
+  deterministic_algorithms: true
+
+inputs:
+  run_artifacts:
+    - run_id: delta-v2-d8-stability-claim-covered-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d8-stability-claim-covered-lora-qwen35-08b-modal-v1/run_receipt.json
+      sha256: 718b6ce1f27744e61fe4cfb047e57c5754b593701be7b3c92d452ee47310ca1f
+    - run_id: delta-v2-d8-stability-claim-covered-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d8-stability-claim-covered-lora-qwen35-08b-modal-v1/train_metrics.json
+      sha256: ca637b0e3eba00ab71fbc20be17a7e475a1503213e27a35ce971a8394ade6aba
+
+eval:
+  module: experiments.delta_v2.run_knowledge_stability_claim_covered_eval
+  path: data/experiments/delta_v2/knowledge_stability_claim_covered_v1/eval.jsonl
+  sha256: 3b6def494dc791ff3d4d46bde569485656d4ab0a1084dd7dc059e863f96d0ae7
+
+output:
+  dir: runs/delta-v2-d8-stability-claim-covered-eval-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: A10G
+  timeout_seconds: 3600
