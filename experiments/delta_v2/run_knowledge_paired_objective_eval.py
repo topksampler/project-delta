@@ -329,6 +329,13 @@ def validate_config(
                 ),
                 "sha256": MARGIN_METRICS_SHA256,
             },
+            {
+                "run_id": TRAINING_RUN_ID,
+                "path": str(
+                    Path("runs") / TRAINING_RUN_ID / "run_receipt.json"
+                ),
+                "sha256": TRAINING_RECEIPT_SHA256,
+            },
         ]
     }:
         raise PairedObjectiveEvalError(

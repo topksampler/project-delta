@@ -46,6 +46,9 @@ inputs:
     - run_id: delta-v2-d3-knowledge-paired-objective-margin-modal-v1
       path: runs/delta-v2-d3-knowledge-paired-objective-margin-modal-v1/metrics.json
       sha256: 959a15dbc94efb27f1f4e6d22b788508371c4716a44a22f2a064b721cf63a09d
+    - run_id: delta-v2-d3-knowledge-paired-objective-qwen35-08b-modal-v1
+      path: runs/delta-v2-d3-knowledge-paired-objective-qwen35-08b-modal-v1/run_receipt.json
+      sha256: 9b78887be36662b2087a988eb49cb34606f57acf7eae38cda40cdf84f653b171
 
 eval:
   module: experiments.delta_v2.run_knowledge_paired_objective_eval
