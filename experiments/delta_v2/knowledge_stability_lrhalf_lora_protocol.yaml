@@ -1,0 +1,68 @@
+schema: delta.knowledge_stability_lrhalf_lora_protocol.v1
+protocol_id: delta-v2-knowledge-stability-lrhalf-lora-v1
+experiment_id: delta_v2
+condition_id: d7_stability_lrhalf_sft_control
+state: preregistered-for-training
+
+decision_trigger:
+  parent_candidate: d5_stability_replay50_sft_control
+  d5_training_receipt_sha256: 448adf5dcd5b049d4cbf3edb2832c2b951ff11eaf059accb262305aa024f986c
+  d5_training_metrics_sha256: 2971fb93488aeafcc88979327b00a951378b3b77bf4e0c56c95340d769191c7e
+  d5_stability_receipt_sha256: 30fd04620b5b6194392e63279aaf73a8d2a0147aaab1abbff807f8f5b9a99dcc
+  d5_stability_metrics_sha256: eb4681387cf599dbc7babab55f36cc844270cb85c3acce6ff19f609e94a0be29
+  d6_training_receipt_sha256: db485d6e2e934c6f26ceb5c95b5dca8f96f0689d8c25e8dea1538fca31b10a79
+  d6_training_metrics_sha256: c53dd8a340a7b6d4e8e035b68749e7e7c296b49b0ece6b80b610410dea2b7495
+  d6_stability_receipt_sha256: 4955cb3bedd334eb224130ee7d9749c9a51d04f4939d26b4bf9cfe5c0d5893a7
+  d6_stability_metrics_sha256: 4e4ecf63127cecda46a19051caa331eb457025a58aaeece243f1e3a677a04bcf
+  decision: halve-learning-rate-at-fixed-training-budget
+
+parent_protocol:
+  path: experiments/delta_v2/knowledge_stability_replay50_lora_protocol.yaml
+  sha256: 50d3ce50b03ca863059aec955a4ab53da0549e52b64e4417824d957595c8c05f
+  only_intervention_factor: peak-learning-rate
+
+implementation:
+  engine_path: experiments/delta_v2/knowledge_stability_replay_lora.py
+  engine_sha256: f5d250446837c075db8a4cddfe515d2f8cbc86fd14d5854de1afc507dd31f569
+  schedule_owner: experiments/delta_v2/train_knowledge_stability_replay50.py
+  schedule_sha256: 3e5b7dbd7162783368e8116c64ce47901a572b5833e45ea3297db4fa3c3d7ffb
+
+changed:
+  peak_learning_rate:
+    parent: 0.0001
+    candidate: 0.00005
+
+unchanged:
+  objective: assistant-only-generative-sft-v1
+  initialization: fresh-base
+  base_revision: 2fc06364715b967f1860aea9cf38778875588b17
+  replay_share: 0.50
+  total_training_units: 240
+  acquisition_units: 120
+  replay_units: 120
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+  optimizer_steps: 60
+  warmup_steps: 6
+  gradient_accumulation_steps: 4
+  seed: 20260730
+
+verification:
+  stability_dev_gates_unchanged: true
+  acquisition_margin_gates_unchanged: true
+  stability_gate_runs_first: true
+  acquisition_margin_only_after_stability_pass: true
+  full_eval_only_after_both_pre_gates: true
+  verify_v2_only_after_full_eval: true
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_adapter_write_authorized: true
+  pre_gate_evaluation_authorized: true
+  full_eval_authorized: false
+  verify_v2_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false

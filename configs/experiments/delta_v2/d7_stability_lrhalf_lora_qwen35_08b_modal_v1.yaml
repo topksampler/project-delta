@@ -1,0 +1,124 @@
+schema: delta.knowledge_stability_lrhalf_lora_config.v1
+run_id: delta-v2-d7-stability-lrhalf-lora-qwen35-08b-modal-v1
+experiment_id: delta_v2
+condition_id: d7_stability_lrhalf_sft_control
+task: train
+
+protocol:
+  protocol_id: delta-v2-knowledge-stability-lrhalf-lora-v1
+  path: experiments/delta_v2/knowledge_stability_lrhalf_lora_protocol.yaml
+  sha256: 432bf6b3ac709a3f529fc2569a8d8777678e67325d6454b778302ef9a5f13c0e
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter: new-lora
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  deterministic_algorithms: true
+
+inputs:
+  run_artifacts:
+    - run_id: delta-v2-d4-stability-base-qwen35-08b-modal-v1
+      path: runs/delta-v2-d4-stability-base-qwen35-08b-modal-v1/run_receipt.json
+      sha256: e91cd432da6d524bfcbb05626386335336a540e14f4d99f017cc11ade50fec97
+    - run_id: delta-v2-d4-stability-base-qwen35-08b-modal-v1
+      path: runs/delta-v2-d4-stability-base-qwen35-08b-modal-v1/metrics.json
+      sha256: e6382bca092a87ff5587f7aaf5f1d113f46f00ee9f07f288efa3725be3858158
+    - run_id: delta-v2-d4-stability-replay-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d4-stability-replay-lora-qwen35-08b-modal-v1/run_receipt.json
+      sha256: bf4b665b8274012ba6ad1e0e6d1417a3708756c24c0e5369a30f1bb89b1d488b
+    - run_id: delta-v2-d4-stability-replay-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d4-stability-replay-lora-qwen35-08b-modal-v1/train_metrics.json
+      sha256: 6544aff7b1d426e2ed3bcef51537941e071ea7fa56ce7fcf8ebf1da449c0e1d1
+    - run_id: delta-v2-d4-stability-replay-margin-modal-v1
+      path: runs/delta-v2-d4-stability-replay-margin-modal-v1/run_receipt.json
+      sha256: f0a12cfebf9a54bf82cd1b42b700b1a3a3a28c8319ba201d4092e2524d360c22
+    - run_id: delta-v2-d4-stability-replay-margin-modal-v1
+      path: runs/delta-v2-d4-stability-replay-margin-modal-v1/metrics.json
+      sha256: b2d38bd87f1a37841c195047ae6fa3d7617d602e1aa7ef48b91a059dbad25e9d
+    - run_id: delta-v2-d4-stability-replay-eval-modal-v1
+      path: runs/delta-v2-d4-stability-replay-eval-modal-v1/run_receipt.json
+      sha256: c26f326f5cbd6f77076bab4b607d2dfc8f78e148c952cdd70d367123da1c91c6
+    - run_id: delta-v2-d4-stability-replay-eval-modal-v1
+      path: runs/delta-v2-d4-stability-replay-eval-modal-v1/metrics.json
+      sha256: 7c97c52a0603bf7b9b49d4d36679cad852536f79cfb0e128e6eeef3649ba4d83
+    - run_id: delta-v2-d5-stability-replay50-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d5-stability-replay50-lora-qwen35-08b-modal-v1/run_receipt.json
+      sha256: 448adf5dcd5b049d4cbf3edb2832c2b951ff11eaf059accb262305aa024f986c
+    - run_id: delta-v2-d5-stability-replay50-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d5-stability-replay50-lora-qwen35-08b-modal-v1/train_metrics.json
+      sha256: 2971fb93488aeafcc88979327b00a951378b3b77bf4e0c56c95340d769191c7e
+    - run_id: delta-v2-d5-stability-replay50-eval-modal-v1
+      path: runs/delta-v2-d5-stability-replay50-eval-modal-v1/run_receipt.json
+      sha256: 30fd04620b5b6194392e63279aaf73a8d2a0147aaab1abbff807f8f5b9a99dcc
+    - run_id: delta-v2-d5-stability-replay50-eval-modal-v1
+      path: runs/delta-v2-d5-stability-replay50-eval-modal-v1/metrics.json
+      sha256: eb4681387cf599dbc7babab55f36cc844270cb85c3acce6ff19f609e94a0be29
+    - run_id: delta-v2-d6-stability-false2-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d6-stability-false2-lora-qwen35-08b-modal-v1/run_receipt.json
+      sha256: db485d6e2e934c6f26ceb5c95b5dca8f96f0689d8c25e8dea1538fca31b10a79
+    - run_id: delta-v2-d6-stability-false2-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d6-stability-false2-lora-qwen35-08b-modal-v1/train_metrics.json
+      sha256: c53dd8a340a7b6d4e8e035b68749e7e7c296b49b0ece6b80b610410dea2b7495
+    - run_id: delta-v2-d6-stability-false2-eval-modal-v1
+      path: runs/delta-v2-d6-stability-false2-eval-modal-v1/run_receipt.json
+      sha256: 4955cb3bedd334eb224130ee7d9749c9a51d04f4939d26b4bf9cfe5c0d5893a7
+    - run_id: delta-v2-d6-stability-false2-eval-modal-v1
+      path: runs/delta-v2-d6-stability-false2-eval-modal-v1/metrics.json
+      sha256: 4e4ecf63127cecda46a19051caa331eb457025a58aaeece243f1e3a677a04bcf
+
+lora:
+  implementation: peft-0.19.0
+  rank: 8
+  alpha: 16
+  dropout: 0.05
+  bias: none
+  target_modules_regex: '^model\.language_model\.layers\.\d+\.(?:self_attn\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\.(?:in_proj_a|in_proj_b|in_proj_qkv|in_proj_z|out_proj)|mlp\.(?:gate_proj|up_proj|down_proj))$'
+  vision_modules_trainable: false
+
+objective:
+  objective_id: assistant-only-generative-sft-v1
+  recall_loss: teacher-forced-assistant-token-cross-entropy
+  boolean_pair_loss: mean-of-positive-and-negative-gold-cross-entropy
+  pair_normalization: one-pair-equals-one-training-unit
+  truth_margin_term: absent
+  pair-ranking_term: absent
+
+training:
+  module: experiments.delta_v2.train_knowledge_stability_lrhalf
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.00005
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  deterministic_algorithms: required
+
+output:
+  dir: runs/delta-v2-d7-stability-lrhalf-lora-qwen35-08b-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: H100
+  timeout_seconds: 7200
