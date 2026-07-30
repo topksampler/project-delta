@@ -1,0 +1,81 @@
+schema: delta.knowledge_stability_replay_data_contract.v1
+
+contract_id: delta-v2-knowledge-stability-replay-data-v1
+dataset_id: delta-v2-knowledge-stability-replay-v1
+experiment_id: delta_v2
+candidate_id: d4_stability_replay_sft_control
+target_revision: v0.26.0
+freeze_state: preregistered-for-build
+
+bindings:
+  design:
+    path: experiments/delta_v2/knowledge_stability_replay_design.yaml
+    sha256: 301fc0de6e1961c67c40e1fec25a40444c301678b0b1b1a4e3dafbe6b5f99c01
+  partition_validator:
+    path: experiments/delta_v2/validate_knowledge_stability_replay_design.py
+    sha256: 712019b799f6e1c3104e7aa2063cc213421e256fdda545e4fa154340f3cb2a4e
+  knowledge_card_generator:
+    path: experiments/delta_v2/knowledge_adaptation.py
+    sha256: 80d81e3e2effe8e973ff5498ce1332b489e799d1ccf810bbca42868eab978354
+  acquisition_train:
+    path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+    sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  current_eval:
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl
+    sha256: 5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c
+
+replay_train:
+  partition: replay_train
+  source_count: 15
+  recall_rows_per_source: 1
+  boolean_pairs_per_source: 3
+  positive_rows_per_source: 3
+  negative_rows_per_source: 3
+  rows: 105
+  pairs: 45
+  model_visible_fields: [messages]
+  corruption_families:
+    annotation_swap: 15
+    family_value_swap: 15
+    full_card_swap: 15
+
+stability_dev:
+  partition: stability_dev
+  source_count: 15
+  probes_per_source: [choice, boolean_true, boolean_false, recall]
+  rows: 60
+  model_visible_fields: [prompt]
+  training_overlap: none
+  pooled_score: forbidden
+
+shortcut_gates:
+  source_overlap_replay_vs_acquisition: 0
+  source_overlap_replay_vs_current_eval: 0
+  source_overlap_replay_vs_stability_dev: 0
+  source_overlap_replay_vs_verify_v2: 0
+  exact_prompt_overlap_acquisition_train: 0
+  exact_prompt_overlap_current_eval: 0
+  exact_prompt_overlap_stability_dev: 0
+  verify_v2_prompt_audit: deferred-until-post-receipt-materialization
+  outer_prompt_template_identical_within_pair: required
+  prompt_length_identical_within_pair: required
+  contract_key_order_identical_within_pair: required
+  donor_value_verified_true_support_rate: 1.0
+  single_corruption_family_share_maximum: 0.3333333333333333
+  empirical_value_only_accuracy_maximum_per_family: 0.60
+  empirical_prompt_length_only_accuracy_maximum: 0.50
+
+outputs:
+  root: data/experiments/delta_v2/knowledge_stability_replay_v1
+  replay_train: replay_train.jsonl
+  replay_pairs: replay_pairs.jsonl
+  stability_dev: stability_dev.jsonl
+  summary: summary.json
+
+execution_boundary:
+  dataset_build_authorized: true
+  base_baseline_authorized: false
+  lora_training_authorized: false
+  modal_job_authorized: false
+  b2_write_authorized: false
+  promotion_authorized: false

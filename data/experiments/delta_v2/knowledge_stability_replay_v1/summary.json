@@ -1,0 +1,117 @@
+{
+  "contract_id": "delta-v2-knowledge-stability-replay-data-v1",
+  "dataset_id": "delta-v2-knowledge-stability-replay-v1",
+  "deterministic_order": true,
+  "execution_boundary": {
+    "b2_write_authorized": false,
+    "base_baseline_authorized": false,
+    "lora_training_authorized": false,
+    "modal_job_authorized": false,
+    "model_invocations_completed": 0,
+    "optimizer_steps_completed": 0,
+    "promotion_authorized": false
+  },
+  "inputs": {
+    "acquisition_train": {
+      "path": "data/experiments/delta_v2/knowledge_paired_v2/train.jsonl",
+      "sha256": "5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9"
+    },
+    "contract": {
+      "path": "experiments/delta_v2/knowledge_stability_replay_data_contract.yaml",
+      "sha256": "adacf9ea0cdb772259c46895f0e7e0357d0682b69433e1f9097df27c9933240c"
+    },
+    "current_eval": {
+      "path": "data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl",
+      "sha256": "5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c"
+    },
+    "design": {
+      "path": "experiments/delta_v2/knowledge_stability_replay_design.yaml",
+      "sha256": "301fc0de6e1961c67c40e1fec25a40444c301678b0b1b1a4e3dafbe6b5f99c01"
+    },
+    "knowledge_card_generator": {
+      "path": "experiments/delta_v2/knowledge_adaptation.py",
+      "sha256": "80d81e3e2effe8e973ff5498ce1332b489e799d1ccf810bbca42868eab978354"
+    },
+    "partition_validator": {
+      "path": "experiments/delta_v2/validate_knowledge_stability_replay_design.py",
+      "sha256": "712019b799f6e1c3104e7aa2063cc213421e256fdda545e4fa154340f3cb2a4e"
+    }
+  },
+  "outputs": {
+    "replay_pairs": {
+      "rows": 45,
+      "sha256": "4c99f8d95ec5e365f50b897659683d1b227d00ef6c5c582bff3e4761f5c1acb3"
+    },
+    "replay_train": {
+      "rows": 105,
+      "sha256": "3cce6b51aefb3ee876599485c7726aebe3568b3f86cec021c66eda49b1f4d98f"
+    },
+    "stability_dev": {
+      "rows": 60,
+      "sha256": "f9c4c150aaf5db7edd2caba10801acd05b8e34cced443afdfa678aca3ed71b3a"
+    }
+  },
+  "replay_train": {
+    "pair_roles": {
+      "negative": 45,
+      "positive": 45
+    },
+    "sources": 15,
+    "surface_counts": {
+      "replay_recall": 15,
+      "replay_verify_false": 45,
+      "replay_verify_true": 45
+    }
+  },
+  "schema": "delta.knowledge_stability_replay_data_audit.v1",
+  "shortcut_audit": {
+    "changed_top_level_field_count_distribution": {
+      "1": 31,
+      "2": 14
+    },
+    "contract_key_order_identical": true,
+    "corruption_family_counts": {
+      "annotation_swap": 15,
+      "family_value_swap": 15,
+      "full_card_swap": 15
+    },
+    "donor_value_verified_true_support_rate": 1.0,
+    "empirical_prompt_length_only_accuracy": 0.5,
+    "empirical_value_only_accuracy_by_family": {
+      "annotation_swap": 0.5,
+      "family_value_swap": 0.5,
+      "full_card_swap": 0.5
+    },
+    "maximum_empirical_value_only_accuracy": 0.5,
+    "maximum_single_corruption_family_share": 0.3333333333333333,
+    "model_visible_metadata_fields": [],
+    "outer_prompt_template_identical": true,
+    "prompt_length_delta_false_minus_true": {
+      "0": 45
+    },
+    "prompt_overlaps": {
+      "acquisition_train": 0,
+      "current_eval": 0,
+      "stability_dev": 0
+    },
+    "source_overlaps": {
+      "acquisition_train": 0,
+      "current_eval": 0,
+      "stability_dev": 0,
+      "verify_v2": 0
+    },
+    "status": "pass",
+    "verify_v2_prompt_audit": "deferred-until-post-receipt-materialization"
+  },
+  "stability_dev": {
+    "pooled_score": null,
+    "probe_counts": {
+      "boolean_false": 15,
+      "boolean_true": 15,
+      "choice": 15,
+      "recall": 15
+    },
+    "sources": 15
+  },
+  "status": "pass"
+}

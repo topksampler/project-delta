@@ -1,0 +1,80 @@
+schema: delta.knowledge_stability_replay_data_freeze.v1
+
+dataset_id: delta-v2-knowledge-stability-replay-v1
+contract_id: delta-v2-knowledge-stability-replay-data-v1
+experiment_id: delta_v2
+candidate_id: d4_stability_replay_sft_control
+freeze_state: frozen-for-baseline
+publication_state: local-reproducible-not-yet-published
+
+replay_train:
+  sources: 15
+  rows: 105
+  recall_rows: 15
+  boolean_pairs: 45
+  positive_rows: 45
+  negative_rows: 45
+  model_visible_fields: [messages]
+
+stability_dev:
+  sources: 15
+  rows: 60
+  probes_per_source: [choice, boolean_true, boolean_false, recall]
+  pooled_score: forbidden
+
+shortcut_audit:
+  status: pass
+  all_declared_source_overlaps: 0
+  all_materialized_prompt_overlaps: 0
+  outer_prompt_template_identical: true
+  prompt_length_identical_within_pair: true
+  donor_value_verified_true_support_rate: 1.0
+  maximum_single_corruption_family_share: 0.3333333333333333
+  maximum_empirical_value_only_accuracy: 0.50
+  empirical_prompt_length_only_accuracy: 0.50
+  verify_v2_prompt_audit: deferred-until-post-receipt-materialization
+
+bindings:
+  - id: design
+    path: experiments/delta_v2/knowledge_stability_replay_design.yaml
+    sha256: 301fc0de6e1961c67c40e1fec25a40444c301678b0b1b1a4e3dafbe6b5f99c01
+  - id: contract
+    path: experiments/delta_v2/knowledge_stability_replay_data_contract.yaml
+    sha256: adacf9ea0cdb772259c46895f0e7e0357d0682b69433e1f9097df27c9933240c
+  - id: builder
+    path: experiments/delta_v2/knowledge_stability_replay_data.py
+    sha256: 4e69a4806331912997f87c61f5bd42e82815cc2b35e13439716389c04526f7e2
+  - id: builder_tests
+    path: experiments/delta_v2/test_knowledge_stability_replay_data.py
+    sha256: 176991bee3373b5e9641d6d49972cb7c8afc109c2b7a22531b10c8a66727f56f
+  - id: replay_train
+    path: data/experiments/delta_v2/knowledge_stability_replay_v1/replay_train.jsonl
+    sha256: 3cce6b51aefb3ee876599485c7726aebe3568b3f86cec021c66eda49b1f4d98f
+  - id: replay_pairs
+    path: data/experiments/delta_v2/knowledge_stability_replay_v1/replay_pairs.jsonl
+    sha256: 4c99f8d95ec5e365f50b897659683d1b227d00ef6c5c582bff3e4761f5c1acb3
+  - id: stability_dev
+    path: data/experiments/delta_v2/knowledge_stability_replay_v1/stability_dev.jsonl
+    sha256: f9c4c150aaf5db7edd2caba10801acd05b8e34cced443afdfa678aca3ed71b3a
+  - id: summary
+    path: data/experiments/delta_v2/knowledge_stability_replay_v1/summary.json
+    sha256: be065cfbbeba6d8ad1e5286538b9aaa428f5ac793ecca7d5418a0982f36ab048
+  - id: acquisition_train
+    path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+    sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  - id: current_eval
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl
+    sha256: 5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c
+
+execution_boundary:
+  model_invocations_completed: 0
+  optimizer_steps_completed: 0
+  dataset_build_completed: true
+  base_baseline_requires_separate_protocol: true
+  lora_training_requires_separate_protocol: true
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  modal_job_authorized: false
+  b2_write_authorized: false
+  promotion_authorized: false
