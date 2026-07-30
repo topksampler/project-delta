@@ -1,0 +1,146 @@
+schema: delta.knowledge_paired_lora_protocol.v1
+
+protocol_id: delta-v2-knowledge-paired-objective-v1
+experiment_id: delta_v2
+condition_id: d3_paired_objective_lora
+state: preregistered-for-training
+
+decision_trigger:
+  stage_1_train_run_id: delta-v2-d2-knowledge-paired-data-sft-control-qwen35-08b-modal-v1
+  stage_1_train_receipt_sha256: cff9d721dadbf48d8974504728ef0fba3b14e9b498a0a893f4dbdba8c32c8f07
+  stage_1_train_metrics_sha256: 4cc7035c23ff0b949810e7b7e2ad599243cbb574bb3d111a4a234d9ccfea27b2
+  stage_1_eval_run_id: delta-v2-d2-knowledge-paired-data-sft-control-eval-modal-v1
+  stage_1_eval_receipt_sha256: 90b9b64b1cce0fa11e8f7af146f49700b54f8317daf6972f4e9de6a5f95c1f19
+  stage_1_eval_metrics_sha256: c75b475e4af524948c3f7976b18f3b5a53a126d282bf47e7c47603706488e705
+  stage_1_full_eval_result: evaluation-gates-fail
+  failed_gate: retention_stable.boolean_false
+  failed_gate_observed: 16/21
+  failed_gate_minimum: 0.90
+
+causal_role:
+  stage: 2
+  name: paired-boolean-objective-only-comparison
+  source_protocol:
+    path: experiments/delta_v2/knowledge_paired_sft_control_protocol.yaml
+    sha256: 7c97f2581636510403f7af8792e044fd7543c8be66500f5d923f73ef0feb72cd
+  only_changed_factor: learning-objective
+  unchanged_factors:
+    - dataset
+    - fresh-base-initialization
+    - lora-topology
+    - optimization
+    - training-unit-order
+    - development-bank
+    - evaluation-bank
+
+dataset:
+  dataset_id: delta-v2-knowledge-paired-v2
+  freeze_path: experiments/delta_v2/knowledge_paired_data_freeze.yaml
+  freeze_sha256: 705eeff619fba976c395e3e8cd5fb53ab3e38d4badb1715dbf1ef995f5b8c490
+  train_path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+  train_sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  train_rows: 147
+  pairs_path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+  pairs_sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+  pair_rows: 63
+  dev_path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+  dev_sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+  dev_rows: 21
+  frozen_eval_path: data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl
+  frozen_eval_sha256: 5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c
+  b2_prefix: datasets/experiments/delta_v2/knowledge_paired_v2/
+  evaluation_wording_added_to_training: false
+
+implementation:
+  engine_path: experiments/delta_v2/knowledge_paired_lora.py
+  engine_sha256: d5e473fe118807feea1255e6a299f80c6ef72ca2088272de79eaea02b7d860c9
+  validator_path: experiments/delta_v2/train_knowledge_paired_objective.py
+  validator_sha256: 4a553247b0b38d849ec06534958d77d0e73e3a77471959673dcc4b0cd80a0dd2
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  initialization: fresh-base
+  base_weights: frozen
+  quantization: none
+  full_weight_training: forbidden
+
+lora:
+  implementation: peft-0.19.0
+  rank: 8
+  alpha: 16
+  dropout: 0.05
+  bias: none
+  target_modules_regex: '^model\.language_model\.layers\.\d+\.(?:self_attn\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\.(?:in_proj_a|in_proj_b|in_proj_qkv|in_proj_z|out_proj)|mlp\.(?:gate_proj|up_proj|down_proj))$'
+  vision_modules_trainable: false
+
+training_units:
+  construction: fixed-recall-and-boolean-pair-units
+  recall_units: 21
+  boolean_pair_units: 63
+  units_per_cycle: 84
+  pair_contains: [verify_true, verify_false]
+  pair_members_share_source_and-corruption-family: true
+  deterministic_unit_shuffle: true
+
+objective:
+  objective_id: paired-boolean-logistic-ranking-v1
+  recall_loss: teacher-forced-assistant-token-cross-entropy
+  boolean_pair_loss: truth-conditioned-logistic-plus-ranking
+  pair_normalization: one-pair-equals-one-training-unit
+  truth_margin_term: mean-softplus-negative-true-and-positive-false
+  pair_ranking_term: softplus-ranking-margin-minus-pair-separation
+  ranking_margin: 1.0
+  ranking_weight: 1.0
+
+optimization:
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.0001
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  deterministic_algorithms: required
+
+verification:
+  first_gate: repaired-pair-boolean-margin-v1
+  verify_true_margin_accuracy_minimum: 0.80
+  verify_false_margin_accuracy_minimum: 0.80
+  truth_conditioned_pair_rate_minimum: 0.80
+  per_corruption_family_false_accuracy_minimum: 0.80
+  full_frozen_eval_only_after_first_gate: true
+  full_eval_protocol: delta-v2-knowledge-eval-v1
+  acquisition_choice_accuracy_minimum: 0.50
+  acquisition_boolean_true_accuracy_minimum: 0.80
+  acquisition_boolean_false_accuracy_minimum: 0.80
+  retention_boolean_false_accuracy_minimum: 0.90
+  recall: advisory
+  feature: report-separately
+  pooled_overall_score: forbidden
+  result: candidate-only-no-promotion
+
+safety_gates:
+  fresh_base_required: true
+  trainable_scope: lora-adapter-only
+  base_weights_frozen: true
+  vision_modules_trainable: false
+  quantization: none
+  optimizer_steps_maximum: 60
+  gradient_norm_clipping: 1.0
+  exact_input_hashes_required: true
+  deterministic_execution_required: true
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_adapter_write_authorized: true
+  repaired_pair_diagnostic_authorized: true
+  full_eval_conditional: true
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false
