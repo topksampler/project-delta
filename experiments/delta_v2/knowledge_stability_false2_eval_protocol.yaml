@@ -1,0 +1,54 @@
+schema: delta.knowledge_stability_replay_eval_protocol.v1
+protocol_id: delta-v2-knowledge-stability-false2-eval-v1
+experiment_id: delta_v2
+condition_id: d6_stability_false2_eval
+state: preregistered-for-pre-gate
+
+decision_trigger:
+  training_run_id: delta-v2-d6-stability-false2-lora-qwen35-08b-modal-v1
+  training_launch_commit: 25b6f0f
+  training_receipt_sha256: db485d6e2e934c6f26ceb5c95b5dca8f96f0689d8c25e8dea1538fca31b10a79
+  training_metrics_sha256: c53dd8a340a7b6d4e8e035b68749e7e7c296b49b0ece6b80b610410dea2b7495
+  adapter_sha256: 6f3d198a0e2417bd717c7078d64989d345150137f6ef8487287aa7d131a5b2e5
+
+baseline:
+  run_id: delta-v2-d4-stability-base-qwen35-08b-modal-v1
+  receipt_sha256: e91cd432da6d524bfcbb05626386335336a540e14f4d99f017cc11ade50fec97
+  metrics_sha256: e6382bca092a87ff5587f7aaf5f1d113f46f00ee9f07f288efa3725be3858158
+
+dataset:
+  path: data/experiments/delta_v2/knowledge_stability_replay_v1/stability_dev.jsonl
+  sha256: f9c4c150aaf5db7edd2caba10801acd05b8e34cced443afdfa678aca3ed71b3a
+  sources: 15
+  rows: 60
+  probe_counts:
+    choice: 15
+    boolean_true: 15
+    boolean_false: 15
+    recall: 15
+
+generation:
+  method: greedy
+  do_sample: false
+  max_new_tokens: 256
+  repeats: 2
+  seed: 20260730
+  repeat_invariant: byte-identical-raw-continuation
+
+gates:
+  choice_parseable_minimum: 0.90
+  boolean_parseable_minimum: 1.0
+  boolean_true_accuracy_minimum: 0.80
+  boolean_false_accuracy_minimum: 0.90
+  recall: advisory
+  pooled_score: forbidden
+  all_gates_required: true
+
+execution_boundary:
+  modal_evaluation_authorized: true
+  model_updates: 0
+  adapter_mutation: forbidden
+  acquisition_margin_authorized_only_after_pass: true
+  full_eval_authorized: false
+  verify_v2_authorized: false
+  promotion_authorized: false

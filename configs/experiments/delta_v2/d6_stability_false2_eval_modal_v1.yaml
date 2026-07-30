@@ -1,0 +1,60 @@
+schema: delta.knowledge_stability_false2_eval_config.v1
+run_id: delta-v2-d6-stability-false2-eval-modal-v1
+experiment_id: delta_v2
+condition_id: d6_stability_false2_eval
+task: eval
+
+protocol:
+  protocol_id: delta-v2-knowledge-stability-false2-eval-v1
+  path: experiments/delta_v2/knowledge_stability_false2_eval_protocol.yaml
+  sha256: 09121276ab9244394115e4d84e781c89d53ae877855453613fd5804fbe864f44
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter:
+    kind: lora
+    run_id: delta-v2-d6-stability-false2-lora-qwen35-08b-modal-v1
+    path: runs/delta-v2-d6-stability-false2-lora-qwen35-08b-modal-v1/adapter
+    sha256: 6f3d198a0e2417bd717c7078d64989d345150137f6ef8487287aa7d131a5b2e5
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  attention_implementation: eager
+  deterministic_algorithms: true
+
+inputs:
+  run_artifacts:
+    - run_id: delta-v2-d6-stability-false2-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d6-stability-false2-lora-qwen35-08b-modal-v1/run_receipt.json
+      sha256: db485d6e2e934c6f26ceb5c95b5dca8f96f0689d8c25e8dea1538fca31b10a79
+    - run_id: delta-v2-d6-stability-false2-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d6-stability-false2-lora-qwen35-08b-modal-v1/train_metrics.json
+      sha256: c53dd8a340a7b6d4e8e035b68749e7e7c296b49b0ece6b80b610410dea2b7495
+
+eval:
+  module: experiments.delta_v2.run_knowledge_stability_false2_eval
+  path: data/experiments/delta_v2/knowledge_stability_replay_v1/stability_dev.jsonl
+  sha256: f9c4c150aaf5db7edd2caba10801acd05b8e34cced443afdfa678aca3ed71b3a
+
+output:
+  dir: runs/delta-v2-d6-stability-false2-eval-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: A10G
+  timeout_seconds: 3600
