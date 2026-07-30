@@ -28,12 +28,14 @@ from experiments.delta_v2.run_knowledge_eval import (
 
 
 PROTOCOL_SCHEMA = "delta.knowledge_lora_protocol.v1"
-PROTOCOL_ID = "delta-v2-knowledge-lora-v1"
+PROTOCOL_ID = "delta-v2-knowledge-lora-v2"
 RUN_CONFIG_SCHEMA = "delta.knowledge_lora_train_config.v1"
 TRAIN_SCHEMA = "delta.knowledge_sft_row.v1"
 RECEIPT_SCHEMA = "delta.knowledge_lora_train_receipt.v1"
 METRICS_SCHEMA = "delta.knowledge_lora_train_metrics.v1"
-PROTOCOL_PATH = Path("experiments/delta_v2/knowledge_lora_protocol.yaml")
+PROTOCOL_PATH = Path(
+    "experiments/delta_v2/knowledge_lora_protocol_v2.yaml"
+)
 FREEZE_PATH = Path(
     "experiments/delta_v2/knowledge_adaptation_freeze.yaml"
 )
@@ -116,6 +118,24 @@ def validate_protocol(
         or protocol.get("state") != "preregistered-for-training"
     ):
         raise KnowledgeTrainError("knowledge LoRA protocol identity changed")
+
+    amends = _mapping(protocol.get("amends"), "amends")
+    if dict(amends) != {
+        "protocol_id": "delta-v2-knowledge-lora-v1",
+        "run_id": "delta-v2-c5-knowledge-lora-qwen35-08b-modal-v1",
+        "git_commit": "ec7987b1067b7e1ce0eccdc398bb9e73185abc64",
+        "status": "failed-before-model-load",
+        "failure_stage": "modal-training-module-routing",
+        "failure_type": "missing-generic-modal-training-router",
+        "model_loaded": False,
+        "optimizer_steps": 0,
+        "adapter_created": False,
+        "estimated_cost_usd": 0.0318,
+        "evidence_prefix": (
+            "runs/delta-v2-c5-knowledge-lora-qwen35-08b-modal-v1/"
+        ),
+    }:
+        raise KnowledgeTrainError("knowledge LoRA amendment changed")
 
     trigger = _mapping(protocol.get("decision_trigger"), "decision_trigger")
     if (

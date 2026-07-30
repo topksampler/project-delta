@@ -18,7 +18,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = (
     REPO_ROOT
     / "configs/experiments/delta_v2/"
-    "c5_knowledge_lora_qwen35_08b_modal_v1.yaml"
+    "c5_knowledge_lora_qwen35_08b_modal_v2.yaml"
 )
 
 

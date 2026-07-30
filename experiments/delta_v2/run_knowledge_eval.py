@@ -36,7 +36,7 @@ FREEZE_PATH = Path(
 )
 MODAL_APP_PATH = "experiments/delta_v2/modal_knowledge_adapt_app.py"
 BASE_RUN_ID = "delta-v2-c4-knowledge-base-qwen35-08b-modal-v1"
-TRAIN_RUN_ID = "delta-v2-c5-knowledge-lora-qwen35-08b-modal-v1"
+TRAIN_RUN_ID = "delta-v2-c5-knowledge-lora-qwen35-08b-modal-v2"
 ADAPTER_RUN_ID = "delta-v2-c5-knowledge-lora-eval-qwen35-08b-modal-v1"
 EXPECTED_STRATA = {
     "acquisition_added": 84,

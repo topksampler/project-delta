@@ -1,0 +1,98 @@
+schema: delta.knowledge_lora_protocol.v1
+
+protocol_id: delta-v2-knowledge-lora-v2
+experiment_id: delta_v2
+condition_id: c5_knowledge_lora
+state: preregistered-for-training
+
+amends:
+  protocol_id: delta-v2-knowledge-lora-v1
+  run_id: delta-v2-c5-knowledge-lora-qwen35-08b-modal-v1
+  git_commit: ec7987b1067b7e1ce0eccdc398bb9e73185abc64
+  status: failed-before-model-load
+  failure_stage: modal-training-module-routing
+  failure_type: missing-generic-modal-training-router
+  model_loaded: false
+  optimizer_steps: 0
+  adapter_created: false
+  estimated_cost_usd: 0.0318
+  evidence_prefix: runs/delta-v2-c5-knowledge-lora-qwen35-08b-modal-v1/
+
+decision_trigger:
+  base_run_id: delta-v2-c4-knowledge-base-qwen35-08b-modal-v1
+  config_sha256: 87f029a255a25cdfc0272667b5d75d94639aefbea892d9271029c165c8e3bdf0
+  metrics_sha256: 6b617bf893a2f9c49e16ba5bd17f16abe195b7b69a35c7e8e94681d81de6a0fb
+  samples_sha256: 50ab84e9800285bf8a3a257338ebd32485cfdec307ddabc4057a12f189dc8315
+  observed:
+    acquisition_boolean_true: 0/21
+    acquisition_boolean_false: 21/21
+    acquisition_choice: 0/21
+    acquisition_recall: 0/21
+    retention_boolean_true: 1/21
+    retention_boolean_false: 21/21
+    retention_choice: 0/21
+    retention_recall: 0/21
+    feature_retention: 0/1
+  diagnosis: false-reject-and-response-format-failure
+
+dataset:
+  dataset_id: delta-v2-vllm-knowledge-adaptation-v1
+  freeze_path: experiments/delta_v2/knowledge_adaptation_freeze.yaml
+  freeze_sha256: 1fab0084c1804805d11c16b432b6b208661a8825e1da40c6606e4313183cc2eb
+  train_path: data/experiments/delta_v2/knowledge_adaptation_v1/train.jsonl
+  train_sha256: 16ad0d2c12a823722501800227c739e59131fd7c7e0f774e2f1faab2e4bd4b95
+  train_rows: 63
+  dev_path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+  dev_sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+  dev_rows: 21
+  post_train_eval_protocol: delta-v2-knowledge-eval-v1
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  base_weights: frozen
+  quantization: none
+  full_weight_training: forbidden
+
+lora:
+  implementation: peft-0.19.0
+  rank: 8
+  alpha: 16
+  dropout: 0.05
+  bias: none
+  target_modules_regex: '^model\.language_model\.layers\.\d+\.(?:self_attn\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\.(?:in_proj_a|in_proj_b|in_proj_qkv|in_proj_z|out_proj)|mlp\.(?:gate_proj|up_proj|down_proj))$'
+  vision_modules_trainable: false
+
+optimization:
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.0001
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  assistant_only_loss: true
+  deterministic_algorithms: required
+
+verification_gates:
+  acquisition:
+    choice_accuracy_minimum: 0.50
+    boolean_true_accuracy_minimum: 0.80
+    boolean_false_accuracy_minimum: 0.80
+  retention:
+    boolean_false_accuracy_minimum: 0.90
+    source_disjoint: required
+  recall: advisory
+  feature: report-separately
+  pooled_overall_score: forbidden
+  result: candidate-only-no-promotion
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_adapter_write_authorized: true
+  adapter_eval_required: true
+  promotion_authorized: false
