@@ -1,0 +1,85 @@
+schema: delta.knowledge_lora_protocol.v1
+
+protocol_id: delta-v2-knowledge-lora-true-weighted-v1
+experiment_id: delta_v2
+condition_id: c6_knowledge_lora_true_weighted
+state: preregistered-for-training
+
+decision_trigger:
+  c5_eval_run_id: delta-v2-c5-knowledge-lora-eval-qwen35-08b-modal-v1
+  c5_eval_metrics_sha256: 592915e674e874e4e5874ed835ed4169127260c2faf88e7e8b92490322670a8b
+  training_surface_run_id: delta-v2-c5-knowledge-lora-train-surface-modal-v1
+  training_surface_metrics_sha256: eac1482e1244933caafc3dd70d70c6b2a3f2adbde091340b1bc530a5216e1d48
+  observed_training_verify_true: 0/21
+  observed_training_verify_false: 21/21
+  diagnosis: negative-answer-prior-not-overcome
+
+dataset:
+  dataset_id: delta-v2-vllm-knowledge-adaptation-v1
+  freeze_path: experiments/delta_v2/knowledge_adaptation_freeze.yaml
+  freeze_sha256: 1fab0084c1804805d11c16b432b6b208661a8825e1da40c6606e4313183cc2eb
+  train_path: data/experiments/delta_v2/knowledge_adaptation_v1/train.jsonl
+  train_sha256: 16ad0d2c12a823722501800227c739e59131fd7c7e0f774e2f1faab2e4bd4b95
+  train_rows: 63
+  dev_path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+  dev_sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+  dev_rows: 21
+  evaluation_wording_added_to_training: false
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  initialization: fresh-base
+  base_weights: frozen
+  quantization: none
+  full_weight_training: forbidden
+
+lora:
+  implementation: peft-0.19.0
+  rank: 8
+  alpha: 16
+  dropout: 0.05
+  bias: none
+  target_modules_regex: '^model\.language_model\.layers\.\d+\.(?:self_attn\.(?:q_proj|k_proj|v_proj|o_proj)|linear_attn\.(?:in_proj_a|in_proj_b|in_proj_qkv|in_proj_z|out_proj)|mlp\.(?:gate_proj|up_proj|down_proj))$'
+  vision_modules_trainable: false
+
+sampling:
+  method: deterministic-virtual-repetition
+  surface_weights:
+    exact_recall: 1
+    verify_true: 4
+    verify_false: 1
+  source_rows_mutated: false
+  seed: 20260730
+
+optimization:
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.0001
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  assistant_only_loss: true
+  deterministic_algorithms: required
+
+verification:
+  first_gate: exact-training-surface-diagnostic
+  training_verify_true_accuracy_minimum: 0.80
+  training_verify_false_accuracy_minimum: 0.80
+  full_frozen_eval_if_first_gate_passes: true
+  frozen_eval_protocol: delta-v2-knowledge-eval-v1
+  frozen_eval_gates_unchanged: true
+  pooled_overall_score: forbidden
+  result: candidate-only-no-promotion
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_adapter_write_authorized: true
+  diagnostic_authorized: true
+  full_eval_conditional: true
+  promotion_authorized: false

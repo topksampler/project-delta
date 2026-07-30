@@ -9,6 +9,7 @@ from experiments.delta_v2.train_knowledge_lora import (
     KnowledgeTrainError,
     TARGET_MODULES_REGEX,
     assistant_only_labels,
+    build_weighted_order,
     target_module_allowed,
     validate_run_config,
 )
@@ -90,6 +91,24 @@ class KnowledgeLoraTests(unittest.TestCase):
             target_module_allowed(
                 "model.visual.blocks.0.attn.q_proj"
             )
+        )
+
+    def test_weighted_order_is_virtual_and_deterministic(self) -> None:
+        rows = [
+            {"surface": "exact_recall"},
+            {"surface": "verify_true"},
+            {"surface": "verify_false"},
+        ]
+        self.assertEqual(
+            build_weighted_order(
+                rows,
+                {
+                    "exact_recall": 1,
+                    "verify_true": 4,
+                    "verify_false": 1,
+                },
+            ),
+            [0, 1, 1, 1, 1, 2],
         )
 
     def test_changed_steps_fail_closed(self) -> None:

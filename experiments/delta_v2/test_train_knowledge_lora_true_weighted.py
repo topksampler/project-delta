@@ -1,0 +1,62 @@
+from __future__ import annotations
+
+import unittest
+from collections import Counter
+from pathlib import Path
+
+import yaml
+
+from experiments.delta_v2.train_knowledge_lora import (
+    KnowledgeTrainError,
+    build_weighted_order,
+)
+from experiments.delta_v2.train_knowledge_lora_true_weighted import (
+    SURFACE_WEIGHTS,
+    validate_run_config,
+)
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+CONFIG_PATH = (
+    REPO_ROOT
+    / "configs/experiments/delta_v2/"
+    "c6_knowledge_lora_true_weighted_qwen35_08b_modal_v1.yaml"
+)
+
+
+class TrueWeightedKnowledgeLoraTests(unittest.TestCase):
+    def test_config_keeps_rows_immutable_and_weights_only_indices(self) -> None:
+        config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+        protocol, train_rows, dev_rows = validate_run_config(
+            config, repo_root=REPO_ROOT
+        )
+        order = build_weighted_order(train_rows, SURFACE_WEIGHTS)
+        exposure = Counter(train_rows[index]["surface"] for index in order)
+        self.assertEqual(len(train_rows), 63)
+        self.assertEqual(len(dev_rows), 21)
+        self.assertEqual(len(order), 126)
+        self.assertEqual(
+            exposure,
+            {
+                "exact_recall": 21,
+                "verify_true": 84,
+                "verify_false": 21,
+            },
+        )
+        self.assertEqual(protocol["model"]["initialization"], "fresh-base")
+        self.assertFalse(
+            protocol["dataset"]["evaluation_wording_added_to_training"]
+        )
+
+    def test_changed_true_weight_fails_closed(self) -> None:
+        config = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+        config["sampling"]["surface_weights"]["verify_true"] = 3
+        with self.assertRaisesRegex(
+            KnowledgeTrainError,
+            "sampling config changed",
+        ):
+            validate_run_config(config, repo_root=REPO_ROOT)
+
+
+if __name__ == "__main__":
+    unittest.main()

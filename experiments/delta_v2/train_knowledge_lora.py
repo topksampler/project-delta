@@ -459,6 +459,7 @@ def _tokenize_rows(
         tokenized.append(
             {
                 "row_id": row["row_id"],
+                "surface": row["surface"],
                 "input_ids": full["input_ids"],
                 "attention_mask": full["attention_mask"],
                 "labels": labels,
@@ -513,18 +514,39 @@ def _write_json(path: Path, payload: Mapping[str, Any]) -> None:
     )
 
 
-def train(
+def build_weighted_order(
+    rows: Sequence[Mapping[str, Any]],
+    surface_weights: Mapping[str, int],
+) -> list[int]:
+    order: list[int] = []
+    for index, row in enumerate(rows):
+        surface = str(row["surface"])
+        weight = surface_weights.get(surface)
+        if not isinstance(weight, int) or weight < 1:
+            raise KnowledgeTrainError(
+                f"invalid training weight for surface: {surface}"
+            )
+        order.extend([index] * weight)
+    if set(surface_weights) != {str(row["surface"]) for row in rows}:
+        raise KnowledgeTrainError("training surface weights changed")
+    return order
+
+
+def train_validated_candidate(
     *,
     config_path: Path,
     repo_root: Path,
+    config: Mapping[str, Any],
+    protocol: Mapping[str, Any],
+    train_rows: Sequence[Mapping[str, Any]],
+    dev_rows: Sequence[Mapping[str, Any]],
+    run_id: str,
+    protocol_id: str,
+    protocol_path: Path,
+    surface_weights: Mapping[str, int],
 ) -> dict[str, Any]:
     started_at = datetime.now(timezone.utc)
     started = time.perf_counter()
-    config = _load_yaml(config_path)
-    protocol, train_rows, dev_rows = validate_run_config(
-        config,
-        repo_root=repo_root,
-    )
     observed_runtime = validate_runtime(config)
 
     import torch
@@ -622,11 +644,14 @@ def train(
     )
     initial_dev_loss = _mean_loss(model, dev_examples, torch)
     losses: list[dict[str, Any]] = []
-    order = list(range(len(train_examples)))
+    order = build_weighted_order(train_rows, surface_weights)
     rng = random.Random(seed)
     rng.shuffle(order)
     cursor = 0
     examples_seen = 0
+    surface_examples_seen: dict[str, int] = {
+        surface: 0 for surface in surface_weights
+    }
     for step in range(1, max_steps + 1):
         optimizer.zero_grad(set_to_none=True)
         micro_losses: list[float] = []
@@ -641,6 +666,7 @@ def train(
             loss.backward()
             micro_losses.append(float(output.loss.detach().cpu()))
             examples_seen += 1
+            surface_examples_seen[str(example["surface"])] += 1
         grad_norm = torch.nn.utils.clip_grad_norm_(
             trainable,
             float(optimization["max_grad_norm"]),
@@ -671,12 +697,14 @@ def train(
     total_parameters = sum(parameter.numel() for parameter in model.parameters())
     metrics = {
         "schema": METRICS_SCHEMA,
-        "run_id": TRAIN_RUN_ID,
-        "protocol_id": PROTOCOL_ID,
+        "run_id": run_id,
+        "protocol_id": protocol_id,
         "status": "pass",
         "steps": max_steps,
         "gradient_accumulation_steps": gradient_accumulation,
         "examples_seen": examples_seen,
+        "surface_weights": dict(surface_weights),
+        "surface_examples_seen": surface_examples_seen,
         "initial_dev_loss": initial_dev_loss,
         "final_dev_loss": final_dev_loss,
         "loss_reduction": initial_dev_loss - final_dev_loss,
@@ -695,15 +723,15 @@ def train(
     config_copy.write_bytes(config_path.read_bytes())
     receipt = {
         "schema": RECEIPT_SCHEMA,
-        "run_id": TRAIN_RUN_ID,
-        "protocol_id": PROTOCOL_ID,
+        "run_id": run_id,
+        "protocol_id": protocol_id,
         "dataset_id": DATASET_ID,
         "base_model": {
             "repository": MODEL_REPOSITORY,
             "revision": MODEL_REVISION,
         },
         "config_sha256": _sha256(config_path),
-        "protocol_sha256": _sha256(repo_root / PROTOCOL_PATH),
+        "protocol_sha256": _sha256(repo_root / protocol_path),
         "train_sha256": _sha256(repo_root / TRAIN_PATH),
         "dev_sha256": _sha256(repo_root / DEV_PATH),
         "adapter_sha256": _sha256(adapter_path),
@@ -727,6 +755,34 @@ def train(
     receipt_path = output_dir / "run_receipt.json"
     _write_json(receipt_path, receipt)
     return {"metrics": metrics, "receipt": receipt}
+
+
+def train(
+    *,
+    config_path: Path,
+    repo_root: Path,
+) -> dict[str, Any]:
+    config = _load_yaml(config_path)
+    protocol, train_rows, dev_rows = validate_run_config(
+        config,
+        repo_root=repo_root,
+    )
+    return train_validated_candidate(
+        config_path=config_path,
+        repo_root=repo_root,
+        config=config,
+        protocol=protocol,
+        train_rows=train_rows,
+        dev_rows=dev_rows,
+        run_id=TRAIN_RUN_ID,
+        protocol_id=PROTOCOL_ID,
+        protocol_path=PROTOCOL_PATH,
+        surface_weights={
+            "exact_recall": 1,
+            "verify_true": 1,
+            "verify_false": 1,
+        },
+    )
 
 
 def validate_only(
