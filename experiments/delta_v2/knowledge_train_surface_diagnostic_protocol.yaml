@@ -1,0 +1,56 @@
+schema: delta.knowledge_train_surface_diagnostic_protocol.v1
+
+protocol_id: delta-v2-knowledge-train-surface-diagnostic-v1
+experiment_id: delta_v2
+condition_id: c5_knowledge_lora_diagnostic
+state: preregistered-for-diagnostic
+
+trigger:
+  adapter_eval_run_id: delta-v2-c5-knowledge-lora-eval-qwen35-08b-modal-v1
+  metrics_sha256: 592915e674e874e4e5874ed835ed4169127260c2faf88e7e8b92490322670a8b
+  samples_sha256: a6549894df5a8c1d9f9065e494e2fbefded5972460b02f296518996bbc2cafa6
+  observed_acquisition_boolean_true: 0/21
+  observed_acquisition_boolean_false: 21/21
+
+dataset:
+  dataset_id: delta-v2-vllm-knowledge-adaptation-v1
+  path: data/experiments/delta_v2/knowledge_adaptation_v1/train.jsonl
+  sha256: 16ad0d2c12a823722501800227c739e59131fd7c7e0f774e2f1faab2e4bd4b95
+  rows: 63
+  prompt_source: messages[0]
+  gold_source: messages[1]
+  mutation: forbidden
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter_run_id: delta-v2-c5-knowledge-lora-qwen35-08b-modal-v2
+  adapter_path: runs/delta-v2-c5-knowledge-lora-qwen35-08b-modal-v2/adapter
+  adapter_sha256: 83fb04ae52502432df6b17d2aaa12cfeb12f457df6a77c83f28fed433d9966fa
+
+generation:
+  method: greedy
+  do_sample: false
+  max_new_tokens: 256
+  repeats: 2
+  seed: 20260730
+  repeat_invariant: byte-identical-raw-continuation
+
+scoring:
+  authority: frozen-training-row-assistant-answer
+  method: exact-stripped-string
+  repair: forbidden
+  report_surfaces:
+    - exact_recall
+    - verify_true
+    - verify_false
+  pooled_overall_score: forbidden
+
+decision:
+  boolean_surface_fit:
+    verify_true_accuracy_minimum: 0.80
+    verify_false_accuracy_minimum: 0.80
+  if_fit_and_eval_true_failed: paraphrase-transfer-failure
+  if_training_true_failed: optimization-or-surface-fit-failure
+  result: diagnostic-only
+  promotion_authorized: false
