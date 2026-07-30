@@ -1,0 +1,175 @@
+schema: delta.knowledge_stability_replay_design.v1
+
+design_id: delta-v2-knowledge-stability-replay-v1
+experiment_id: delta_v2
+candidate_id: d4_stability_replay_sft_control
+state: preregistered-for-data-build
+
+decision_trigger:
+  stage_1:
+    report: artifacts/reports/delta_v2/repaired_data_sft_control_modal_v1.md
+    report_sha256: 1bd1f7ee7803f62991b0b751135afdbb7336b9f2a9870fb8f4ed38cbb4b5d46f
+    result: acquisition-gates-pass-retention-false-fail
+    acquisition_choice: 12/21
+    retention_boolean_false: 16/21
+  stage_2:
+    report: artifacts/reports/delta_v2/paired_objective_lora_modal_v1.md
+    report_sha256: ab5a2035ab601635ecafbd8f77b5be6b8661e936e093122c64cd7a60bdbcd5ae
+    result: acquisition-choice-and-retention-false-fail
+    acquisition_choice: 0/21
+    retention_boolean_false: 15/21
+  decision: preserve-generative-objective-add-source-disjoint-stability-replay
+
+source_pool:
+  facts:
+    path: data/experiments/delta_v2/acceptance_attempt_2/facts/atomic_fact_deltas_acceptance.jsonl
+    sha256: 52f5f8bfa247550ef50277657900725db6ed8cc99bc3fe21d8a112629ffec75a
+  current_eval:
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl
+    sha256: 5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c
+  eligibility:
+    status: stable
+    families:
+      - python.config_field.v1
+      - python.environment_variable.v1
+    blocked_current_acquisition_sources: 21
+    blocked_current_retention_sources: 21
+    eligible_after_blocking: 711
+
+partitions:
+  selection_algorithm: sha256-source-id-with-config-path-diversity-v1
+  selection_order:
+    - replay_train
+    - stability_dev
+    - verify_v2
+  source_overlap_between_partitions: forbidden
+  current_eval_source_overlap: forbidden
+  config_path_maximum_per_partition: 1
+  replay_train:
+    salt: delta-v2-stability-replay-train-v1
+    sources: 15
+    family_quota:
+      python.config_field.v1: 6
+      python.environment_variable.v1: 9
+  stability_dev:
+    salt: delta-v2-stability-replay-dev-v1
+    sources: 15
+    family_quota:
+      python.config_field.v1: 6
+      python.environment_variable.v1: 9
+  verify_v2:
+    salt: delta-v2-stability-replay-verify-v2
+    sources: 21
+    family_quota:
+      python.config_field.v1: 9
+      python.environment_variable.v1: 12
+    use_for_training: false
+    use_for_candidate_selection: false
+    wording_materialized_after_candidate_receipt: true
+  derived_partition_sha256: c87130408a7c0524bc4267df9ead6574f57c5deb1ff8a97bbeaa177a0b887608
+
+replay_data:
+  truth_authority: normalized-after-revision-AST-observation
+  replay_sources: 15
+  recall_rows_per_source: 1
+  boolean_pairs_per_source: 3
+  positive_rows_per_source: 3
+  negative_rows_per_source: 3
+  replay_rows: 105
+  replay_pairs: 45
+  corruption_families:
+    - annotation_swap
+    - family_value_swap
+    - full_card_swap
+  false_contract_rule: source-grounded-field-value-or-full-card-derangement
+  donor_value_verified_true_support_rate: 1.0
+  exact_current_eval_prompt_overlap: 0
+  exact_stability_dev_prompt_overlap: 0
+  exact_verify_v2_prompt_overlap: 0
+  model_visible_fields: [messages]
+
+candidate_training:
+  parent_protocol:
+    path: experiments/delta_v2/knowledge_paired_sft_control_protocol.yaml
+    sha256: 7c97f2581636510403f7af8792e044fd7543c8be66500f5d923f73ef0feb72cd
+  only_intervention_factor: stability-replay-microbatch
+  unchanged:
+    objective: assistant-only-generative-sft-v1
+    initialization: fresh-base
+    base_revision: 2fc06364715b967f1860aea9cf38778875588b17
+    lora_rank: 8
+    lora_alpha: 16
+    lora_dropout: 0.05
+    learning_rate: 0.0001
+    optimizer_steps: 60
+    gradient_accumulation_steps: 4
+    seed: 20260730
+  schedule:
+    optimizer_steps: 60
+    units_per_step: 4
+    total_units: 240
+    acquisition_units: 180
+    replay_units: 60
+    replay_share: 0.25
+    total_boolean_pair_units: 180
+    total_recall_units: 60
+    step_types:
+      - count: 45
+        units:
+          - acquisition_boolean_pair
+          - acquisition_boolean_pair
+          - acquisition_recall
+          - replay_boolean_pair
+      - count: 15
+        units:
+          - acquisition_boolean_pair
+          - acquisition_boolean_pair
+          - acquisition_boolean_pair
+          - replay_recall
+    step_type_order: deterministic-seeded-shuffle
+    within_stream_order: deterministic-seeded-shuffle
+
+gates:
+  before_training:
+    source_partition_audit: required
+    corruption_shortcut_audit: required
+    exact_prompt_overlap: 0
+    zero_update_stability_dev_base_baseline: required
+  before_full_eval:
+    acquisition_pair_margin:
+      verified_true_minimum: 0.80
+      verified_false_minimum: 0.80
+      truth_conditioned_pairs_minimum: 0.80
+      every_corruption_family_false_minimum: 0.80
+    held_out_stability_dev:
+      sources: 15
+      probes_per_source: [choice, boolean_true, boolean_false, recall]
+      items: 60
+      choice_parseable_minimum: 0.90
+      boolean_parseable_minimum: 1.0
+      boolean_true_accuracy_minimum: 0.80
+      boolean_false_accuracy_minimum: 0.90
+      recall: advisory
+      pooled_score: forbidden
+  current_full_eval:
+    protocol_id: delta-v2-knowledge-eval-v1
+    unchanged_required: true
+    original_gates_required: true
+  verify_v2:
+    required_before_promotion: true
+    stable_sources: 21
+    probes_per_source: [choice, boolean_true, boolean_false, recall]
+    pooled_score: forbidden
+  promotion_authorized: false
+
+execution_boundary:
+  partition_build_authorized: true
+  replay_data_build_authorized: false
+  base_baseline_authorized: false
+  lora_training_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  modal_job_authorized: false
+  b2_write_authorized: false
+  promotion_authorized: false
