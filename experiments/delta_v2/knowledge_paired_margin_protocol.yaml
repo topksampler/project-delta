@@ -1,0 +1,56 @@
+schema: delta.knowledge_paired_margin_protocol.v1
+
+protocol_id: delta-v2-knowledge-paired-margin-v1
+experiment_id: delta_v2
+condition_id: d2_paired_data_sft_control_margin
+state: preregistered-for-diagnostic
+
+decision_trigger:
+  training_run_id: delta-v2-d2-knowledge-paired-data-sft-control-qwen35-08b-modal-v1
+  training_launch_commit: fd3f8f3
+  training_receipt_sha256: cff9d721dadbf48d8974504728ef0fba3b14e9b498a0a893f4dbdba8c32c8f07
+  training_metrics_sha256: 4cc7035c23ff0b949810e7b7e2ad599243cbb574bb3d111a4a234d9ccfea27b2
+  adapter_sha256: 9ef3caaf1f1d83a26df485ee0abcd365d1f932e0752cb9a99d9c5ac3510565a5
+  objective_id: assistant-only-generative-sft-v1
+
+dataset:
+  dataset_id: delta-v2-knowledge-paired-v2
+  freeze_path: experiments/delta_v2/knowledge_paired_data_freeze.yaml
+  freeze_sha256: 705eeff619fba976c395e3e8cd5fb53ab3e38d4badb1715dbf1ef995f5b8c490
+  train_path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+  train_sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  train_rows: 147
+  pairs_path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+  pairs_sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+  pair_rows: 63
+  included_surfaces: [verify_true, verify_false]
+  included_rows: 126
+  mutation: forbidden
+
+scoring:
+  teacher_forced_gold_nll: assistant-completion-sequence
+  sequence_margin: log_probability_yes-minus-log_probability_no
+  predicted_yes_if: sequence-margin-strictly-positive
+  pair_separation: true-sequence-margin-minus-false-sequence-margin
+  truth_conditioned_pair: true-margin-positive-and-false-margin-negative
+  deterministic_repeats: not-applicable-exact-forward-pass
+  pooled_overall_score: forbidden
+
+gates:
+  verify_true_margin_accuracy_minimum: 0.80
+  verify_false_margin_accuracy_minimum: 0.80
+  truth_conditioned_pair_rate_minimum: 0.80
+  per_corruption_family_false_accuracy_minimum: 0.80
+  all_gates_required: true
+  full_frozen_eval_only_if_pass: true
+  paired_objective_training_requires_separate_protocol: true
+  promotion_authorized: false
+
+execution_boundary:
+  modal_diagnostic_authorized: true
+  model_updates: 0
+  optimizer_steps: 0
+  adapter_mutation: forbidden
+  full_eval_conditional: true
+  paired_objective_training_authorized: false
+  promotion_authorized: false
