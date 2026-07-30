@@ -1,0 +1,81 @@
+schema: delta.knowledge_paired_data_freeze.v1
+
+dataset_id: delta-v2-knowledge-paired-v2
+contract_id: delta-v2-knowledge-paired-data-v2
+experiment_id: delta_v2
+parent_dataset_id: delta-v2-vllm-knowledge-adaptation-v1
+target_revision: v0.26.0
+freeze_state: frozen
+publication_state: local-reproducible-not-yet-published
+
+training_data:
+  source_cards: 21
+  rows: 147
+  recall_rows: 21
+  boolean_pairs: 63
+  positive_rows: 63
+  negative_rows: 63
+  model_visible_fields: [messages]
+
+corruption_families:
+  annotation_swap: 21
+  config_default_swap: 9
+  env_getter_swap: 12
+  full_card_swap: 21
+
+shortcut_audit:
+  status: pass
+  outer_prompt_template_identical: true
+  contract_key_order_identical: true
+  donor_value_verified_true_support_rate: 1.0
+  annotation_only_negative_share: 0.3333333333333333
+  maximum_single_corruption_family_share: 0.3333333333333333
+  maximum_empirical_value_only_accuracy: 0.5555555555555556
+  maximum_allowed_empirical_value_only_accuracy: 0.60
+  frozen_eval_prompt_overlap: 0
+  original_eval_prompt_overlap: 0
+
+causal_boundary:
+  stage_1: original-assistant-only-generative-sft
+  stage_2: paired-boolean-objective
+  stage_2_only_change: learning-objective
+  unchanged_dev_path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+  unchanged_eval_path: data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl
+  hyperparameter_sweep_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false
+
+bindings:
+  - id: contract
+    path: experiments/delta_v2/knowledge_paired_data_contract.yaml
+    sha256: fc918c411291df585a270b2200f96ddc6118fa1193de922c8448fb3eae16b10f
+  - id: generator
+    path: experiments/delta_v2/knowledge_paired_data.py
+    sha256: 2b13f73f9d451a0022c7e0a088b64f92b66f7fa99a156252762275d455f09c34
+  - id: generator_tests
+    path: experiments/delta_v2/test_knowledge_paired_data.py
+    sha256: 91bbc63ec9edda56abb63eac777c78e46a35d35a0c219bf10717f143a92ae5dc
+  - id: train
+    path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+    sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  - id: pairs
+    path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+    sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+  - id: build_summary
+    path: data/experiments/delta_v2/knowledge_paired_v2/summary.json
+    sha256: aa6d4b08d91e8e8d8441f30b2ce0a46e4ee84f3e71378c2945dfaab680bf08f2
+  - id: unchanged_dev
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+    sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+  - id: unchanged_eval
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl
+    sha256: 5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c
+
+execution_boundary:
+  model_invocations_completed: 0
+  optimizer_steps_completed: 0
+  dataset_build_authorized: true
+  stage_1_training_requires_separate_protocol: true
+  stage_2_training_requires_separate_protocol: true

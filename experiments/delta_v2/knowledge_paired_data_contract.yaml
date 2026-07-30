@@ -1,0 +1,88 @@
+schema: delta.knowledge_paired_data_contract.v1
+
+contract_id: delta-v2-knowledge-paired-data-v2
+experiment_id: delta_v2
+parent_dataset_id: delta-v2-vllm-knowledge-adaptation-v1
+target_revision: v0.26.0
+freeze_state: preregistered
+
+decision_trigger:
+  diagnostic_protocol_id: delta-v2-knowledge-boolean-margin-v1
+  diagnostic_protocol_sha256: 57b79d276d869e85b9323c6bc1730a540bb89503e9628115d85fd1c685c8da2e
+  result_report: artifacts/reports/delta_v2/boolean_margin_diagnostic_modal_v1.md
+  result_report_sha256: 3788aa452e7bb735f8e96417c7b7d7017517809006b5ddce01d1dae6aaadb780
+  observed_failure: global-label-intercept-with-zero-trained-truth-conditioned-pairs
+  blocking_warning: annotation-only-negative-bank
+
+bindings:
+  knowledge_card_generator:
+    path: experiments/delta_v2/knowledge_adaptation.py
+    sha256: 80d81e3e2effe8e973ff5498ce1332b489e799d1ccf810bbca42868eab978354
+  fact_deltas:
+    path: data/experiments/delta_v2/acceptance_attempt_2/facts/atomic_fact_deltas_acceptance.jsonl
+    sha256: 52f5f8bfa247550ef50277657900725db6ed8cc99bc3fe21d8a112629ffec75a
+  frozen_eval_selection:
+    path: data/experiments/delta_v2/acceptance_attempt_2/eval/acceptance_eval_items_v3.jsonl
+    sha256: 1125a7a5429cf847d16475259ffeb6578b8d4841c81f2f01d20d4065f4c188cb
+  unchanged_dev:
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+    sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+  unchanged_eval:
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/eval.jsonl
+    sha256: 5cc70b14353d874f7d51117dbec341a5814f4a55606b611824dd5b2f0d86dd9c
+
+construction:
+  source_count: 21
+  recall_rows_per_source: 1
+  boolean_pairs_per_source: 3
+  positive_rows_per_source: 3
+  negative_rows_per_source: 3
+  train_rows: 147
+  pair_rows: 63
+  false_contract_rule: source-grounded-field-value-or-full-card-derangement
+  model_visible_fields: [messages]
+  metadata_not_model_visible:
+    - pair_id
+    - pair_role
+    - corruption_family
+    - changed_field
+    - donor_source_id
+  corruption_families:
+    annotation_swap: 21
+    config_default_swap: 9
+    env_getter_swap: 12
+    full_card_swap: 21
+
+shortcut_gates:
+  outer_prompt_template_identical_within_pair: required
+  contract_key_order_identical_within_pair: required
+  changed_top_level_fields_minimum: 1
+  single_field_corruption_pairs: 42
+  full_card_corruption_pairs: 21
+  donor_value_verified_true_support_rate: 1.0
+  annotation_only_negative_share_maximum: 0.3333333333333333
+  single_corruption_family_share_maximum: 0.3333333333333333
+  empirical_value_only_accuracy_maximum_per_family: 0.60
+  original_eval_prompt_overlap: 0
+  frozen_eval_prompt_overlap: 0
+  evaluation_wording_added_to_training: false
+
+causal_comparison:
+  stage_1: original-assistant-only-generative-sft-on-repaired-data
+  stage_2: paired-boolean-objective-on-identical-repaired-data
+  stage_2_only_change: learning-objective
+  lora_topology_unchanged: true
+  optimizer_schedule_unchanged: true
+  seed_unchanged: true
+  frozen_eval_unchanged: true
+
+outputs:
+  root: data/experiments/delta_v2/knowledge_paired_v2
+  train: train.jsonl
+  pairs: pairs.jsonl
+  summary: summary.json
+
+execution_boundary:
+  dataset_build_authorized: true
+  model_training_authorized: false
+  promotion_authorized: false
