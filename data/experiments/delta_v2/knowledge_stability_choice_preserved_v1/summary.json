@@ -1,0 +1,16 @@
+{
+  "dataset_id": "delta-v2-knowledge-stability-choice-preserved-v1",
+  "eval_rows": 60,
+  "eval_sha256": "3b6def494dc791ff3d4d46bde569485656d4ab0a1084dd7dc059e863f96d0ae7",
+  "exact_prompt_overlap_train_eval": 0,
+  "model_invocations_completed": 0,
+  "optimizer_steps_completed": 0,
+  "pairs": 60,
+  "pairs_sha256": "db6f70d354d74df30c14847061f2487de4446d60ce03e6263f87ab1474b02aad",
+  "schema": "delta.knowledge_stability_choice_preserved_data_audit.v1",
+  "source_overlap_train_eval": 15,
+  "sources": 15,
+  "status": "pass",
+  "train_rows": 150,
+  "train_sha256": "2957d28fd6e2476e4acaba49b52fda5983dc65aaad4e125130fe1b58fd68a283"
+}

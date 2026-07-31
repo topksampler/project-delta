@@ -1,0 +1,70 @@
+schema: delta.knowledge_stability_choice_preserved_data_protocol.v1
+protocol_id: delta-v2-knowledge-stability-choice-preserved-data-v1
+dataset_id: delta-v2-knowledge-stability-choice-preserved-v1
+experiment_id: delta_v2
+state: preregistered-for-build
+
+decision_trigger:
+  d11_stability:
+    choice_parseable: 0/15
+    boolean_true: 14/15
+    boolean_false: 13/15
+    recall: 3/15
+  diagnosis: hard-negative-learning-displaced-exact-choice-surface
+  decision: add-one-letter-choice-preservation-surface-per-source
+
+only_intervention_factor:
+  parent: delta-v2-knowledge-stability-hard-negative-v1
+  factor: generative-surface-coverage
+  parent_value: recall-plus-boolean
+  candidate_value: recall-plus-boolean-plus-one-letter-choice
+
+builder:
+  path: experiments/delta_v2/build_knowledge_stability_choice_preserved.py
+  sha256: 5153966d215be57f18ab32dfe45bb67cf3f41288211cbed9494b5ca2f56fc1df
+
+parent_partition:
+  path: experiments/delta_v2/knowledge_stability_replay_design.yaml
+  sha256: 301fc0de6e1961c67c40e1fec25a40444c301678b0b1b1a4e3dafbe6b5f99c01
+  selected_partition: stability_dev
+
+construction:
+  sources: 15
+  source_partition: stability_dev
+  train_rows: 150
+  choice_rows: 15
+  recall_rows: 15
+  boolean_pairs: 60
+  positive_rows: 60
+  negative_rows: 60
+  eval_rows: 60
+  eval_probes_per_source: [choice, boolean_true, boolean_false, recall]
+  source_overlap_train_eval: required-same-claims
+  exact_prompt_overlap_train_eval: 0
+  eval_wording: held-out
+
+choice_surface:
+  answer_format: exactly-one-letter
+  options_per_source: 4
+  ordering_salt: delta-v2-knowledge-choice-train-v2
+  evaluation_ordering_salt: delta-v2-knowledge-choice-v1
+  exact_eval_prompt_reuse: forbidden
+
+hard_negative_rule:
+  field: annotation
+  per_source: 1
+  if_true_annotation_is_not_str: str
+  if_true_annotation_is_str: bool
+  eval_probe_values_read_during_build: false
+
+interpretation_boundary:
+  supports: new-wording-and-new-corruptions-on-ingested-claims
+  does_not_support: generalization-to-unseen-source-facts
+  ci_cd_semantics: all-required-current-source-facts-enter-adaptation-corpus
+
+execution_boundary:
+  dataset_build_authorized: true
+  model_invocations_completed: 0
+  optimizer_steps_completed: 0
+  modal_job_authorized: false
+  promotion_authorized: false

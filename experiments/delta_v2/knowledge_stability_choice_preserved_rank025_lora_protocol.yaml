@@ -1,0 +1,99 @@
+schema: delta.knowledge_stability_choice_preserved_rank025_lora_protocol.v1
+protocol_id: delta-v2-knowledge-stability-choice-preserved-rank025-lora-v1
+experiment_id: delta_v2
+condition_id: d13_stability_choice_preserved_rank025_sft_control
+state: preregistered-for-training
+
+decision_trigger:
+  d11_training_receipt_sha256: 656ba2de76177713cbeb02a355684a0310f7428f5c3edee5e6619fe24aff5dbc
+  d11_training_metrics_sha256: 3fc85d6eaee54ff486f26444b99cab5770050993e6dd18050bb4cb42d547da45
+  d11_stability_receipt_sha256: 2834f9816bdcd9806399da134a2b4622257010ce58283ced2a95dc2bf6b16a23
+  d11_stability_metrics_sha256: 281f3e7bebf2b2bf5f07f3da6b1ac21e6f637988bc6302cb8388f07fe7ac7c4a
+  observed:
+    choice_parseable: 0/15
+    boolean_true: 14/15
+    boolean_false: 13/15
+    recall: 3/15
+  decision: parallel-choice-preservation-ranking-weight-ablation
+
+only_intervention_factor:
+  sibling: d12_stability_choice_preserved_sft_control
+  factor: ranking_weight
+  sibling_value: 0.50
+  candidate_value: 0.25
+
+data:
+  acquisition_train:
+    path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+    sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  acquisition_pairs:
+    path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+    sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+  acquisition_dev:
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+    sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+  stability_train:
+    path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/train.jsonl
+    sha256: 2957d28fd6e2476e4acaba49b52fda5983dc65aaad4e125130fe1b58fd68a283
+  stability_pairs:
+    path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/pairs.jsonl
+    sha256: db6f70d354d74df30c14847061f2487de4446d60ce03e6263f87ab1474b02aad
+  stability_eval:
+    path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/eval.jsonl
+    sha256: 3b6def494dc791ff3d4d46bde569485656d4ab0a1084dd7dc059e863f96d0ae7
+
+implementation:
+  engine_path: experiments/delta_v2/knowledge_stability_multisurface_lora.py
+  engine_sha256: 8531bec37067d7923aa3d12b9df27fdef16d6b7d46aaf05fbc6ea154b4b415d2
+
+objective:
+  objective_id: generative-sft-plus-paired-ranking-v1
+  recall_loss: teacher-forced-assistant-token-cross-entropy
+  boolean_generative_loss: mean-positive-and-negative-gold-cross-entropy
+  boolean_ranking_loss: truth-conditioned-logistic-plus-pair-separation
+  ranking_margin: 1.0
+  ranking_weight: 0.25
+
+unchanged:
+  initialization: fresh-base
+  base_revision: 2fc06364715b967f1860aea9cf38778875588b17
+  stability_share: 0.50
+  replay_pair_units: 90
+  replay_generative_units: 30
+  replay_recall_units: 15
+  replay_choice_units: 15
+  total_training_units: 240
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+  learning_rate: 0.0001
+  optimizer_steps: 60
+  warmup_steps: 6
+  gradient_accumulation_steps: 4
+  seed: 20260730
+
+optimization:
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.0001
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  deterministic_algorithms: required
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_adapter_write_authorized: true
+  stability_pre_gate_authorized: true
+  acquisition_margin_authorized_only_after_stability_pass: true
+  full_eval_authorized: false
+  verify_v2_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false
