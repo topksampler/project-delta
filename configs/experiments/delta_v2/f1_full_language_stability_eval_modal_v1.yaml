@@ -1,0 +1,60 @@
+schema: delta.knowledge_full_language_stability_eval_config.v1
+run_id: delta-v2-f1-full-language-stability-eval-modal-v1
+experiment_id: delta_v2
+condition_id: f1_full_language_stability_eval
+task: eval
+
+protocol:
+  protocol_id: delta-v2-knowledge-full-language-stability-eval-v1
+  path: experiments/delta_v2/knowledge_full_language_stability_eval_protocol.yaml
+  sha256: bb31c811eb47a83d4678a1460902892049be957352298b4a88393812a319cd2a
+
+model:
+  kind: full_language_checkpoint
+  run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1
+  path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/model
+  sha256: 0037e2e25837c0ea7e36766f68c487b80853b6051c0ae382b399a59701e2171a
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  attention_implementation: eager
+  deterministic_algorithms: true
+
+inputs:
+  run_artifacts:
+    - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/run_receipt.json, sha256: d2de9cf7eeafac0ba54fad077dcaa8a8cb16422e4d98450d447bdeea17f263c1}
+    - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/train_metrics.json, sha256: f53ed0cfe52aae73411bbb2b33a9789bc936f413f1e872c4e07a84d9381cfeaa}
+    - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/model/model.safetensors, sha256: 0037e2e25837c0ea7e36766f68c487b80853b6051c0ae382b399a59701e2171a}
+    - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/model/config.json, sha256: 664817c67d9b8e64c7a75d98c2a21be8325bee43fab70d0dfe7ec6a141a98412}
+    - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/model/generation_config.json, sha256: 4a4505ef94dbb317b8c508ff53777cb0dfed044027864a1c05822c07217251ef}
+    - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/model/processor_config.json, sha256: d89ef49ce9cd37fbf510158e13c1ef063d9286411c1ec9049932dbe0487143b1}
+    - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/model/tokenizer_config.json, sha256: 5f7aa0d810000c4a0940b35c8f16e56c3439260fccc13a321826ebc3ccf2501f}
+    - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/model/tokenizer.json, sha256: 06b9509352d2af50381ab2247e083b80d32d5c0aba91c272ca9ff729b6a0e523}
+    - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/model/chat_template.jinja, sha256: 273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80}
+
+eval:
+  module: experiments.delta_v2.run_knowledge_full_language_stability_eval
+  path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/eval.jsonl
+  sha256: 3b6def494dc791ff3d4d46bde569485656d4ab0a1084dd7dc059e863f96d0ae7
+
+output:
+  dir: runs/delta-v2-f1-full-language-stability-eval-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: A10G
+  timeout_seconds: 3600
