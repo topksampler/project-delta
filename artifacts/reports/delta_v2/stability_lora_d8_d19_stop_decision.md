@@ -160,3 +160,77 @@ next architecture:
   response objectives before any more training;
 - weak results across d13, d18, and d19: close this 0.8B LoRA branch and move
   to a separately contracted capacity/mechanism study.
+
+## Token-local diagnostic result
+
+The three conditions ran concurrently as d20. Each scored the same 15 held-out
+choice prompts, made zero model updates, and cost less than USD 0.02.
+
+| checkpoint | forced letter correct | complete candidate correct | greedy first token is A-D | gold letter then terminates | diagnosis |
+|---|---:|---:|---:|---:|---|
+| d13 | 9/15 | 9/15 | 15/15 | 15/15 | content and termination signals |
+| d18 | 10/15 | 11/15 | 15/15 | 1/15 | content signal; termination defect |
+| d19 | 9/15 | 10/15 | 8/15 | 15/15 | content and termination signals; first-token defect |
+
+D13 evidence:
+
+- run: `delta-v2-d20-choice-token-diagnostic-d13-modal-v1`
+- receipt SHA-256:
+  `42425da6bb534b510824d7460d6ed6e94551b4e4be4acd0ce688f8c41669c5dd`
+- metrics SHA-256:
+  `3171dfddba9563574cbcd7131f8c12cda40e38c247ede6e1e30c900bd8f2e9cb`
+- samples SHA-256:
+  `8f7b93b84be6122da31cf984632fddc3a8b7bf0d2709d7e92f88aa63b5e5e2f3`
+
+D18 evidence:
+
+- run: `delta-v2-d20-choice-token-diagnostic-d18-modal-v1`
+- receipt SHA-256:
+  `15fb095a8f3ab49278edb27234b92691535faeb76d552fcfc822736d0d6b27ce`
+- metrics SHA-256:
+  `e0ad3c9f6ba3be6310a7d3ddc3acaa0b0068078d8abed6b6861306fe235da587`
+- samples SHA-256:
+  `005228703bdb062be84ef792c4bd6a397d84448d758c980788e5351b6140be5d`
+
+D19 evidence:
+
+- run: `delta-v2-d20-choice-token-diagnostic-d19-modal-v1`
+- receipt SHA-256:
+  `cff4b3097116103f6bd058a6588982c71183d3ec90004f4c99d628954f84ff97`
+- metrics SHA-256:
+  `d1772afb6435d1d4c98b4bbba260090b3361f9324ed19c6f5e1fc74ebdbba112`
+- samples SHA-256:
+  `50c080da054dd17e1dfe741b4a3829c5615f8f3fdc817199d0ccc985174349bc`
+
+The diagnostic rejects the stronger claim that the adapters contain no
+choice-relevant knowledge. D18 selects the correct answer letter on 10/15
+prompts when the decision is isolated, compared with only 1/15 exact generated
+answers. Its mean correct-letter margin is positive at 1.142 logits, while its
+mean termination margin is negative at -2.767 logits. The generated failure is
+therefore dominated by a local stop-policy defect.
+
+D19 exposes the complementary defect. Given a forced A-D decision, it is
+correct on 9/15 and strongly terminates after the gold letter. In unconstrained
+generation, however, only 8/15 highest-probability first tokens are letters.
+The model often starts prose before it reaches the otherwise viable choice
+decision.
+
+## Revised branch decision
+
+The current d8-d19 recipe lineage remains stopped. The broader 0.8B LoRA
+mechanism study remains open because d20 found real, separable content signal.
+
+The next weight-changing candidate must:
+
+1. remove whole-sequence verbose-negative ranking;
+2. optimize the gold A-D token against the full vocabulary at the first answer
+   position;
+3. optimize the chat-termination token against the full vocabulary immediately
+   after the gold letter;
+4. keep Boolean truth-conditioned ranking and replay unchanged;
+5. retain exact-contract recall as a separately reported surface;
+6. use the unchanged held-out stability pre-gate before any acquisition or
+   full evaluation.
+
+This is a new objective contract, not another weight or rank interpolation.
+QLoRA, full-weight training, and RL remain unauthorized.
