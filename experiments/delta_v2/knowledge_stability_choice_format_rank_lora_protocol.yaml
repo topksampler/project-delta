@@ -1,0 +1,106 @@
+schema: delta.knowledge_stability_choice_format_rank_lora_protocol.v1
+protocol_id: delta-v2-knowledge-stability-choice-format-rank-lora-v1
+experiment_id: delta_v2
+condition_id: d17_stability_choice_format_rank_sft_control
+state: preregistered-for-training
+
+decision_trigger:
+  d14_stability_receipt_sha256: b68900cebb30cd4f7b89a3fff56e380e4a5bb7cf6b2674c3788120d19bf0921f
+  d14_stability_metrics_sha256: 57fafe49540bd8e40216dab8ab0c4f8b423bd9ceef079324a75827a8f5781b71
+  d15_stability_receipt_sha256: 0c44a3fb9ecc5d345eee2b78616da28577d0ec0d77ca3d19eca4623c58039ffa
+  d15_stability_metrics_sha256: 0af5bf1a76fcb5957b2682d42b16871266ea9f49bc40a4d80e4f7d903e950a00
+  observed:
+    d14_choice_parseable: 8/15
+    d14_boolean_false: 13/15
+    d15_choice_parseable: 0/15
+    d15_boolean_false: 15/15
+    d15_choice_failure: verbose-the-correct-answer-prefix
+  decision: test-explicit-format-ranking-in-parallel-format-control-batch
+
+only_intervention_factor:
+  parent: d15_stability_choice_doubled_sft_control
+  factor: choice-format-ranking-loss
+  parent_value: absent
+  candidate_value:
+    negative: verbose-the-correct-answer-prefix
+    mean-token-log-probability-margin: 1.0
+    weight: 1.0
+
+data:
+  acquisition_train:
+    path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+    sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  acquisition_pairs:
+    path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+    sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+  acquisition_dev:
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+    sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+  stability_train:
+    path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/train.jsonl
+    sha256: 2957d28fd6e2476e4acaba49b52fda5983dc65aaad4e125130fe1b58fd68a283
+  stability_pairs:
+    path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/pairs.jsonl
+    sha256: db6f70d354d74df30c14847061f2487de4446d60ce03e6263f87ab1474b02aad
+  stability_eval:
+    path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/eval.jsonl
+    sha256: 3b6def494dc791ff3d4d46bde569485656d4ab0a1084dd7dc059e863f96d0ae7
+
+implementation:
+  engine_path: experiments/delta_v2/knowledge_stability_multisurface_choice_control_lora.py
+  engine_sha256: a2655122ddd7cab40bcdde7e316d05fb06c280aa726ef7ac6205c93c254c9ad2
+
+objective:
+  recall_loss: teacher-forced-assistant-token-cross-entropy
+  boolean_generative_loss: mean-positive-and-negative-gold-cross-entropy
+  boolean_ranking_loss: truth-conditioned-logistic-plus-pair-separation
+  ranking_margin: 1.0
+  ranking_weight: 0.50
+  choice_format_margin: 1.0
+  objective_id: generative-sft-plus-paired-ranking-choice-format-v1
+  choice_loss_weight: 1.0
+  choice_format_ranking_weight: 1.0
+
+unchanged:
+  initialization: fresh-base
+  base_revision: 2fc06364715b967f1860aea9cf38778875588b17
+  stability_share: 0.50
+  replay_pair_units: 90
+  replay_generative_units: 30
+  replay_recall_units: 0
+  replay_choice_units: 30
+  total_training_units: 240
+  lora_rank: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+  learning_rate: 0.0001
+  optimizer_steps: 60
+  warmup_steps: 6
+  gradient_accumulation_steps: 4
+  seed: 20260730
+
+optimization:
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.0001
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  deterministic_algorithms: required
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_adapter_write_authorized: true
+  stability_pre_gate_authorized: true
+  acquisition_margin_authorized_only_after_stability_pass: true
+  full_eval_authorized: false
+  verify_v2_authorized: false
+  qlora_authorized: false
+  full_weight_authorized: false
+  reinforcement_authorized: false
+  promotion_authorized: false
