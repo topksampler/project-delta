@@ -36,6 +36,12 @@ runtime:
 
 inputs:
   run_artifacts:
+    - {run_id: delta-v2-d20-choice-token-diagnostic-d13-modal-v1, path: runs/delta-v2-d20-choice-token-diagnostic-d13-modal-v1/run_receipt.json, sha256: 42425da6bb534b510824d7460d6ed6e94551b4e4be4acd0ce688f8c41669c5dd}
+    - {run_id: delta-v2-d20-choice-token-diagnostic-d13-modal-v1, path: runs/delta-v2-d20-choice-token-diagnostic-d13-modal-v1/metrics.json, sha256: 3171dfddba9563574cbcd7131f8c12cda40e38c247ede6e1e30c900bd8f2e9cb}
+    - {run_id: delta-v2-d20-choice-token-diagnostic-d18-modal-v1, path: runs/delta-v2-d20-choice-token-diagnostic-d18-modal-v1/run_receipt.json, sha256: 15fb095a8f3ab49278edb27234b92691535faeb76d552fcfc822736d0d6b27ce}
+    - {run_id: delta-v2-d20-choice-token-diagnostic-d18-modal-v1, path: runs/delta-v2-d20-choice-token-diagnostic-d18-modal-v1/metrics.json, sha256: e0ad3c9f6ba3be6310a7d3ddc3acaa0b0068078d8abed6b6861306fe235da587}
+    - {run_id: delta-v2-d20-choice-token-diagnostic-d19-modal-v1, path: runs/delta-v2-d20-choice-token-diagnostic-d19-modal-v1/run_receipt.json, sha256: cff4b3097116103f6bd058a6588982c71183d3ec90004f4c99d628954f84ff97}
+    - {run_id: delta-v2-d20-choice-token-diagnostic-d19-modal-v1, path: runs/delta-v2-d20-choice-token-diagnostic-d19-modal-v1/metrics.json, sha256: d1772afb6435d1d4c98b4bbba260090b3361f9324ed19c6f5e1fc74ebdbba112}
     - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/run_receipt.json, sha256: d2de9cf7eeafac0ba54fad077dcaa8a8cb16422e4d98450d447bdeea17f263c1}
     - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/train_metrics.json, sha256: f53ed0cfe52aae73411bbb2b33a9789bc936f413f1e872c4e07a84d9381cfeaa}
     - {run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1, path: runs/delta-v2-f1-full-language-sft-qwen35-08b-modal-v1/model/model.safetensors, sha256: 0037e2e25837c0ea7e36766f68c487b80853b6051c0ae382b399a59701e2171a}
