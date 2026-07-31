@@ -1,0 +1,68 @@
+schema: delta.knowledge_full_language_train_surface_protocol.v1
+protocol_id: delta-v2-knowledge-full-language-train-surface-v1
+experiment_id: delta_v2
+condition_id: f2_full_language_train_surface_diagnostic
+state: preregistered-for-diagnostic
+
+decision_trigger:
+  training_run_id: delta-v2-f1-full-language-sft-qwen35-08b-modal-v1
+  training_receipt_sha256: d2de9cf7eeafac0ba54fad077dcaa8a8cb16422e4d98450d447bdeea17f263c1
+  training_metrics_sha256: f53ed0cfe52aae73411bbb2b33a9789bc936f413f1e872c4e07a84d9381cfeaa
+  checkpoint_sha256: 0037e2e25837c0ea7e36766f68c487b80853b6051c0ae382b399a59701e2171a
+  stability_eval_run_id: delta-v2-f1-full-language-stability-eval-modal-v1
+  stability_metrics_sha256: cfb54dbb3f7010c5ca6ab4be55142a27deef31e8df2324a6e7a64a0512f25d69
+  stability_samples_sha256: 212e5fefeeabba78398306447ec6b92639ee5c5c836212da275ce752a3370f13
+  observed_stability:
+    choice: 11/15
+    boolean_true: 13/15
+    boolean_false: 10/15
+    recall: 0/15
+    gate: fail
+
+surface:
+  authority: exact-rows-referenced-by-frozen-training-schedule
+  schedule_sha256: 7bfb23a53e2c1f58c9cb9aa5f5a18dbeea1ea66ef1ef84204e43f968a4da6427
+  source_claims: 36
+  distinct_rows: 282
+  row_counts:
+    exact_recall: 36
+    verify_true: 123
+    verify_false: 123
+  prompt_source: messages[0]
+  gold_source: messages[1]
+  mutation: forbidden
+
+generation:
+  method: greedy
+  do_sample: false
+  max_new_tokens: 256
+  repeats: 2
+  seed: 20260730
+  repeat_invariant: byte-identical-raw-continuation
+
+scoring:
+  authority: frozen-training-row-assistant-answer
+  method: exact-stripped-string
+  repair: forbidden
+  pooled_overall_score: forbidden
+
+diagnostic_gates:
+  exact_recall_accuracy_minimum: 0.80
+  verify_true_accuracy_minimum: 0.95
+  verify_false_accuracy_minimum: 0.95
+  all_required_for_training_surface_fit: true
+
+interpretation:
+  if_training_surface_fails: optimization-or-surface-fit-failure
+  if_training_surface_passes_and_stability_fails: heldout-transfer-or-calibration-failure
+  more_same_training_authorized: false
+  result: diagnostic-only
+  promotion_authorized: false
+
+execution_boundary:
+  modal_diagnostic_authorized: true
+  model_updates: 0
+  checkpoint_mutation: forbidden
+  acquisition_margin_authorized: false
+  full_eval_authorized: false
+  promotion_authorized: false
