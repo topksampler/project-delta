@@ -1,16 +1,21 @@
-# delta_v2 ADAPT handoff
+# delta_v2 ADAPT durable handoff
 
-Date: 2026-07-30
+Date: 2026-07-31
 
 Repository: `/Users/lalithnarayanc/lalith-ai-lab`
 
-Branch: `main`
+Current Codex worktree:
+`/Users/lalithnarayanc/.codex/worktrees/fbf4/lalith-ai-lab`
 
-Latest experiment commit at handoff: `da21aea`
+Remote branch: `origin/main`
+
+Evidence HEAD before this handoff: `68e2c75`
+
+Pause state: no Modal or Lambda job is running. No candidate is promoted.
 
 ## Start here
 
-Read completely before acting:
+Read this handoff completely, then read these files completely before acting:
 
 1. `AGENTS.md`
 2. `docs/project-delta.md`
@@ -19,11 +24,16 @@ Read completely before acting:
 5. `docs/experiments/delta_v2.md`
 6. `experiments/delta_v2/README.md`
 7. `experiments/delta_v2/DATA_MODEL.md`
-8. this handoff
+8. `artifacts/reports/delta_v2/full_language_sft_oracle_modal_v1.md`
+9. `artifacts/reports/delta_v2/stability_lora_d8_d19_stop_decision.md`
 
-Then inspect `git status`.
+Then inspect `git status` before changing anything. Report the exact loop
+position and explain the two-axis ADAPT design in plain language before
+proposing work.
 
-Preserve the existing user-owned uncommitted documentation. At handoff it is:
+## Preserve user-owned work
+
+At pause, these documentation changes belong to the user:
 
 ```text
  M docs/delta-roadmap.md
@@ -36,222 +46,300 @@ Preserve the existing user-owned uncommitted documentation. At handoff it is:
 ?? experiments/delta_v2/README.md
 ```
 
-Do not discard, overwrite, stage, commit, or copy these files without first
-reviewing their current contents and agreeing on any overlap. Keep blogs out of
-the work. Do not touch or copy the frozen `e1_vllm` harness. Do not push.
+Do not discard, overwrite, stage, commit, or mechanically copy these files.
+Review their current contents before any overlapping documentation change.
 
-## Loop position
+Do not touch the frozen `e1_vllm` experiment, blogs, or unrelated work. Do not
+launch compute or push merely because this handoff describes a next step; wait
+for the returning user's instruction.
+
+## Exact loop position
 
 ```text
-SENSE implemented
-→ BUILD implemented
-→ DECIDE partial
-→ ADAPT partial and active
-→ VERIFY implemented per candidate
-→ MEMORY implemented per candidate
+SENSE implemented for the delta_v2 vertical slice
+→ BUILD implemented for the frozen source/eval slice
+→ DECIDE active
+→ rejected ADAPT CandidateStates preserved
+→ candidate VERIFY complete
+→ rollback retained the pinned base
 ```
 
-SENSE and BUILD are complete for this vertical slice, not for the full DELTA
-program. The source pipeline has exact snapshots, a complete file inventory,
-preregistered fact families, independently extracted facts, verified features,
-executable behavior probes, split facts/features, and frozen evaluation
-environments.
+DELTA is at `DECIDE`, before a new `InterventionPlan`. The full-language F1
+candidate completed ADAPT and failed VERIFY. Its exact training-surface
+diagnostic also failed. Acquisition-margin, full frozen evaluation, promotion,
+and active-pointer mutation were therefore blocked.
 
-No candidate model has been promoted. The pinned base model remains the active
-state.
-
-## Completed no-weight controls
-
-The first no-training ADAPT matrix is recorded in
-`artifacts/reports/delta_v2/adapt_no_training_matrix.md`.
-
-- c0: frozen base
-- c1: task calibration
-- c2: oracle source context
-- c3: source comparison
-
-These are diagnostic context conditions, not a production RAG system.
-Production RAG remains unimplemented.
-
-## Knowledge adaptation bank
-
-Frozen environment: `delta-v2-vllm-knowledge-adaptation-v1`
-
-- 21 verified v0.26-added facts used for same-claim acquisition
-- 21 source-disjoint stable facts used for retention
-- one source-disjoint verified feature behavior
-- 63 immutable SFT rows: 21 recall, 21 verified true, 21 deterministic false
-- 169 frozen evaluation probes, each run twice
-- deterministic gold and exact scorers own the verdict
-- recall is advisory
-- no pooled overall score
-- no held-out-fact generalization claim
-
-Base model:
+The active model remains the pinned base:
 
 - repository: `Qwen/Qwen3.5-0.8B`
 - revision: `2fc06364715b967f1860aea9cf38778875588b17`
 
-## LoRA results
+SENSE and BUILD are implemented for this research slice, not for the entire
+DELTA program. No closed production loop should be claimed.
 
-### c5 — balanced 1:1
+## ADAPT architecture now frozen in the canonical contract
 
-Training run:
-`delta-v2-c5-knowledge-lora-qwen35-08b-modal-v2`
-
-Adapter SHA-256:
-`83fb04ae52502432df6b17d2aaa12cfeb12f457df6a77c83f28fed433d9966fa`
-
-Frozen evaluation:
-
-- acquisition choice: 10/21
-- acquisition true: 0/21
-- acquisition false: 21/21
-- acquisition recall: 10/21
-- retention choice: 7/21
-- retention true: 1/21
-- retention false: 21/21
-- retention recall: 3/21
-- feature: 0/1
-
-The candidate failed its gates. Exact training-surface replay then showed:
-
-- verified true: 0/21
-- deterministic false: 21/21
-- recall: 9/21
-
-c5 learned an always-`no` policy rather than the truth-conditioned distinction.
-
-### c6 — true-weighted 4:1
-
-Training run:
-`delta-v2-c6-knowledge-lora-true-weighted-qwen35-08b-modal-v1`
-
-Adapter SHA-256:
-`8dae0e5cf7692542efc34f4fc836b1c96279bae680747edc368f646fdf938e36`
-
-The deterministic virtual sampler consumed:
-
-- 163 verified-true examples
-- 37 deterministic-false examples
-- 40 recall examples
-
-Its conditional training-surface gate showed:
-
-- verified true: 21/21
-- deterministic false: 0/21
-- recall: 8/21
-
-c6 learned an always-`yes` policy. The gate blocked the full 169-item
-evaluation. c5 and c6 bracket the answer-prior boundary between 1:1 and 4:1.
-
-The next minimal LoRA candidate is fresh-base c7 at a 2:1 true:false sampler
-ratio, with every other parameter, source row, and verification gate unchanged.
-c7 has not been implemented or run.
-
-## New ADAPT architecture requested by the user
-
-The user wants ADAPT to explicitly contain:
-
-1. LoRA
-2. QLoRA
-3. full-weight fine-tuning
-4. verifier-grounded reinforcement learning
-
-RAG remains a no-weight context control. The research goal is persistent model
-weight change as the environment changes, not merely changing context.
-
-The rigorous design has two axes:
+`docs/project-delta.md` owns the DELTA invariant and module contracts. It now
+defines no-weight controls separately from persistent weight adaptation and
+organizes weight-changing ADAPT along two independent axes:
 
 | learning objective | adapter weights | full model weights |
 |---|---|---|
-| supervised | LoRA / QLoRA | full SFT or continued training |
-| reinforcement | adapter-policy RL for harness validation | full-policy RL |
+| supervised | LoRA; QLoRA with a quantized frozen base | full SFT or continued training |
+| verifier-grounded reinforcement | adapter-policy RL for reward-harness validation | full-policy RL after reward-harness audit |
 
-The canonical `docs/project-delta.md` contract currently says context, RAG,
-LoRA, or later post-training. It has not yet been amended to encode this
-two-axis ADAPT design. Update the canonical contract once, then keep detailed
-condition matrices in the `delta_v2` charter; do not duplicate ownership in the
-roadmap or harness README.
+Plain language:
 
-## Intended RL contract
+- the first axis is **how the model learns**: supervised examples or verified
+  reward;
+- the second axis is **how much of the model may change**: a small adapter or
+  the full language model;
+- RAG and context injection are controls that change what the model can read,
+  not its weights;
+- QLoRA is an adapter method with a quantized frozen base. It is not a presumed
+  quality improvement over LoRA;
+- verifier-grounded RL remains ineligible until its environment, deterministic
+  rewards, anti-hacking tests, stability controls, and rollback gates are
+  separately frozen.
 
-RL means weight-changing, verifier-grounded post-training:
+The research goal remains persistent weight adaptation as versioned sources
+change. RAG is a necessary no-weight comparator, not the target mechanism.
+
+## What has been completed
+
+### No-weight controls
+
+The c0-c3 matrix is recorded in
+`artifacts/reports/delta_v2/adapt_no_training_matrix.md`:
+
+- c0: frozen base;
+- c1: task calibration;
+- c2: oracle source context;
+- c3: source comparison.
+
+These are diagnostic controls, not a production RAG system.
+
+### Supervised LoRA study
+
+The original c5/c7/c6 true:false ratio sweep bracketed a response-prior
+boundary rather than finding truth-conditioned learning:
+
+- c5, 1:1, learned an always-`no` tendency;
+- c7, 2:1, learned an always-`yes` tendency;
+- c6, 4:1, strengthened the always-`yes` tendency.
+
+Repaired source-grounded negative data later showed that LoRA can learn real
+truth-conditioned and choice signal, but the candidates still failed the
+unchanged held-out stability/false-rejection gates. The d8-d19 multisurface
+recipe lineage was stopped rather than scaled further.
+
+The zero-update d20 token-local diagnostic rejected the claim that LoRA is
+useless. Representative adapters contained choice-relevant content signal, but
+the implemented objectives coupled content, first-token behavior, and
+termination behavior incorrectly. See
+`artifacts/reports/delta_v2/stability_lora_d8_d19_stop_decision.md`.
+
+Do not restart d8-d19, increase its steps/rank, or launch QLoRA as a quality
+fix. Those are closed continuations of the rejected recipe.
+
+### Full-language supervised feasibility oracle
+
+The user explicitly chose to move down the mechanism-complexity ladder and run
+plain full-language SFT before adding QLoRA or RL.
+
+Training run:
+`delta-v2-f1-full-language-sft-qwen35-08b-modal-v1`
+
+- fresh pinned base;
+- explicit PyTorch training loop, not `SFTTrainer`;
+- plain assistant-token cross-entropy;
+- all language-model and LM-head weights trainable; vision frozen;
+- 752,393,024 / 852,985,920 parameters trainable (88.21%);
+- 60 optimizer steps;
+- 240 schedule units: 120 acquisition and 120 replay;
+- 180 Boolean-pair units and 60 recall units;
+- initial/final dev loss: 2.394504 / 0.292759;
+- H100 compute: 217.61 seconds;
+- estimated dispatch cost: USD 0.365;
+- checkpoint SHA-256:
+  `0037e2e25837c0ea7e36766f68c487b80853b6051c0ae382b399a59701e2171a`;
+- training metrics SHA-256:
+  `f53ed0cfe52aae73411bbb2b33a9789bc936f413f1e872c4e07a84d9381cfeaa`;
+- training receipt SHA-256:
+  `d2de9cf7eeafac0ba54fad077dcaa8a8cb16422e4d98450d447bdeea17f263c1`.
+
+The full checkpoint is preserved in immutable B2 run storage. It is a rejected
+candidate, not an active or promoted model.
+
+## VERIFY result
+
+Held-out stability run:
+`delta-v2-f1-full-language-stability-eval-modal-v1`
+
+The frozen bank contains 15 source claims and four same-claim/new-wording probe
+surfaces, with two deterministic repeats per probe. Exact prompt overlap with
+training is zero.
+
+| held-out cell | pinned base | full-language candidate | required | verdict |
+|---|---:|---:|---:|---|
+| choice correct | 0/15 | 11/15 | diagnostic | improved |
+| choice parseable | 0/15 | 15/15 | at least 14/15 | pass |
+| Boolean true | 1/15 | 13/15 | at least 12/15 | pass |
+| Boolean false | 14/15 | 10/15 | at least 14/15 | **fail** |
+| exact recall | 0/15 | 0/15 | advisory | no gain |
+
+Evidence:
+
+- metrics SHA-256:
+  `cfb54dbb3f7010c5ca6ab4be55142a27deef31e8df2324a6e7a64a0512f25d69`;
+- samples SHA-256:
+  `212e5fefeeabba78398306447ec6b92639ee5c5c836212da275ce752a3370f13`;
+- evaluation compute: 109.03 seconds on A10;
+- estimated dispatch cost: USD 0.048.
+
+Raw-sample inspection confirmed model errors, not parser or scorer errors. Five
+false statements received deterministic `yes` answers. The conjunctive
+false-rejection gate correctly blocked the candidate.
+
+## Exact training-surface diagnostic
+
+Run:
+`delta-v2-f2-full-language-train-surface-diagnostic-modal-v1`
+
+This zero-update run replayed all 282 distinct rows actually referenced by the
+training schedule, twice each. It did not mutate the checkpoint.
+
+| exact training cell | observed | minimum | verdict |
+|---|---:|---:|---|
+| exact recall | 20/36, 55.56% | 80% | **fail** |
+| verified true | 110/123, 89.43% | 95% | **fail** |
+| verified false | 119/123, 96.75% | 95% | pass |
+
+Evidence:
+
+- metrics SHA-256:
+  `b3aa9ba397115d777436b5fa12a987e9bc1a21f9a578c4514a0a738e459e1424`;
+- samples SHA-256:
+  `3a8d378ef4287926f105f43ab3b0db741cb64f5abced36bcf96415b4f9cdb4e7`;
+- receipt SHA-256:
+  `f4fa6ef8bce18aa57d3becc980391f5e97c0cc55783cf837a229ff5cdbc5f6d7`;
+- compute: 275.70 seconds on A10G;
+- estimated successful-run cost: USD 0.1015.
+
+The first F2 dispatch stopped in preflight before model loading because six
+frozen d20 evidence files were missing from the worker input declaration. It
+performed zero model invocations, cost about USD 0.013, and produced no
+scientific result. Commit `415cfe8` added the exact hashed evidence bindings;
+the retry above completed.
+
+## Honest conclusion
+
+Full fine-tuning is an update mechanism, not a complete solution. Unlocking 88%
+of the model produced real knowledge signal: held-out choice improved from
+0/15 to 11/15 and held-out true claims from 1/15 to 13/15. Persistent weight
+adaptation is therefore not disproven at this scale.
+
+The candidate nevertheless exposed two independent failures:
+
+1. it did not fully fit its own exact recall and verified-true training
+   surfaces;
+2. false rejection was 119/123 on familiar training wording but only 10/15 on
+   held-out wording, a severe wording-transfer/calibration gap.
+
+This is not evidence that LoRA is useless, and it is not evidence that full
+fine-tuning works. The current narrow prompt bank plus plain generative SFT is
+insufficient even when update capacity is broad. Merely repeating the identical
+schedule longer is not justified.
+
+The complete audit is
+`artifacts/reports/delta_v2/full_language_sft_oracle_modal_v1.md`.
+
+## Next controlled intervention when the user returns
+
+Stay at the simplest mechanism: fresh-base full-language supervised training.
+Change supervised coverage before adding adapter or RL complexity.
+
+The next candidate should be a new, separately preregistered condition that:
+
+1. uses the same 36 verified source claims and pinned base revision;
+2. trains each claim on multiple independently worded recall, choice, true,
+   and false surfaces;
+3. keeps true and false examples balanced per claim;
+4. reserves disjoint wording templates and corruption families for VERIFY;
+5. has zero exact prompt overlap between train and held-out banks;
+6. freezes an early-stop rule that first requires exact training-surface fit;
+7. retains the same held-out Boolean-false minimum of 90%;
+8. reports recall, choice, true, and false separately with no pooled score;
+9. starts from the pinned base, never from rejected F1;
+10. remains candidate-only with rollback to the pinned base.
+
+Recommended order:
+
+1. freeze and audit the multiwording data manifest without model calls;
+2. freeze the fresh-base full-language SFT contract and resource budget;
+3. freeze exact training-surface and held-out stability gates;
+4. commit only non-overlapping files;
+5. launch one training candidate;
+6. run the exact training-surface gate;
+7. only if it passes, run held-out stability VERIFY;
+8. only if stability passes, authorize acquisition-margin and full evaluation.
+
+Do not launch LoRA, QLoRA, full-model vision training, or verifier-grounded RL
+as part of this continuation. Each remains blocked until its own contract and
+safety/verification gates are frozen. Do not train on the held-out F1 stability
+prompts; that bank remains evidence, not remediation data.
+
+## Durable artifacts and platform notes
+
+All run evidence and model artifacts live under immutable B2
+`runs/<run_id>/` prefixes. Local `runs/` files are a disposable cache. The F1
+checkpoint is large and need not be downloaded locally; Modal can pull it
+directly from B2 with exact SHA-256 bindings.
+
+This Codex worktree has no `.env`. For authorized dispatch or B2 operations,
+the credential file used in this session was:
 
 ```text
-verified development task
-→ policy rollout: answer, source action, tool call, or executable test
-→ deterministic code / AST / documentation / behavior verifier
-→ reward vector
-→ policy optimization
-→ changed policy weights
-→ frozen VERIFY
+/Users/lalithnarayanc/lalith-ai-lab/.env
 ```
 
-Reward should keep correctness, provenance, honesty, regression, and cost
-separate. A language-model judge may review or help phrase candidates, but
-must not define gold truth or override deterministic verification.
+Export it before child processes:
 
-The unseen acceptance transition must never become the RL training
-environment. RL may interact with verified development truth. Acceptance
-remains sealed for VERIFY.
+```bash
+set -a
+source /Users/lalithnarayanc/lalith-ai-lab/.env
+set +a
+```
 
-Before any RL job, freeze:
+Keep the B2 endpoint trimmed. A missing export causes `s5cmd` to hang during
+credential/region discovery.
 
-- environment state and allowed actions
-- observation boundary
-- rollout schema
-- deterministic reward components and aggregation
-- reward-hacking tests
-- reference/KL or other stability policy
-- retention and false-accept controls
-- optimizer and update scope
-- checkpoint, rollback, and promotion gates
+The worktree is detached. Successful checkpoints were pushed explicitly with:
 
-Validate this environment first with adapter-policy RL. Full-policy RL is the
-intended weight-changing research lane after the reward harness survives that
-audit.
+```bash
+git push origin HEAD:main
+```
 
-## Recommended continuation
+Never stage the user-owned documentation listed above. Check the remote before
+pushing because another task may have advanced `main` during the pause.
 
-1. Amend the canonical ADAPT contract and standalone Mermaid flow so the four
-   requested lanes and two axes are explicit.
-2. Preserve c5 and c6 as negative results.
-3. Preregister and run c7 LoRA at 2:1.
-4. Apply the cheap exact training-surface gate before a full frozen evaluation.
-5. If c7 passes, run the unchanged 169-item evaluation.
-6. Freeze a LoRA-versus-QLoRA parity contract using identical source rows,
-   objective, adapter topology where possible, and evaluation.
-7. Add full-weight supervised fine-tuning as a separately budgeted candidate.
-8. Design and audit the verifier-grounded RL environment before launching RL.
-
-Do not silently expand to multiple new training variants. Change one
-preregistered factor at a time and preserve every failed run under its immutable
-run ID.
-
-## Verification and commits
-
-At handoff:
-
-- delta_v2 experiment tests: 211 passing
-- shared tests: 34 passing
-- `git diff --check`: passing
-
-Recent checkpoints:
+## Recent checkpoints
 
 ```text
-da21aea Record delta_v2 c6 weighted LoRA result
-efc5799 Preregister c6 training surface gate
-40b64aa Preregister delta_v2 true-weighted LoRA
-c00bc30 Record delta_v2 training surface diagnosis
-9bdb8d7 Preregister delta_v2 training surface diagnostic
-8406231 Record delta_v2 LoRA evaluation
-1cd946c Record delta_v2 LoRA training
-231ea97 Lock delta_v2 knowledge comparison gates
-f4e9a61 Preregister delta_v2 LoRA evaluation
-81ffe6a Amend delta_v2 LoRA launch
-bfa54b6 Fix generic Modal training routing
+68e2c75 Record full-language VERIFY result
+415cfe8 Declare diagnostic evidence inputs
+e379c1d Preregister full-language training-surface diagnostic
+398781c Preregister full-language stability VERIFY
+154dd00 Preregister DELTA full-language SFT oracle
+ca11bec Record DELTA token-local diagnostic result
+28adf9a Preregister DELTA token-local choice diagnostic
+42a15f1 Stop DELTA stability LoRA recipe lineage
 ```
 
-All run data and model artifacts are under immutable B2
-`runs/<run_id>/` prefixes. Local `runs/` content is a disposable cache.
+At pause:
+
+- no compute job is running;
+- no model is promoted;
+- the pinned base is the only active state;
+- F1 and all LoRA candidates are preserved negative evidence;
+- the next action is data/contract design, not an automatic compute launch.
