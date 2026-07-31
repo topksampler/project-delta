@@ -1,0 +1,60 @@
+schema: delta.knowledge_choice_token_diagnostic_config.v1
+run_id: delta-v2-d20-choice-token-diagnostic-d13-modal-v1
+experiment_id: delta_v2
+condition_id: d20_choice_token_d13
+task: eval
+
+protocol:
+  protocol_id: delta-v2-knowledge-choice-token-diagnostic-v1
+  path: experiments/delta_v2/knowledge_choice_token_diagnostic_protocol.yaml
+  sha256: b968bd38953dcb68de288c383c310c4931af409ec1b1032463478e67d96c3a20
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter:
+    kind: lora
+    run_id: delta-v2-d13-stability-choice-preserved-rank025-lora-qwen35-08b-modal-v1
+    path: runs/delta-v2-d13-stability-choice-preserved-rank025-lora-qwen35-08b-modal-v1/adapter
+    sha256: 31fbf1199f948c0fc7d6e9d16f867f3004e5f9cd180f3aa480a075a70d1c3107
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  attention_implementation: eager
+  deterministic_algorithms: true
+
+inputs:
+  run_artifacts:
+    - run_id: delta-v2-d13-stability-choice-preserved-rank025-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d13-stability-choice-preserved-rank025-lora-qwen35-08b-modal-v1/run_receipt.json
+      sha256: a9892d79fbbf1325d956ba73f567ed203e84075b184436b3d70fdfc5cba0729c
+    - run_id: delta-v2-d13-stability-choice-preserved-rank025-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d13-stability-choice-preserved-rank025-lora-qwen35-08b-modal-v1/train_metrics.json
+      sha256: ce5fe837554286cc84bd0f15037ebe8dbd8df28fedcd8a314f5b1db65aadcfc4
+
+eval:
+  module: experiments.delta_v2.run_knowledge_choice_token_diagnostic
+  path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/eval.jsonl
+  sha256: 3b6def494dc791ff3d4d46bde569485656d4ab0a1084dd7dc059e863f96d0ae7
+
+output:
+  dir: runs/delta-v2-d20-choice-token-diagnostic-d13-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: A10G
+  timeout_seconds: 3600
