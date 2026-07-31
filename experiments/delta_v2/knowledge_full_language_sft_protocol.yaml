@@ -1,0 +1,131 @@
+schema: delta.knowledge_full_language_sft_protocol.v1
+protocol_id: delta-v2-knowledge-full-language-sft-v1
+experiment_id: delta_v2
+condition_id: f1_full_language_plain_sft
+state: preregistered-for-training
+
+decision_trigger:
+  stop_decision_commit: ca11bec
+  d13_token_metrics_sha256: 3171dfddba9563574cbcd7131f8c12cda40e38c247ede6e1e30c900bd8f2e9cb
+  d18_token_metrics_sha256: e0ad3c9f6ba3be6310a7d3ddc3acaa0b0068078d8abed6b6861306fe235da587
+  d19_token_metrics_sha256: d1772afb6435d1d4c98b4bbba260090b3361f9324ed19c6f5e1fc74ebdbba112
+  observation: constrained LoRA recipes confound knowledge and response policy
+  decision: establish-full-weight-supervised-feasibility-before-adapters
+
+research_question:
+  question: can the pinned 0.8B model learn acquisition and replay surfaces when update capacity is not adapter-constrained
+  interpretation:
+    cannot_fit_training: data-objective-implementation-or-capacity-failure
+    fits_training_not_paraphrase: memorization-or-coverage-failure
+    learns_acquisition_forgets_stability: continual-learning-failure
+    passes_acquisition_and_stability: feasibility-established
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  initialization: fresh-base
+  update_scope:
+    trainable:
+      - model.language_model.*
+      - lm_head.*
+    frozen:
+      - vision modules
+      - multimodal projector modules
+    minimum_trainable_fraction: 0.70
+  quantization: none
+  adapter: none
+
+data:
+  acquisition_train:
+    path: data/experiments/delta_v2/knowledge_paired_v2/train.jsonl
+    sha256: 5d1fced8285c18684464a84c12d659a6f68fd50cacabe6c2ef598230a8be0db9
+  acquisition_pairs:
+    path: data/experiments/delta_v2/knowledge_paired_v2/pairs.jsonl
+    sha256: 0fc176cbb17e533591b7ac980285d3665a1cb062f26a091070bfbfebc9646819
+  acquisition_dev:
+    path: data/experiments/delta_v2/knowledge_adaptation_v1/dev.jsonl
+    sha256: dc8dc048de89c6306d1950acbda2a5e67ace7a712a174eb68d2d22ed3e68cff9
+  stability_train:
+    path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/train.jsonl
+    sha256: 2957d28fd6e2476e4acaba49b52fda5983dc65aaad4e125130fe1b58fd68a283
+  stability_pairs:
+    path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/pairs.jsonl
+    sha256: db6f70d354d74df30c14847061f2487de4446d60ce03e6263f87ab1474b02aad
+  stability_eval:
+    path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/eval.jsonl
+    sha256: 3b6def494dc791ff3d4d46bde569485656d4ab0a1084dd7dc059e863f96d0ae7
+
+schedule:
+  sha256: 7bfb23a53e2c1f58c9cb9aa5f5a18dbeea1ea66ef1ef84204e43f968a4da6427
+  total_units: 240
+  acquisition_units: 120
+  stability_units: 120
+  acquisition_boolean_pairs: 90
+  acquisition_recall: 30
+  stability_boolean_pairs: 90
+  stability_choice: 30
+
+objective:
+  objective_id: plain-assistant-token-sft-v1
+  recall_loss: assistant-token-cross-entropy
+  boolean_pair_loss: mean-positive-and-negative-assistant-token-cross-entropy
+  ranking_loss: none
+  preference_loss: none
+  format_negative_loss: none
+
+optimization:
+  optimizer: adamw
+  max_steps: 60
+  learning_rate: 0.00001
+  warmup_steps: 6
+  weight_decay: 0.0
+  micro_batch_size: 1
+  gradient_accumulation_steps: 4
+  max_sequence_length: 768
+  max_grad_norm: 1.0
+  dtype: bfloat16
+  seed: 20260730
+  deterministic_algorithms: required
+
+implementation:
+  trainer: explicit-pytorch-loop
+  trainer_library: none
+  engine_path: experiments/delta_v2/train_knowledge_full_language_sft.py
+  engine_sha256: a30d44b6dcd957fd4b61d01619908b1460c76a8e6f7bdc91c6415e28898901ed
+  deepspeed: false
+  fsdp: false
+  gradient_checkpointing: false
+
+safety:
+  nonfinite_loss: fail-fast
+  nonfinite_gradient: fail-fast
+  cuda_required: true
+  bfloat16_required: true
+  vision_trainable: false
+  candidate_isolation: required
+  rollback:
+    action: retain-pinned-base
+    repository: Qwen/Qwen3.5-0.8B
+    revision: 2fc06364715b967f1860aea9cf38778875588b17
+  crash_policy: no-candidate
+  automatic_promotion: forbidden
+
+verification_order:
+  - training-health-and-loss
+  - exact-training-surface-diagnostic
+  - held-out-stability-pre-gate
+  - acquisition-margin
+  - full-frozen-evaluation
+  - promotion-and-rollback-rehearsal
+
+execution_boundary:
+  modal_training_authorized: true
+  b2_checkpoint_write_authorized: true
+  training_surface_diagnostic_authorized_after_train: true
+  stability_pre_gate_authorized_after_train: true
+  acquisition_margin_authorized_only_after_stability_pass: true
+  full_eval_authorized: false
+  qlora_authorized: false
+  lora_authorized: false
+  reinforcement_learning_authorized: false
+  promotion_authorized: false
