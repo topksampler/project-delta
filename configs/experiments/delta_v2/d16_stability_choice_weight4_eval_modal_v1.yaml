@@ -1,0 +1,60 @@
+schema: delta.knowledge_stability_choice_weight4_eval_config.v1
+run_id: delta-v2-d16-stability-choice-weight4-eval-modal-v1
+experiment_id: delta_v2
+condition_id: d16_stability_choice_weight4_eval
+task: eval
+
+protocol:
+  protocol_id: delta-v2-knowledge-stability-choice-weight4-eval-v1
+  path: experiments/delta_v2/knowledge_stability_choice_weight4_eval_protocol.yaml
+  sha256: dea8a3e2efac4275f3fe2b4b557c78cff50818a8b45a49988a72ba1c6e145131
+
+model:
+  repository: Qwen/Qwen3.5-0.8B
+  revision: 2fc06364715b967f1860aea9cf38778875588b17
+  adapter:
+    kind: lora
+    run_id: delta-v2-d16-stability-choice-weight4-lora-qwen35-08b-modal-v1
+    path: runs/delta-v2-d16-stability-choice-weight4-lora-qwen35-08b-modal-v1/adapter
+    sha256: 25a02108399e0a990de1a868db959ae229728e9df25f7f1de6239597bec46dcf
+  quantization: none
+
+runtime:
+  profile: delta-v2-knowledge-modal-v1
+  python: 3.11.9
+  packages:
+    torch: 2.10.0
+    torchvision: 0.25.0
+    transformers: 5.14.1
+    peft: 0.19.0
+    pillow: 12.1.0
+    sentencepiece: 0.2.1
+    protobuf: 6.33.4
+    pyyaml: 6.0.3
+    safetensors: 0.8.0
+  device: cuda
+  dtype: bfloat16
+  attention_implementation: eager
+  deterministic_algorithms: true
+
+inputs:
+  run_artifacts:
+    - run_id: delta-v2-d16-stability-choice-weight4-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d16-stability-choice-weight4-lora-qwen35-08b-modal-v1/run_receipt.json
+      sha256: 68e507be0997f6e5ec465910fe95be2abbb9fc0fbb21f1dfc37551921176617f
+    - run_id: delta-v2-d16-stability-choice-weight4-lora-qwen35-08b-modal-v1
+      path: runs/delta-v2-d16-stability-choice-weight4-lora-qwen35-08b-modal-v1/train_metrics.json
+      sha256: ea59cad8df55789600b26c9ac72c12d89884ac5b311ce75af50eb0d1c19b85b5
+
+eval:
+  module: experiments.delta_v2.run_knowledge_stability_choice_weight4_eval
+  path: data/experiments/delta_v2/knowledge_stability_choice_preserved_v1/eval.jsonl
+  sha256: 3b6def494dc791ff3d4d46bde569485656d4ab0a1084dd7dc059e863f96d0ae7
+
+output:
+  dir: runs/delta-v2-d16-stability-choice-weight4-eval-modal-v1
+
+modal:
+  app_path: experiments/delta_v2/modal_knowledge_adapt_app.py
+  gpu: A10G
+  timeout_seconds: 3600
